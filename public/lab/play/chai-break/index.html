@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chai Break — the chai is getting cold</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,800;1,500&family=Work+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#F7EFDF;--tea:#B3541E;--tea-deep:#8C3A0F;--leaf:#4C6444;--ink:#33261C;--steam:#C9BBA6}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--cream);color:var(--ink);font-family:'Work Sans',system-ui,sans-serif;min-height:100vh;padding:30px 16px 70px;
+    background-image:radial-gradient(circle at 85% 12%, rgba(179,84,30,.08), transparent 40%)}
+  .wrap{max-width:560px;margin:0 auto;text-align:center}
+  .cup{font-size:3.4rem;line-height:1}
+  h1{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(2rem,7vw,2.9rem);margin-top:8px}
+  .tag{font-family:'Fraunces',serif;font-style:italic;color:var(--tea-deep);margin:6px 0 26px}
+  .card{background:#FFFDF7;border:2px solid var(--ink);border-radius:16px;padding:24px;box-shadow:5px 6px 0 rgba(51,38,28,.15);margin-bottom:16px;text-align:left}
+  label{display:block;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--tea-deep);font-weight:600;margin-bottom:8px}
+  .intervals{display:flex;gap:8px;flex-wrap:wrap}
+  .intv{padding:10px 16px;border-radius:999px;border:2px solid var(--ink);background:none;cursor:pointer;font-family:'Work Sans',sans-serif;font-weight:600;color:var(--ink)}
+  .intv.on{background:var(--tea);border-color:var(--tea);color:#fff}
+  .intv:focus-visible,.big:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
+  .timerFace{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(3rem,15vw,5rem);text-align:center;letter-spacing:.02em;margin:6px 0}
+  .phase{text-align:center;font-family:'Fraunces',serif;font-style:italic;font-size:1.05rem;color:var(--tea-deep);min-height:1.5em}
+  .big{display:block;width:100%;margin-top:16px;font-family:'Fraunces',serif;font-weight:800;font-size:1.15rem;background:var(--tea);color:#fff;border:2px solid var(--ink);border-radius:12px;padding:15px;cursor:pointer;box-shadow:0 4px 0 var(--ink)}
+  .big:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+  .big.leaf{background:var(--leaf)}
+  .assignment{display:none;text-align:center}
+  .assignment .task{font-family:'Fraunces',serif;font-weight:600;font-size:1.35rem;line-height:1.45;margin:10px 0 16px}
+  .row2{display:flex;gap:10px}
+  .row2 .big{margin-top:0}
+  .ghost{background:none;color:var(--ink);box-shadow:none;border-style:dashed}
+  .stats{display:flex;justify-content:space-around;text-align:center}
+  .stat .n{font-family:'Fraunces',serif;font-weight:800;font-size:1.9rem;color:var(--tea)}
+  .stat .l{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tea-deep)}
+  .guilt{font-style:italic;color:var(--tea-deep);font-size:.9rem;text-align:center;margin-top:12px;min-height:1.3em}
+  footer{margin-top:36px;font-size:.78rem;color:var(--tea-deep);font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="cup">☕</div>
+  <h1>Chai Break</h1>
+  <p class="tag">Work timers nag. This one judges.</p>
+
+  <div class="card">
+    <label>Work stretch</label>
+    <div class="intervals" id="intervals"></div>
+    <div class="timerFace" id="face">90:00</div>
+    <div class="phase" id="phase">The kettle is patient. For now.</div>
+    <button class="big" id="mainBtn">Start working</button>
+  </div>
+
+  <div class="card assignment" id="assign">
+    <label style="text-align:center">⏰ Break assignment</label>
+    <div class="task" id="task"></div>
+    <div class="row2">
+      <button class="big leaf" id="didIt">Did it ✓</button>
+      <button class="big ghost" id="skipIt">Skip (coward)</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="stats">
+      <div class="stat"><div class="n" id="streak">0</div><div class="l">streak</div></div>
+      <div class="stat"><div class="n" id="taken">0</div><div class="l">breaks taken</div></div>
+      <div class="stat"><div class="n" id="skipped">0</div><div class="l">skipped</div></div>
+    </div>
+    <div class="guilt" id="guilt"></div>
+  </div>
+
+  <footer>Doctors recommend breaks. We recommend theatrical ones.</footer>
+</div>
+
+<script>
+const TASKS = [
+  "Stand up. Look out a window. Judge one cloud.",
+  "Drink water like it's a personality trait. Whole glass.",
+  "Walk to the farthest wall and back. Nod at it respectfully.",
+  "Stretch your arms up and audibly say 'aahhh' like an uncle.",
+  "Blink slowly ten times. Your eyes have been screaming.",
+  "Go touch one (1) plant. Apologize if you forgot to water it.",
+  "Stare at the ceiling and think about the ocean for 30 seconds.",
+  "Roll your shoulders back five times. You are not a shrimp.",
+  "Make actual chai. Or at least stand near the kettle meaningfully.",
+  "Text one human something nice. Not a forward. Original content.",
+  "Do five squats. Nobody's watching. Probably.",
+  "Look at your phone's photos from one year ago. Feel something.",
+  "Open a window. Breathe air that hasn't been in the room all day.",
+  "Fix your posture. Now fix it again, it lasted four seconds.",
+  "Walk one lap of wherever you are, hands behind back, like an inspector.",
+  "Close your eyes and name five sounds you can hear.",
+  "Refill your water bottle. Yes, the one that's been empty since 11am.",
+  "Do the wrist stretches. The ones you saw once and ignored.",
+  "Step outside if you can. Report back to your desk with one weather fact.",
+  "Untense your jaw. You didn't know it was tensed. It was.",
+  "Massage your own shoulders for 20 seconds. Bill yourself later.",
+  "Find the oldest snack in your drawer. Assess. Do not necessarily eat.",
+  "Look at something 20 feet away for 20 seconds. Eye doctor's orders.",
+  "Stand in sunlight for a minute like a satisfied cat."
+];
+const GUILT = [
+  "", 
+  "Skipping breaks doesn't make the work better. It makes the tea sad.",
+  "Two skips. The kettle is writing you up.",
+  "Three skips. Your spine has filed a formal complaint.",
+  "At this point the chai is just for show, isn't it?"
+];
+const INTERVALS = [{m:25,l:"25 min"},{m:45,l:"45 min"},{m:60,l:"60 min"},{m:90,l:"90 min"},{m:.1,l:"6 sec (demo)"}];
+let workMin = 90, remaining = 90*60, running = false, timer = null;
+let stats = {streak:0, taken:0, skipped:0};
+
+const $ = id => document.getElementById(id);
+
+const iw = $("intervals");
+INTERVALS.forEach(iv=>{
+  const b = document.createElement("button");
+  b.className = "intv" + (iv.m===90 ? " on" : "");
+  b.textContent = iv.l;
+  b.addEventListener("click", ()=>{
+    workMin = iv.m; remaining = Math.round(iv.m*60);
+    document.querySelectorAll(".intv").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on"); stopTimer(); paint();
+    $("mainBtn").textContent = "Start working";
+    $("phase").textContent = "The kettle is patient. For now.";
+  });
+  iw.appendChild(b);
+});
+
+function paint(){
+  const m = String(Math.floor(remaining/60)).padStart(2,"0");
+  const s = String(Math.floor(remaining%60)).padStart(2,"0");
+  $("face").textContent = m + ":" + s;
+}
+function stopTimer(){ running=false; clearInterval(timer); }
+
+$("mainBtn").addEventListener("click", ()=>{
+  if(running){ stopTimer(); $("mainBtn").textContent="Resume"; $("phase").textContent="Paused. The chai understands."; return; }
+  running = true; $("mainBtn").textContent = "Pause";
+  $("phase").textContent = "Working. The kettle watches.";
+  timer = setInterval(()=>{
+    remaining--;
+    if(remaining <= 0){ stopTimer(); breakTime(); }
+    else if(remaining === 300){ $("phase").textContent = "Five minutes. The kettle stirs."; }
+    paint();
+  }, 1000);
+});
+
+function breakTime(){
+  try{ new AudioContext && ding(); }catch(e){}
+  $("phase").textContent = "THE CHAI IS GETTING COLD.";
+  $("task").textContent = TASKS[Math.floor(Math.random()*TASKS.length)];
+  $("assign").style.display = "block";
+  $("assign").scrollIntoView({behavior:"smooth"});
+  $("mainBtn").textContent = "Start working";
+}
+function ding(){
+  const c = new AudioContext();
+  [0,.18].forEach((d,i)=>{
+    const o=c.createOscillator(), g=c.createGain();
+    o.type="sine"; o.frequency.value = i? 1318 : 988;
+    o.connect(g); g.connect(c.destination);
+    const t=c.currentTime+d;
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.15,t+.02);
+    g.gain.exponentialRampToValueAtTime(.001,t+.5);
+    o.start(t); o.stop(t+.55);
+  });
+}
+async function loadStats(){
+  try{
+    const r = await window.storage.get("chai-stats");
+    stats = JSON.parse(r.value);
+  }catch(e){ /* first run or no storage */ }
+  paintStats();
+}
+async function saveStats(){
+  try{ await window.storage.set("chai-stats", JSON.stringify(stats)); }catch(e){}
+}
+function paintStats(){
+  $("streak").textContent = stats.streak;
+  $("taken").textContent = stats.taken;
+  $("skipped").textContent = stats.skipped;
+  $("guilt").textContent = GUILT[Math.min(stats.skippedRow||0, GUILT.length-1)];
+}
+function resetClock(){
+  remaining = Math.round(workMin*60); paint();
+  $("assign").style.display="none";
+  $("phase").textContent = "The kettle resets. So do you.";
+}
+$("didIt").addEventListener("click", ()=>{
+  stats.taken++; stats.streak++; stats.skippedRow=0;
+  paintStats(); saveStats(); resetClock();
+});
+$("skipIt").addEventListener("click", ()=>{
+  stats.skipped++; stats.streak=0; stats.skippedRow=(stats.skippedRow||0)+1;
+  paintStats(); saveStats(); resetClock();
+});
+
+paint(); loadStats();
+</script>
+</body>
+</html>

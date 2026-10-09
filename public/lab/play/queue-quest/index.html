@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Queue Quest — the game for the line you're standing in</title>
+<link href="https://fonts.googleapis.com/css2?family=Chango&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#25226B;--panel:#332F8A;--txt:#F5F3FF;--dim:#B9B4E8;--pop:#FFB703;--mint:#5EE6A8;--pink:#FF5D8F;--ink:#1A1850}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--txt);font-family:'Rubik',system-ui,sans-serif;min-height:100vh;padding:26px 14px 70px;user-select:none;
+    background-image:radial-gradient(circle at 15% 10%, rgba(255,183,3,.12), transparent 35%),radial-gradient(circle at 90% 80%, rgba(255,93,143,.10), transparent 40%)}
+  .wrap{max-width:480px;margin:0 auto;text-align:center}
+  h1{font-family:'Chango',cursive;font-size:clamp(1.9rem,8vw,2.8rem);color:var(--pop);text-shadow:0 3px 0 var(--ink);letter-spacing:.02em}
+  .tag{color:var(--dim);margin:8px 0 20px;font-size:.92rem}
+  .menu{display:grid;gap:12px}
+  .gameBtn{background:var(--panel);border:3px solid var(--ink);border-radius:16px;padding:16px;cursor:pointer;color:var(--txt);text-align:left;box-shadow:0 5px 0 var(--ink);font-family:'Rubik',sans-serif}
+  .gameBtn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+  .gameBtn:focus-visible{outline:3px solid var(--pop);outline-offset:2px}
+  .gameBtn .gt{font-weight:800;font-size:1.1rem}
+  .gameBtn .gd{font-size:.82rem;color:var(--dim);margin-top:3px}
+  .gameBtn .best{font-size:.75rem;color:var(--mint);margin-top:5px;font-weight:600}
+  .stage{display:none;background:var(--panel);border:3px solid var(--ink);border-radius:18px;padding:22px 16px;margin-top:6px;box-shadow:0 6px 0 var(--ink);min-height:340px}
+  .stage h2{font-family:'Chango',cursive;font-size:1.3rem;color:var(--pop)}
+  .stage .hint{color:var(--dim);font-size:.85rem;margin:6px 0 16px}
+  .bigScore{font-family:'Chango',cursive;font-size:2.2rem;color:var(--mint);min-height:1.2em}
+  .actionBtn{margin-top:14px;font-family:'Chango',cursive;font-size:1.15rem;background:var(--pop);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:14px 30px;cursor:pointer;box-shadow:0 5px 0 var(--ink)}
+  .actionBtn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+  .backBtn{display:block;margin:14px auto 0;background:none;border:none;color:var(--dim);cursor:pointer;font-size:.82rem;text-decoration:underline;font-family:'Rubik',sans-serif}
+  /* chai game */
+  .glass{width:90px;height:200px;border:4px solid var(--txt);border-top:none;border-radius:0 0 16px 16px;margin:10px auto;position:relative;overflow:hidden;background:rgba(255,255,255,.06)}
+  .chaiFill{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(180deg,#D89B5A,#B3541E);height:0%}
+  .goldZone{position:absolute;left:0;right:0;height:14%;bottom:66%;background:rgba(94,230,168,.3);border-top:2px dashed var(--mint);border-bottom:2px dashed var(--mint)}
+  /* token game */
+  .tokenShow{font-family:'Chango',cursive;font-size:2.6rem;letter-spacing:.15em;color:var(--pop);min-height:1.3em}
+  .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:14px auto 0}
+  .pad button{font-family:'Rubik',sans-serif;font-weight:800;font-size:1.2rem;padding:14px;border-radius:12px;border:3px solid var(--ink);background:var(--bg);color:var(--txt);cursor:pointer;box-shadow:0 3px 0 var(--ink)}
+  .pad button:active{transform:translateY(3px);box-shadow:none}
+  .entry{font-family:'Chango',cursive;font-size:1.6rem;letter-spacing:.2em;min-height:1.3em;color:var(--mint)}
+  /* stamp game */
+  .track{position:relative;height:64px;background:var(--bg);border:3px solid var(--ink);border-radius:12px;margin:16px 0;overflow:hidden}
+  .doc{position:absolute;top:8px;width:56px;height:44px;background:var(--txt);border-radius:6px;left:0}
+  .doc::after{content:"📄";font-size:1.4rem;display:block;text-align:center;line-height:44px}
+  .zone{position:absolute;top:0;bottom:0;width:70px;left:50%;transform:translateX(-50%);background:rgba(94,230,168,.25);border-left:2px dashed var(--mint);border-right:2px dashed var(--mint)}
+  .stamped{position:absolute;top:6px;font-size:1.6rem}
+  /* achievements */
+  .ach{margin-top:20px;text-align:left}
+  .ach h3{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;text-align:center}
+  .badge{display:flex;gap:10px;align-items:center;background:var(--panel);border:2px solid var(--ink);border-radius:12px;padding:9px 12px;margin-bottom:7px;font-size:.85rem;opacity:.35}
+  .badge.won{opacity:1;border-color:var(--pop)}
+  .badge .ic{font-size:1.3rem}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:var(--pop);color:var(--ink);font-weight:800;padding:12px 20px;border-radius:12px;border:3px solid var(--ink);transition:transform .3s ease;z-index:9}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  footer{color:var(--dim);font-size:.76rem;margin-top:30px;font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>QUEUE QUEST</h1>
+  <p class="tag">One thumb. Ninety seconds. The line moves when it moves.</p>
+
+  <div class="menu" id="menu"></div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="ach" id="achWrap">
+    <h3>Waiting-room honors</h3>
+    <div id="achList"></div>
+  </div>
+
+  <footer>Designed to be abandoned instantly when it's your turn. No hard feelings.</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+let data = {plays:0, best:{chai:0, token:0, stamp:0}, ach:{}};
+
+const ACH = [
+  {id:"first", ic:"🎟", nm:"Platform Ticket", d:"Play your first round"},
+  {id:"bank", ic:"🏦", nm:"Survived the Bank", d:"Play 5 rounds total"},
+  {id:"rto", ic:"🛵", nm:"RTO Veteran", d:"Play 15 rounds total"},
+  {id:"gold", ic:"🏛", nm:"Government Office Gold", d:"Play 40 rounds total"},
+  {id:"chai3", ic:"☕", nm:"Steady Hands", d:"Score 250+ in Perfect Chai"},
+  {id:"token7", ic:"🔢", nm:"Photographic-ish", d:"Recall a 7-digit token"},
+  {id:"stamp5", ic:"📄", nm:"Officially Approved", d:"5 perfect stamps in one round"}
+];
+
+async function load(){
+  try{ const r = await window.storage.get("qq-data"); data = JSON.parse(r.value); }catch(e){}
+  paintMenu(); paintAch();
+}
+async function save(){ try{ await window.storage.set("qq-data", JSON.stringify(data)); }catch(e){} }
+function toast(t){
+  const el = $("toast"); el.textContent = t; el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 2200);
+}
+function award(id){
+  if(data.ach[id]) return;
+  data.ach[id] = true; save(); paintAch();
+  const a = ACH.find(x=>x.id===id);
+  toast(a.ic + " " + a.nm + " unlocked!");
+}
+function bumpPlays(){
+  data.plays++;
+  award("first");
+  if(data.plays>=5) award("bank");
+  if(data.plays>=15) award("rto");
+  if(data.plays>=40) award("gold");
+  save(); 
+}
+function paintAch(){
+  const l = $("achList"); l.innerHTML = "";
+  ACH.forEach(a=>{
+    const d = document.createElement("div");
+    d.className = "badge" + (data.ach[a.id] ? " won" : "");
+    d.innerHTML = `<span class="ic">${a.ic}</span><span><b>${a.nm}</b><br><span style="color:var(--dim)">${a.d}</span></span>`;
+    l.appendChild(d);
+  });
+}
+
+const GAMES = [
+  {id:"chai", t:"☕ Perfect Chai", d:"Stop the pour in the golden zone. 3 cups.", run:runChai},
+  {id:"token", t:"🔢 Token Rush", d:"The counter flashes your token. Remember it.", run:runToken},
+  {id:"stamp", t:"📄 Stamp of Approval", d:"Stamp the file as it slides past. Bureaucracy!", run:runStamp}
+];
+function paintMenu(){
+  const m = $("menu"); m.innerHTML = "";
+  GAMES.forEach(g=>{
+    const b = document.createElement("button");
+    b.className = "gameBtn";
+    b.innerHTML = `<div class="gt">${g.t}</div><div class="gd">${g.d}</div><div class="best">Best: ${data.best[g.id]||0}</div>`;
+    b.addEventListener("click", ()=>{ $("menu").style.display="none"; $("stage").style.display="block"; g.run(); });
+    m.appendChild(b);
+  });
+}
+function backToMenu(){
+  $("stage").style.display="none"; $("menu").style.display="grid";
+  paintMenu(); window._cleanup && window._cleanup();
+}
+function stageHTML(h){ $("stage").innerHTML = h + '<button class="backBtn" id="back">← back to the line</button>'; $("back").addEventListener("click", backToMenu); }
+function setBest(g, s){ if(s > (data.best[g]||0)){ data.best[g]=s; toast("New best: "+s+"!"); } save(); }
+
+/* ---------- Perfect Chai ---------- */
+function runChai(){
+  let cup = 0, total = 0, raf = null, level = 0, dir = 1, speed = 1.1, active = false;
+  stageHTML(`
+    <h2>Perfect Chai</h2>
+    <p class="hint">Tap STOP when the chai hits the green band. Overfill = scalded uncle.</p>
+    <div class="glass"><div class="goldZone" id="zone"></div><div class="chaiFill" id="fill"></div></div>
+    <div class="bigScore" id="sc">Cup 1 of 3</div>
+    <button class="actionBtn" id="act">POUR</button>`);
+  const fill = $("fill"), sc = $("sc"), act = $("act");
+  function loop(){
+    level += dir * speed;
+    if(level>=100){ level=100; stop(); judge(); return; }
+    fill.style.height = level + "%";
+    raf = requestAnimationFrame(loop);
+  }
+  function stop(){ cancelAnimationFrame(raf); active=false; }
+  function judge(){
+    // gold zone: 66%–80%
+    const center = 73;
+    const dist = Math.abs(level - center);
+    let pts = Math.max(0, Math.round(100 - dist*9));
+    if(level>80) pts = Math.max(0, pts-30);
+    total += pts;
+    sc.textContent = (level>95 ? "OVERFLOW! " : "") + "+" + pts + " (total " + total + ")";
+    cup++;
+    if(cup>=3){
+      act.textContent = "DONE — " + total + " pts";
+      setBest("chai", total);
+      if(total>=250) award("chai3");
+      bumpPlays();
+      act.onclick = runChai;
+      act.textContent = "AGAIN (" + total + " pts)";
+    }else{
+      act.textContent = "NEXT CUP";
+      act.onclick = ()=>{ level=0; speed+=.5; sc.textContent = "Cup " + (cup+1) + " of 3"; start(); };
+    }
+  }
+  function start(){ active=true; act.textContent="STOP"; act.onclick = ()=>{ if(active){ stop(); judge(); } }; loop(); }
+  act.onclick = start;
+  window._cleanup = ()=>cancelAnimationFrame(raf);
+}
+
+/* ---------- Token Rush ---------- */
+function runToken(){
+  let digits = 4, entry = "", token = "", phase = "idle", score = 0;
+  stageHTML(`
+    <h2>Token Rush</h2>
+    <p class="hint">The board flashes your token number. Type it back. It gets longer.</p>
+    <div class="tokenShow" id="show">— — — —</div>
+    <div class="entry" id="entry"></div>
+    <div class="pad" id="pad"></div>
+    <button class="actionBtn" id="act">CALL MY NUMBER</button>`);
+  const show = $("show"), entryEl = $("entry"), act = $("act"), pad = $("pad");
+  [1,2,3,4,5,6,7,8,9,"⌫",0,"✓"].forEach(k=>{
+    const b = document.createElement("button"); b.textContent = k;
+    b.addEventListener("click", ()=>{
+      if(phase!=="entry") return;
+      if(k==="⌫") entry = entry.slice(0,-1);
+      else if(k==="✓") check();
+      else if(entry.length<digits) entry += k;
+      entryEl.textContent = entry.split("").join(" ");
+    });
+    pad.appendChild(b);
+  });
+  function newToken(){
+    token = Array.from({length:digits}, ()=>Math.floor(Math.random()*10)).join("");
+    phase = "show"; entry=""; entryEl.textContent="";
+    show.textContent = token.split("").join(" ");
+    act.textContent = "…memorize…";
+    setTimeout(()=>{
+      show.textContent = "NOW SERVING: ???";
+      phase = "entry"; act.textContent = "TYPE IT & HIT ✓";
+    }, 900 + digits*180);
+  }
+  function check(){
+    if(entry === token){
+      score++; setBest("token", Math.max(data.best.token||0, digits));
+      if(digits>=7) award("token7");
+      toast("Correct! Token " + token + " may proceed.");
+      digits++;
+      newToken();
+    }else{
+      show.textContent = "It was " + token.split("").join(" ");
+      phase="idle";
+      act.textContent = "WRONG WINDOW — RETRY (reached " + digits + " digits)";
+      setBest("token", digits-1 >= 4 ? digits : (data.best.token||0));
+      bumpPlays();
+      digits = 4;
+      act.onclick = newToken;
+    }
+  }
+  act.onclick = newToken;
+  window._cleanup = ()=>{};
+}
+
+/* ---------- Stamp of Approval ---------- */
+function runStamp(){
+  let x = -60, v = 2.2, raf=null, hits=0, perfect=0, files=0, running=false;
+  stageHTML(`
+    <h2>Stamp of Approval</h2>
+    <p class="hint">Tap STAMP when the file is in the green window. 8 files. Bureaucratic precision.</p>
+    <div class="track" id="track"><div class="zone"></div><div class="doc" id="doc"></div></div>
+    <div class="bigScore" id="sc">0 approved</div>
+    <button class="actionBtn" id="act">OPEN COUNTER</button>`);
+  const doc = $("doc"), sc = $("sc"), act = $("act"), track = $("track");
+  function loop(){
+    x += v;
+    const w = track.clientWidth;
+    if(x > w){ x = -60; files++; v += .35; if(files>=8) return end(); }
+    doc.style.left = x + "px";
+    raf = requestAnimationFrame(loop);
+  }
+  function stampNow(){
+    if(!running) return;
+    const w = track.clientWidth, center = w/2, docC = x+28;
+    const dist = Math.abs(docC-center);
+    if(dist < 38){
+      hits++; if(dist<14) perfect++;
+      sc.textContent = hits + " approved" + (dist<14 ? " · PERFECT ✦" : "");
+      const s = document.createElement("span"); s.className="stamped"; s.textContent="✅";
+      s.style.left = (x+14)+"px"; track.appendChild(s);
+      setTimeout(()=>s.remove(), 500);
+    }else{
+      sc.textContent = hits + " approved · you stamped the desk";
+    }
+    files++; x=-60; v+=.35;
+    if(files>=8) end();
+  }
+  function end(){
+    running=false; cancelAnimationFrame(raf);
+    const score = hits*10 + perfect*15;
+    sc.textContent = "Shift over: " + hits + "/8 approved, " + perfect + " perfect · " + score + " pts";
+    setBest("stamp", score);
+    if(perfect>=5) award("stamp5");
+    bumpPlays();
+    act.textContent = "NEXT SHIFT";
+    act.onclick = runStamp;
+  }
+  act.onclick = ()=>{ running=true; act.textContent="STAMP!"; act.onclick=stampNow; loop(); };
+  window._cleanup = ()=>cancelAnimationFrame(raf);
+}
+
+load();
+</script>
+</body>
+</html>

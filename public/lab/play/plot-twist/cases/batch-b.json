@@ -1,0 +1,695 @@
+[
+  {
+    "id": "batch-b-cat-patch",
+    "caseNumber": 15,
+    "title": "The Cat Patch",
+    "subtitle": "At nine sharp, six work computers grew whiskers. The company servers did not.",
+    "location": "Northstar Support Academy",
+    "incident": "Monday, 8:39–9:02 AM",
+    "difficulty": "Gentle",
+    "fileMark": "SOFTWARE / PRANK",
+    "brief": [
+      "At the start of a customer-service exam, every computer in Northstar's training room replaced the company logo with a cat and changed each HELP button to HISS. Public users and the rest of the office saw the normal website.",
+      "The code repository, deployment history, and company servers were untouched. Someone changed what six browsers displayed without changing the website itself."
+    ],
+    "question": "Who released the cat patch, and how did six computers change without a website deployment?",
+    "suspects": [
+      {
+        "id": "omar",
+        "name": "Omar Kaye",
+        "role": "Front-end developer",
+        "initials": "OK",
+        "statement": "It looks like my kind of joke, but my code never left review. Check the servers."
+      },
+      {
+        "id": "tessa",
+        "name": "Tessa Quill",
+        "role": "Support trainer",
+        "initials": "TQ",
+        "statement": "I reached the academy after nine. The cats were already all over the screens."
+      },
+      {
+        "id": "len",
+        "name": "Len Park",
+        "role": "IT administrator",
+        "initials": "LP",
+        "statement": "I reset the training profile on Friday. I installed no software this morning."
+      }
+    ],
+    "theories": [
+      {
+        "id": "local-extension",
+        "label": "Added a locally hosted browser extension to the managed training-device group, rewriting the page only on those six computers"
+      },
+      {
+        "id": "cached-beta",
+        "label": "Sent the computers to an abandoned beta website through a stale network cache"
+      },
+      {
+        "id": "server-patch",
+        "label": "Briefly deployed altered website code, then erased the release history"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "☁",
+        "tag": "SERVER CAPTURE",
+        "title": "The website stayed serious",
+        "text": "A network capture from an affected computer shows Northstar's server returning the ordinary logo and the word HELP. The cat artwork appeared only after the browser received the page."
+      },
+      {
+        "glyph": "▦",
+        "tag": "ROOM CHECK",
+        "title": "Six of six, and nowhere else",
+        "text": "Only the academy's six computers were affected. They belong to one centrally managed browser group; phones and laptops on the same room network displayed the normal site."
+      },
+      {
+        "glyph": "⊞",
+        "tag": "EXTENSION LIST",
+        "title": "Purr-fect Support Tools",
+        "text": "The six-device training group received a locally hosted extension package at 8:47. Its rules replace Northstar's logo, HELP labels, and notification sound with the exact cat versions witnesses saw."
+      },
+      {
+        "glyph": "▣",
+        "tag": "INSTALL RECORD",
+        "title": "A trainer's local session",
+        "text": "The management audit shows Tessa's trainer account uploaded CAT-PATCH.crx from a drive named TQ-TRAINING-KIT and assigned it to the training group. Omar and Len's accounts have no academy-management session that morning."
+      },
+      {
+        "glyph": "↥",
+        "tag": "BADGE LOG",
+        "title": "Twenty-one early minutes",
+        "text": "Tessa's badge opened the academy at 8:39, not after nine as she claimed. Camera footage shows her leaving computer six at 8:49 with her training USB in hand."
+      }
+    ],
+    "hints": [
+      "Separate the website sent by the server from the version assembled by each browser.",
+      "Ask what the six affected computers share that nearby phones and laptops do not."
+    ],
+    "solution": {
+      "culpritId": "tessa",
+      "theoryId": "local-extension",
+      "title": "The patch lived in the browser, not the product.",
+      "explanation": "Tessa arrived early, signed into the academy's browser-management console, and uploaded her cat-themed extension package from TQ-TRAINING-KIT. She assigned it to the six-device training group, whose browsers installed it by managed policy and rewrote the normal page after it arrived from Northstar's unchanged server. The management audit, her signed-in session, and her 8:39 badge entry make the prank uniquely hers.",
+      "proof": [
+        "The server delivered the unaltered website",
+        "All affected computers belonged to one managed browser group",
+        "Tessa's session assigned the matching extension package"
+      ]
+    }
+  },
+  {
+    "id": "batch-b-unscheduled-slide",
+    "caseNumber": 16,
+    "title": "The Unscheduled Slide",
+    "subtitle": "The display had no signal, yet it showed the company's best-kept secret.",
+    "location": "Halcyon Tower, Meeting Room 12",
+    "incident": "Tuesday, 7:45–8:01 AM",
+    "difficulty": "Measured",
+    "fileMark": "OFFICE / DISCLOSURE",
+    "brief": [
+      "At 7:58, a conference-room display flashed a confidential acquisition slide for twelve seconds while visiting caterers worked in the corridor. No presentation computer was connected, and the slide had not been scheduled for the room.",
+      "The screen then returned to its harmless blue welcome mark. Three people had been near Room 12 before the visitors arrived."
+    ],
+    "question": "Who exposed the acquisition slide, and how did it appear on a screen with no presentation signal?",
+    "suspects": [
+      {
+        "id": "mira",
+        "name": "Mira Voss",
+        "role": "Audio-visual technician",
+        "initials": "MV",
+        "statement": "I tested the cable at 7:45. I neither restarted the display nor changed its welcome screen."
+      },
+      {
+        "id": "priya",
+        "name": "Priya Sen",
+        "role": "Finance analyst",
+        "initials": "PS",
+        "statement": "I brought the slide deck upstairs, but it stayed encrypted on my laptop."
+      },
+      {
+        "id": "jonah",
+        "name": "Jonah Reed",
+        "role": "Catering supervisor",
+        "initials": "JR",
+        "statement": "My crew reached the corridor at 7:56. We never entered the locked room."
+      }
+    ],
+    "theories": [
+      {
+        "id": "boot-image",
+        "label": "Replaced the display's local boot image and restarted it with a service remote"
+      },
+      {
+        "id": "wireless-cast",
+        "label": "Cast the slide from a nearby laptop, then disconnected before anyone entered"
+      },
+      {
+        "id": "signage-schedule",
+        "label": "Inserted the slide into the building's central signage schedule"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "□",
+        "tag": "INPUT LOG",
+        "title": "No source attached",
+        "text": "The display recorded NO INPUT from 7:40 until 8:16. A wireless cast or connected laptop would have created a named input event."
+      },
+      {
+        "glyph": "⌘",
+        "tag": "SIGNAGE SERVER",
+        "title": "Room 12 is off the list",
+        "text": "The building's signage server controls lobby screens only. Room 12's display has never enrolled, and the server logged no new media or schedule that morning."
+      },
+      {
+        "glyph": "↻",
+        "tag": "UPTIME",
+        "title": "A restart at 7:58",
+        "text": "The display's internal clock reset at exactly 7:58. Its manual says a custom boot image appears for twelve seconds whenever the unit restarts without an input."
+      },
+      {
+        "glyph": "▤",
+        "tag": "SERVICE HISTORY",
+        "title": "Welcome became confidential",
+        "text": "At 7:51, a maintenance USB replaced welcome.png with a pixel-for-pixel copy of the acquisition slide. The USB serial is AV-14, assigned to Mira's toolkit."
+      },
+      {
+        "glyph": "◉",
+        "tag": "REMOTE REGISTER",
+        "title": "One authorised restart",
+        "text": "Mira signed out Room 12's service remote at 7:43 and returned it at 8:04. Priya's laptop remained encrypted in the finance safe until 8:10, and Jonah never crossed the room's badge-controlled door."
+      }
+    ],
+    "hints": [
+      "A screen can display its own image even when it receives no presentation signal.",
+      "The twelve-second duration is not random; compare it with the display manual and uptime log."
+    ],
+    "solution": {
+      "culpritId": "mira",
+      "theoryId": "boot-image",
+      "title": "The secret was disguised as a welcome.",
+      "explanation": "Mira used her AV-14 maintenance USB to replace the display's local boot image with the acquisition slide, then restarted the screen at 7:58 using its service remote. With no input attached, the display showed that image for its standard twelve-second boot interval. The USB serial and remote register give Mira both the preparation and the trigger, while the uptime log contradicts her denial.",
+      "proof": [
+        "No wired or wireless input was active",
+        "The slide replaced the display's local boot image",
+        "Mira controlled both the matching USB and service remote"
+      ]
+    }
+  },
+  {
+    "id": "batch-b-last-library-scan",
+    "caseNumber": 17,
+    "title": "The Last Library Scan",
+    "subtitle": "The atlas left the shelf. Its electronic name stayed behind.",
+    "location": "Bellwether Public Library",
+    "incident": "Wednesday, 4:35–5:12 PM",
+    "difficulty": "Measured",
+    "fileMark": "LIBRARY / RFID",
+    "brief": [
+      "A rare illustrated street atlas vanished from the local-history room. The exit gates never alarmed, and the catalogue still placed the atlas inside the building after closing.",
+      "A cataloguer, a researcher, and a shelving volunteer handled books near the room. Someone separated the atlas from the electronic identity meant to protect it."
+    ],
+    "question": "Who removed the atlas, and how were the library's RFID gates fooled?",
+    "suspects": [
+      {
+        "id": "rina",
+        "name": "Rina Holt",
+        "role": "Rare-books cataloguer",
+        "initials": "RH",
+        "statement": "I measured the atlas, returned it to its cradle, and spent the next hour at the front desk."
+      },
+      {
+        "id": "jules",
+        "name": "Jules Amani",
+        "role": "Local-history researcher",
+        "initials": "JA",
+        "statement": "I requested the atlas but was refused. I left with my own notebook and nothing else."
+      },
+      {
+        "id": "theo",
+        "name": "Theo Pell",
+        "role": "Shelving volunteer",
+        "initials": "TP",
+        "statement": "My cart held only ordinary returns and withdrawn paperbacks. I never touched the atlas."
+      }
+    ],
+    "theories": [
+      {
+        "id": "rfid-swap",
+        "label": "Moved the atlas's active RFID strip into an ordinary book and gave the atlas a deactivated discard strip"
+      },
+      {
+        "id": "foil-sleeve",
+        "label": "Wrapped the atlas in metallic material to block its tag at the exit gates"
+      },
+      {
+        "id": "return-chute",
+        "label": "Dropped the atlas through the internal return conveyor and collected it outside"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "⌁",
+        "tag": "GATE LOG",
+        "title": "No shielded object",
+        "text": "At 5:08, the gates recorded the ordinary books on Theo's discard cart as it crossed into the collection vestibule beyond the secure exit. They saw neither the atlas tag nor the interference pattern made by a foil-shielded book."
+      },
+      {
+        "glyph": "⌖",
+        "tag": "SHELF SCANNER",
+        "title": "An atlas among the gardens",
+        "text": "After closing, the handheld scanner located the atlas's RFID number inside The Pocket Garden, an ordinary book two aisles from local history."
+      },
+      {
+        "glyph": "▥",
+        "tag": "ENDPAPER",
+        "title": "A newly hidden strip",
+        "text": "The Pocket Garden's rear endpaper has been freshly lifted and reglued. Beneath it sits the atlas's active RFID strip, still carrying fibres from its cream mounting paper."
+      },
+      {
+        "glyph": "⊘",
+        "tag": "DISCARD LIST",
+        "title": "One dead tag missing",
+        "text": "A withdrawn paperback on Theo's cart is missing its deactivated RFID strip. A manual reader detects that strip inside the atlas, which is concealed beneath the cart's false cardboard bottom in the vestibule beyond the gates."
+      },
+      {
+        "glyph": "▰",
+        "tag": "DESK CAMERA",
+        "title": "The cart had one keeper",
+        "text": "Rina remained continuously at the staffed desk, and Jules left through the gates carrying a transparent document wallet. Theo alone handled the discard cart, added its false bottom at 4:41, and pushed it through the gates at 5:08."
+      }
+    ],
+    "hints": [
+      "The catalogue tracks a radio tag, not the physical book around it.",
+      "Find both halves of the exchange: where the active atlas tag stayed and where a deactivated tag went."
+    ],
+    "solution": {
+      "culpritId": "theo",
+      "theoryId": "rfid-swap",
+      "title": "He shelved the atlas's name and moved the book.",
+      "explanation": "Theo peeled the atlas's active RFID strip away and hid it inside The Pocket Garden, leaving the catalogue convinced the atlas remained in the library. He transferred a deactivated strip from a withdrawn paperback into the atlas, hid the atlas under his discard cart's false bottom, and pushed the cart through the gates into the collection vestibule. The paired tag locations, silent gate crossing, and Theo's exclusive control of the altered cart prove the swap.",
+      "proof": [
+        "The atlas's active tag remained in an ordinary shelf book",
+        "A discard's deactivated tag was placed in the atlas",
+        "Theo alone pushed the altered cart and hidden atlas through the gates"
+      ]
+    }
+  },
+  {
+    "id": "batch-b-bus-that-never-cancelled",
+    "caseNumber": 18,
+    "title": "The Bus That Never Cancelled",
+    "subtitle": "The route kept running. One lonely sign insisted otherwise.",
+    "location": "Cedar Square Bus Stop",
+    "incident": "Friday, 5:16–5:31 PM",
+    "difficulty": "Gentle",
+    "fileMark": "TRANSIT / FALSE NOTICE",
+    "brief": [
+      "At rush hour, Cedar Square's digital sign announced ROUTE 6 CANCELLED and sent dozens of passengers walking to another stop. Route 6 was running normally, and every other sign showed it two minutes away.",
+      "Transit control says it never sent the cancellation. The false message appeared only at Cedar Square and vanished after an inspector opened the sign cabinet and completed a standard connectivity check."
+    ],
+    "question": "Who posted the false cancellation, and how was one public sign separated from the live transit system?",
+    "suspects": [
+      {
+        "id": "dev",
+        "name": "Dev Batra",
+        "role": "Transit dispatcher",
+        "initials": "DB",
+        "statement": "The control feed showed Route 6 on time. I sent no cancellation to any stop."
+      },
+      {
+        "id": "lio",
+        "name": "Lio March",
+        "role": "Street-poster artist",
+        "initials": "LM",
+        "statement": "I pasted a concert notice beside the shelter. I never touched the electronic sign."
+      },
+      {
+        "id": "quinn",
+        "name": "Quinn Hale",
+        "role": "Sign maintenance contractor",
+        "initials": "QH",
+        "statement": "I inspected Cedar Square yesterday. Today I was across town and the cabinet remained sealed."
+      }
+    ],
+    "theories": [
+      {
+        "id": "offline-slide",
+        "label": "Disconnected the live feed and left a false maintenance slide on a USB inside the sign controller"
+      },
+      {
+        "id": "dispatch-message",
+        "label": "Sent a targeted cancellation through the central transit-control system"
+      },
+      {
+        "id": "projected-overlay",
+        "label": "Projected convincing letters onto the sign's glass from a nearby building"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "≋",
+        "tag": "CONTROL FEED",
+        "title": "The buses were still speaking",
+        "text": "Transit control's signed message history shows only ROUTE 6 — 2 MIN for Cedar Square. Neighboring signs received the same correct feed throughout the incident."
+      },
+      {
+        "glyph": "▦",
+        "tag": "PIXEL PHOTO",
+        "title": "Light from inside",
+        "text": "A passenger's close photograph shows each false letter aligned perfectly to the sign's own amber pixel grid. Nothing was projected onto the outer glass."
+      },
+      {
+        "glyph": "⌁",
+        "tag": "CABINET",
+        "title": "Live cable, quietly unlatched",
+        "text": "The sign's network plug was unclipped inside the locked cabinet. When disconnected, this model automatically loops a maintenance slide stored on its service USB."
+      },
+      {
+        "glyph": "QC",
+        "tag": "FALSE SLIDE",
+        "title": "A forgotten test footer",
+        "text": "Magnification reveals tiny text below CANCELLED: QC TEST 4. The same footer appears on test slides in Quinn's contractor manual, but not in transit-control templates."
+      },
+      {
+        "glyph": "△",
+        "tag": "SERVICE KEY",
+        "title": "The seal tells on its cutter",
+        "text": "The cabinet seal was sliced beneath its fold and restuck with orange service wax. Quinn signed out the only triangular cabinet key that morning; matching orange wax is pressed into its teeth."
+      }
+    ],
+    "hints": [
+      "If central control stayed correct and every other sign agreed, investigate what this one sign can display by itself.",
+      "The tiny QC footer identifies the source of the false message more reliably than the large words do."
+    ],
+    "solution": {
+      "culpritId": "quinn",
+      "theoryId": "offline-slide",
+      "title": "One unplugged cable cancelled an imaginary bus.",
+      "explanation": "Quinn opened the cabinet with his triangular service key, disconnected the network cable, and inserted a USB whose offline maintenance slide falsely said ROUTE 6 CANCELLED. The sign looped that local slide until the inspector restored its connection. The contractor-only QC footer and orange wax embedded in Quinn's key identify both his file and his access.",
+      "proof": [
+        "The central transit feed never carried a cancellation",
+        "The isolated sign looped a local USB slide",
+        "Quinn's key and template link him to the cabinet and message"
+      ]
+    }
+  },
+  {
+    "id": "batch-b-whiteboard-memory",
+    "caseNumber": 19,
+    "title": "The Whiteboard's Memory",
+    "subtitle": "Everyone surrendered their phone. The wall sent the secret anyway.",
+    "location": "Kestrel Design Studio, Blue Room",
+    "incident": "Thursday, 2:00–2:38 PM",
+    "difficulty": "Sharp",
+    "fileMark": "WORKPLACE / LEAK",
+    "brief": [
+      "A rival agency's proposal contains Kestrel's secret campaign line—including the presenter's crossed-out misspelling. The phrase existed only as handwriting on the Blue Room's smart whiteboard during a closed pitch.",
+      "All phones were sealed in a locker, the room camera shows no one photographing the board, and the wall was erased before anyone left."
+    ],
+    "question": "Who leaked the campaign line, and how did it leave a phone-free room after the board was erased?",
+    "suspects": [
+      {
+        "id": "carlo",
+        "name": "Carlo Wynn",
+        "role": "Campaign designer",
+        "initials": "CW",
+        "statement": "I wrote the line, corrected one letter, and never touched the board controls."
+      },
+      {
+        "id": "nessa",
+        "name": "Nessa Bell",
+        "role": "Pitch facilitator",
+        "initials": "NB",
+        "statement": "I pressed ERASE when the pitch ended. I saved or sent nothing."
+      },
+      {
+        "id": "mina",
+        "name": "Mina Shore",
+        "role": "Client observer",
+        "initials": "MS",
+        "statement": "My phone stayed sealed. I took only the printed agenda I was given."
+      }
+    ],
+    "theories": [
+      {
+        "id": "board-export",
+        "label": "Used the whiteboard's Quick Send feature to email a layered PDF before erasing the wall"
+      },
+      {
+        "id": "hidden-camera",
+        "label": "Concealed a tiny camera in the room and photographed the finished board"
+      },
+      {
+        "id": "display-mirror",
+        "label": "Mirrored the board live to a computer outside the meeting room"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "✎",
+        "tag": "RIVAL FILE",
+        "title": "Even the mistake survived",
+        "text": "The rival PDF contains the crossed-out first spelling as a pale vector layer beneath the corrected word. A normal photograph would flatten both into one image."
+      },
+      {
+        "glyph": "◉",
+        "tag": "ROOM CAMERA",
+        "title": "No lens, no receiver",
+        "text": "Continuous footage accounts for every object and person. No device faced the board, and the room's wireless-mirroring receiver remained powered off."
+      },
+      {
+        "glyph": "↗",
+        "tag": "BOARD AUDIT",
+        "title": "Send, then erase",
+        "text": "At 2:36:14, the board created a layered PDF and used QUICK SEND — SLOT 3. ERASE followed nineteen seconds later."
+      },
+      {
+        "glyph": "@",
+        "tag": "QUICK SEND",
+        "title": "A friendly name for an outside address",
+        "text": "Slot 3 is labelled PROJECT ARCHIVE, but its hidden address is an external mailbox registered to Nessa's freelance portfolio account."
+      },
+      {
+        "glyph": "⌨",
+        "tag": "TOUCH LOG",
+        "title": "Three deliberate taps",
+        "text": "The board records Nessa's facilitator PIN, then the sequence EXPORT, SLOT 3, SEND. Carlo never knew the PIN; Mina was visible across the room while Nessa stood at the controls."
+      }
+    ],
+    "hints": [
+      "The crossed-out word remains a separate layer, which tells you more than the visible phrase itself.",
+      "Erase was not the only control used at 2:36; follow the board's action sequence and saved recipient."
+    ],
+    "solution": {
+      "culpritId": "nessa",
+      "theoryId": "board-export",
+      "title": "The wall mailed its memory before forgetting.",
+      "explanation": "Nessa unlocked the smart whiteboard with her facilitator PIN, exported its layered writing history, and sent the PDF to her outside mailbox through disguised Quick Send slot 3. She erased the board nineteen seconds later and described only that final action. The rival's editable crossed-out layer, the audit sequence, and Nessa's registered recipient address prove the digital export.",
+      "proof": [
+        "The leaked file preserves editable whiteboard layers",
+        "The board exported to slot 3 immediately before erasure",
+        "That external slot and the authorising PIN belong to Nessa"
+      ]
+    }
+  },
+  {
+    "id": "batch-b-empty-bike-dock",
+    "caseNumber": 20,
+    "title": "The Occupied Empty Dock",
+    "subtitle": "Bay twelve reported a bicycle all afternoon. Anyone could see it was empty.",
+    "location": "Riverside Community Bike Station",
+    "incident": "Saturday, 12:06–12:19 PM",
+    "difficulty": "Sharp",
+    "fileMark": "CIVIC BIKE / SENSOR",
+    "brief": [
+      "A gold-painted community bicycle disappeared from bay twelve during a street fair. The rental system insisted the bike remained locked there, so no missing-bike alert was raised for four hours.",
+      "The station camera shows no rider leaving on the gold bicycle. A courier, a repair volunteer, and a dock technician were beside bay twelve shortly before it became visibly empty."
+    ],
+    "question": "Who removed the bicycle, and how was an empty dock made to report that it was occupied?",
+    "suspects": [
+      {
+        "id": "malik",
+        "name": "Malik Snow",
+        "role": "Parcel cyclist",
+        "initials": "MS",
+        "statement": "I parked my own bike beside the station for one delivery. I never unlocked a community bike."
+      },
+      {
+        "id": "fern",
+        "name": "Fern Ibarra",
+        "role": "Repair-tent volunteer",
+        "initials": "FI",
+        "statement": "I tightened the gold bike's bell at noon, then returned to the fair tent."
+      },
+      {
+        "id": "arden",
+        "name": "Arden Pike",
+        "role": "Dock systems technician",
+        "initials": "AP",
+        "statement": "My van passed Riverside, but I did not stop. The station needed no service."
+      }
+    ],
+    "theories": [
+      {
+        "id": "calibration-tongue",
+        "label": "Released the bike in service mode and inserted a calibration tongue that kept the dock's latch sensor closed"
+      },
+      {
+        "id": "database-ghost",
+        "label": "Altered the central rental database to invent an occupied bay after removing the bike"
+      },
+      {
+        "id": "painted-decoy",
+        "label": "Exchanged the gold bicycle for a similar bike that was later moved during the fair"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "12",
+        "tag": "BAY STATUS",
+        "title": "Occupied without any weight",
+        "text": "Bay twelve has no weight sensor. It reports OCCUPIED whenever a small switch inside its locking jaw is held closed by a bicycle's steel docking tab."
+      },
+      {
+        "glyph": "▰",
+        "tag": "LOCKING JAW",
+        "title": "A bicycle reduced to one part",
+        "text": "Inside the empty jaw is a narrow greased steel tongue. It presses the occupancy switch exactly as a real docking tab would."
+      },
+      {
+        "glyph": "⚒",
+        "tag": "LOCAL CONSOLE",
+        "title": "Service release at 12:08",
+        "text": "The dock recorded a keyed maintenance release at 12:08 and no customer rental. The central database received the false occupied signal but issued no command itself."
+      },
+      {
+        "glyph": "△",
+        "tag": "CALIBRATION KIT",
+        "title": "Tool B12 is absent",
+        "text": "Technicians use numbered steel tongues to test dock switches. B12 is missing from Arden's signed kit, and its unusual three-notch edge matches the tongue inside bay twelve."
+      },
+      {
+        "glyph": "▣",
+        "tag": "SERVICE VAN",
+        "title": "Gold beneath the blanket",
+        "text": "Traffic video shows Arden's van stopped behind the station from 12:06 to 12:12. A search finds fresh gold paint on its internal bike rack; Malik's delivery scan and Fern's fair livestream place both away at 12:08."
+      }
+    ],
+    "hints": [
+      "The system does not see a whole bicycle. Discover the single condition it calls occupied.",
+      "A normal renter could release a bike, but only one suspect carried the part that could keep the empty latch closed."
+    ],
+    "solution": {
+      "culpritId": "arden",
+      "theoryId": "calibration-tongue",
+      "title": "The dock counted a sliver of steel as a bicycle.",
+      "explanation": "Arden stopped his van, used the technician key to release the gold bike, and loaded it onto his internal rack. He inserted calibration tongue B12 into the empty locking jaw, holding its occupancy switch closed and preventing an alert. The local service release, missing numbered tool, and gold paint inside his van identify both culprit and method.",
+      "proof": [
+        "A calibration tongue held the dock's simple occupancy switch",
+        "Arden's key made the unbilled service release",
+        "His missing tool and van physically link him to the removal"
+      ]
+    }
+  },
+  {
+    "id": "batch-b-robots-wrong-turn",
+    "caseNumber": 21,
+    "title": "The Robot's Wrong Turn",
+    "subtitle": "The delivery order said Studio A. A square sticker quietly disagreed.",
+    "location": "Lumen Works Design Campus",
+    "incident": "Monday, 2:11–2:19 PM",
+    "difficulty": "Sharp",
+    "fileMark": "ROBOTICS / DIVERSION",
+    "brief": [
+      "A delivery robot carrying a sealed prototype should have travelled from reception to Studio A. Instead, it turned into a service corridor and arrived empty at its charging dock seven minutes later.",
+      "The manifest remained correct, the parcel seal was intact when recovered, and the robot received no remote reroute command. Someone changed what the robot believed about one hallway junction."
+    ],
+    "question": "Who diverted the delivery robot, and what made it choose the wrong corridor without a remote command?",
+    "suspects": [
+      {
+        "id": "kian",
+        "name": "Kian Moss",
+        "role": "Robotics engineer",
+        "initials": "KM",
+        "statement": "I monitored the fleet console. Nobody changed the route, remotely or otherwise."
+      },
+      {
+        "id": "amba",
+        "name": "Amba Grey",
+        "role": "Reception courier",
+        "initials": "AG",
+        "statement": "I scanned the Studio A label, sealed the lid, and watched the robot start correctly."
+      },
+      {
+        "id": "suri",
+        "name": "Suri Vale",
+        "role": "Studio B designer",
+        "initials": "SV",
+        "statement": "I was printing sample labels in Studio B. I never went near the robot or its route markers."
+      }
+    ],
+    "theories": [
+      {
+        "id": "false-marker",
+        "label": "Covered a hallway navigation marker with a printed substitute that falsely identified Studio B's alcove as the Studio A destination"
+      },
+      {
+        "id": "remote-reroute",
+        "label": "Sent a hidden route command through the robot fleet console"
+      },
+      {
+        "id": "label-swap",
+        "label": "Replaced the parcel's Studio A address label before the robot left reception"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "A",
+        "tag": "PARCEL SCAN",
+        "title": "The destination stayed correct",
+        "text": "The robot scanned STUDIO A at reception and again at recovery. The numbered parcel seal and adhesive edges are continuous, ruling out a label exchange."
+      },
+      {
+        "glyph": "⌁",
+        "tag": "FLEET LOG",
+        "title": "No one touched the route",
+        "text": "The signed fleet log contains no command after departure. The robot changed direction locally at Junction 4 while following its unchanged Studio A route."
+      },
+      {
+        "glyph": "▦",
+        "tag": "ROBOT CAMERA",
+        "title": "One square over another",
+        "text": "A camera frame shows a fresh black-and-white navigation marker taped over Junction 4's permanent marker. Its code falsely identifies the service corridor as STUDIO A — DELIVERY ALCOVE, so the robot treats the wrong alcove as its unchanged destination."
+      },
+      {
+        "glyph": "·",
+        "tag": "PRINT DEFECT",
+        "title": "The missing lower-right dot",
+        "text": "The false marker lacks one tiny lower-right printer dot. Studio B's label printer has the same blocked nozzle; no other campus printer shares the defect."
+      },
+      {
+        "glyph": "▣",
+        "tag": "ACCESS RECORD",
+        "title": "Print, intercept, conceal",
+        "text": "Studio B's printer logged the marker under Suri's PIN at 2:11. Her badge opened the delivery alcove at 2:16 and the sample cabinet at 2:17, where the still-sealed prototype was recovered."
+      }
+    ],
+    "hints": [
+      "The delivery label told the truth and the fleet console stayed quiet, so look at the robot's local view of the building.",
+      "A printed navigation marker is also a printed object; inspect it for the signature of its machine."
+    ],
+    "solution": {
+      "culpritId": "suri",
+      "theoryId": "false-marker",
+      "title": "The robot obeyed a counterfeit landmark.",
+      "explanation": "Suri printed a false navigation marker in Studio B and taped it over Junction 4's real marker. The counterfeit code labelled Studio B's alcove as the Studio A destination, so the robot completed its unchanged route at the wrong physical location. Suri removed the still-sealed parcel before the robot continued to its dock. The missing printer dot, her PIN, and her timed alcove access trace the entire diversion to her.",
+      "proof": [
+        "The parcel label and remote route never changed",
+        "A counterfeit marker redirected the robot locally",
+        "The marker's printer defect and access trail identify Suri"
+      ]
+    }
+  }
+]

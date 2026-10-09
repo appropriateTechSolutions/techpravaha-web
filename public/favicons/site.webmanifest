@@ -1,0 +1,12 @@
+{
+  "name": "Tech Pravaha",
+  "short_name": "Pravaha",
+  "description": "A design and build studio. Beautiful things, shipped.",
+  "start_url": "/",
+  "display": "browser",
+  "theme_color": "#0A0A0C",
+  "background_color": "#0A0A0C",
+  "icons": [
+    { "src": "/favicons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

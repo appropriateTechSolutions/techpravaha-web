@@ -1,0 +1,695 @@
+[
+  {
+    "id": "batch-c-northbound-atlas",
+    "caseNumber": 22,
+    "title": "The Northbound Atlas",
+    "subtitle": "One dark tunnel. One locked display. A ticket that travelled without a train.",
+    "location": "The Aurora Limited, Observation Car",
+    "incident": "9:06–9:08 PM",
+    "difficulty": "Measured",
+    "fileMark": "RAIL / ARCHIVE",
+    "brief": [
+      "The Aurora Limited carried a tiny travelling exhibition about the first survey of its mountain route. Its prize was the surveyor's signed paper ticket, mounted on a steel conservation card inside a locked tabletop case.",
+      "During a two-minute tunnel crossing, the carriage lights dimmed. When they returned, the ticket and its backing card were gone. The lid lock and its paper inspection seal were untouched."
+    ],
+    "question": "Who took the surveyor's ticket, and how did it leave the locked display?",
+    "suspects": [
+      {
+        "id": "mara-quill",
+        "name": "Mara Quill",
+        "role": "Railway archivist",
+        "initials": "MQ",
+        "statement": "I watched the humidity dial from the aisle. I did not put a hand on the case."
+      },
+      {
+        "id": "leo-voss",
+        "name": "Leo Voss",
+        "role": "Travel photographer",
+        "initials": "LV",
+        "statement": "My monopod stayed folded in my luggage. I held my camera with both hands through the tunnel."
+      },
+      {
+        "id": "dev-arun",
+        "name": "Dev Arun",
+        "role": "Dining-car steward",
+        "initials": "DA",
+        "statement": "I counted the empty tea cups by touch until the carriage lights returned."
+      }
+    ],
+    "theories": [
+      {
+        "id": "magnetic-monopod",
+        "label": "Dragged the steel backing card through the humidity slot with a magnet hidden in a monopod foot"
+      },
+      {
+        "id": "copied-frame-key",
+        "label": "Opened the display with a copied key, then carefully replaced the inspection seal"
+      },
+      {
+        "id": "window-paper-roll",
+        "label": "Rolled the ticket tightly and drew it out through the observation window gasket"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "▣",
+        "tag": "DISPLAY",
+        "title": "A seal without a wrinkle",
+        "text": "The lid's paper inspection seal is continuous under magnification, and the lock contains no fresh marks. The case was not opened from above."
+      },
+      {
+        "glyph": "↔",
+        "tag": "CASE PLAN",
+        "title": "The narrow way out",
+        "text": "A four-millimetre humidity-service slot runs across the rear of the case. The thin ticket and its steel conservation card fit through it together; the closed window gasket does not admit even the bare ticket."
+      },
+      {
+        "glyph": "≋",
+        "tag": "FELT LINING",
+        "title": "Two tracks to the rear",
+        "text": "Fresh parallel scratches cross the felt from the ticket's former position to the humidity slot. The steel card was pulled flat across the case rather than lifted."
+      },
+      {
+        "glyph": "⊕",
+        "tag": "CAMERA GEAR",
+        "title": "A foot with a strong attraction",
+        "text": "Leo's monopod has a powerful retrieval magnet beneath its rubber foot. Blue fibres from the display lining and a fresh steel shaving cling to its edge."
+      },
+      {
+        "glyph": "▧",
+        "tag": "PASSENGER PHOTO",
+        "title": "One hand too many",
+        "text": "A passenger's tunnel photograph catches Leo's camera hanging from its neck strap while his right hand extends the monopod across the rear of the display. His claim that it stayed in his luggage is false."
+      }
+    ],
+    "hints": [
+      "Treat the intact lid as a boundary, then look for a route sized for the ticket and its backing card.",
+      "The steel card can be moved without fingers. Compare the scratches with Leo's equipment and statement."
+    ],
+    "solution": {
+      "culpritId": "leo-voss",
+      "theoryId": "magnetic-monopod",
+      "title": "The ticket followed a magnetic route.",
+      "explanation": "Leo extended the magnetic foot of his monopod over the case, caught the ticket's steel conservation card through the glass, and dragged it across the felt to the rear humidity slot. He collected the card as it emerged, all without opening the sealed lid. The scratches establish the route, the fibres and steel shaving tie it to his monopod, and the passenger photograph breaks his alibi.",
+      "proof": [
+        "The intact seal rules out opening the display",
+        "The steel card and scratch trail lead to the humidity slot",
+        "Leo's magnetic monopod carries the trace and appears in use"
+      ]
+    }
+  },
+  {
+    "id": "batch-c-falcon-seal",
+    "caseNumber": 23,
+    "title": "The Falcon Behind the Seal",
+    "subtitle": "The wax stayed whole. The ancient amulet did not stay put.",
+    "location": "Briar Museum, Egyptian Loan Gallery",
+    "incident": "3:40–3:53 PM",
+    "difficulty": "Gentle",
+    "fileMark": "HISTORY / MUSEUM",
+    "brief": [
+      "A glazed falcon amulet arrived in a cedar loan chest for a private museum preview. The front hasp was tied shut and stamped with the lender's red wax seal before three specialists entered the gallery.",
+      "Thirteen minutes later, the amulet was missing. The cord still crossed the hasp, the seal remained genuine and unbroken, and the chest appeared to have stayed on its marked table."
+    ],
+    "question": "Who removed the falcon amulet, and how was the sealed chest opened?",
+    "suspects": [
+      {
+        "id": "sana-idris",
+        "name": "Dr Sana Idris",
+        "role": "Egyptian collection curator",
+        "initials": "SI",
+        "statement": "I checked the lender's seal twice and catalogued the chest from the front."
+      },
+      {
+        "id": "felix-orr",
+        "name": "Felix Orr",
+        "role": "Exhibit photographer",
+        "initials": "FO",
+        "statement": "I photographed only the chest's front and never shifted the black backdrop behind it."
+      },
+      {
+        "id": "yumi-bell",
+        "name": "Yumi Bell",
+        "role": "Fine-art courier",
+        "initials": "YB",
+        "statement": "I recorded the room temperature beside the door and did not approach the table."
+      }
+    ],
+    "theories": [
+      {
+        "id": "rear-hinge-pins",
+        "label": "Drove out the horizontal rear hinge pins and pivoted the lid on the articulated front hasp strap"
+      },
+      {
+        "id": "softened-wax-seal",
+        "label": "Softened the lender's wax seal, opened the hasp, and pressed the same seal back into place"
+      },
+      {
+        "id": "false-bottom-drawer",
+        "label": "Released a concealed drawer in the chest's base and removed the amulet from below"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "◉",
+        "tag": "WAX LAB",
+        "title": "Truly unbroken",
+        "text": "Microscopy shows one continuous cooling pattern through the wax and cord fibres. The seal was neither warmed nor replaced after it was stamped."
+      },
+      {
+        "glyph": "⌁",
+        "tag": "CHEST DRAWING",
+        "title": "Security at only one edge",
+        "text": "The sealed hasp fixes an articulated strap at the front, leaving enough play for the lid's rear edge to rise eight centimetres. Each rear butt hinge turns on a horizontal tapered pin accessible from its outboard end. An X-ray confirms the chest base is solid."
+      },
+      {
+        "glyph": "↶",
+        "tag": "TABLE DUST",
+        "title": "A half-turn on the table",
+        "text": "Curved scuffs interrupt the chest's dust outline. Someone rotated it to expose the outboard ends of both rear hinge pins, then returned it precisely to the tape marks."
+      },
+      {
+        "glyph": "⌖",
+        "tag": "TOOL TRACE",
+        "title": "Graphite in the hinge",
+        "text": "Fresh graphite and cedar dust coat both horizontal pin channels. Felix's photographic tool roll contains a graphite-darkened pin punch whose tip matches the new circular impressions at their outboard ends."
+      },
+      {
+        "glyph": "▤",
+        "tag": "TIME-LAPSE",
+        "title": "The backdrop went behind",
+        "text": "A ceiling time-lapse shows Felix wrap his black backdrop around the rear of the chest for seventy-three seconds. The other two suspects remain visible by the door, contradicting his front-only account."
+      }
+    ],
+    "hints": [
+      "A seal can be genuine and still protect only one part of a container.",
+      "Look at the opposite edge of the lid, then ask who hid that edge from the room camera."
+    ],
+    "solution": {
+      "culpritId": "felix-orr",
+      "theoryId": "rear-hinge-pins",
+      "title": "The seal guarded the wrong side.",
+      "explanation": "Felix rotated the chest, screened its rear with his photographic backdrop, and drove the two horizontal tapered hinge pins out from their exposed ends. The articulated front hasp strap remained sealed but acted as a loose pivot, allowing him to raise the lid's rear edge eight centimetres and take the amulet. He then replaced the pins and chest. The scuffs, graphite, matched tool, and time-lapse all point to the unguarded hinges and to Felix.",
+      "proof": [
+        "The wax and solid base eliminate the seal and false-bottom methods",
+        "Rotation scuffs and disturbed pins reveal access from the rear",
+        "Felix's matched punch and concealed time at the hinges identify him"
+      ]
+    }
+  },
+  {
+    "id": "batch-c-meteorite-air",
+    "caseNumber": 24,
+    "title": "The Vacuum That Never Broke",
+    "subtitle": "A vacuum held perfectly while a piece of another world disappeared.",
+    "location": "Kestrel Peak Observatory, Spectroscopy Lab",
+    "incident": "2:15–2:22 AM",
+    "difficulty": "Sharp",
+    "fileMark": "SCIENCE / SPACE",
+    "brief": [
+      "A thumb-sized slice of the Ardent meteorite rested in a vacuum display chamber while its spectrum was streamed to a public overnight event. At 2:22, the camera still showed the empty plinth—but every pressure gauge remained steady.",
+      "The chamber door requires a full venting cycle and records every opening. None occurred. Three members of the observatory team had reason to be near the instrument controls."
+    ],
+    "question": "Who removed the meteorite slice, and how did it leave an unopened vacuum chamber?",
+    "suspects": [
+      {
+        "id": "rhea-lin",
+        "name": "Rhea Lin",
+        "role": "Instrument engineer",
+        "initials": "RL",
+        "statement": "The control console slept all night. I was on the roof resetting the cloud sensor."
+      },
+      {
+        "id": "omar-sayeed",
+        "name": "Dr Omar Sayeed",
+        "role": "Planetary scientist",
+        "initials": "OS",
+        "statement": "I answered audience questions beside the projection wall and never touched the machinery."
+      },
+      {
+        "id": "nina-park",
+        "name": "Nina Park",
+        "role": "Night astronomer",
+        "initials": "NP",
+        "statement": "I kept the telescope guiding on target from the main control room."
+      }
+    ],
+    "theories": [
+      {
+        "id": "calibration-arm-cassette",
+        "label": "Used the chamber's magnetic calibration arm to carry the slice into an isolated spectrograph cassette"
+      },
+      {
+        "id": "replica-before-pumpdown",
+        "label": "Substituted a replica before the chamber was evacuated and removed it after the public scan"
+      },
+      {
+        "id": "vacuum-intake-suction",
+        "label": "Drew the slice through the vacuum intake line while the pumps kept the pressure reading steady"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "◌",
+        "tag": "PRESSURE LOG",
+        "title": "No breath of outside air",
+        "text": "Pressure varies by less than 0.02 percent all night, and a 2:15 calibration image shows the slice's unique edge notch on the plinth. It was real and still present after pumpdown."
+      },
+      {
+        "glyph": "⊙",
+        "tag": "CHAMBER PLAN",
+        "title": "A second compartment",
+        "text": "The vacuum intake is protected by a mesh far smaller than the slice. A motorized calibration arm, however, can move from the plinth into a spectrograph cassette behind its own gate valve."
+      },
+      {
+        "glyph": "⌁",
+        "tag": "MATERIAL TEST",
+        "title": "Iron answers a magnet",
+        "text": "The meteorite is rich in iron. A matching offcut snaps firmly to the calibration arm's magnetic reference puck, which bears a new crescent-shaped scrape."
+      },
+      {
+        "glyph": "▥",
+        "tag": "COMMAND AUDIT",
+        "title": "A journey in coordinates",
+        "text": "At 2:17, the console accepted a manual route from the sample plinth to cassette B, then closed the cassette gate. The command used Rhea's hardware badge and engineering override."
+      },
+      {
+        "glyph": "◇",
+        "tag": "CASSETTE LATCH",
+        "title": "Gold film on one sleeve",
+        "text": "Cassette B was opened from the outer lab side at 2:20. A torn strip of its gold Kapton seal is caught in the cuff of Rhea's roof jacket; roof telemetry shows the cloud sensor never needed a reset."
+      }
+    ],
+    "hints": [
+      "The steady vacuum rules out the chamber door, but not equipment designed to move while the chamber is sealed.",
+      "Trace the calibration arm's route through the gate valve, then follow the badge and seal fragment."
+    ],
+    "solution": {
+      "culpritId": "rhea-lin",
+      "theoryId": "calibration-arm-cassette",
+      "title": "The meteorite travelled inside the instrument.",
+      "explanation": "Rhea woke the console, used the calibration arm's magnetic puck to lift the iron-rich slice, and routed it into cassette B. Closing the cassette gate preserved the display chamber's vacuum while she opened the cassette from the lab side and removed the sample. The real slice was present after pumpdown, the intake is too small, and the command audit, false roof errand, and Kapton fragment uniquely connect Rhea to the working route.",
+      "proof": [
+        "The stable pressure and 2:15 image rule out venting and an early replica",
+        "The magnetic arm and gated cassette provide a sealed route",
+        "Rhea's badge, false alibi, and torn cassette seal identify the operator"
+      ]
+    }
+  },
+  {
+    "id": "batch-c-brooch-bouquet",
+    "caseNumber": 25,
+    "title": "The Moonstone at the Final Pose",
+    "subtitle": "The dancer never left the spotlight, yet the moonstone left her costume.",
+    "location": "Orpheum Theatre, Main Stage",
+    "incident": "8:46–8:51 PM",
+    "difficulty": "Measured",
+    "fileMark": "BALLET / JEWEL",
+    "brief": [
+      "For the gala ballet, a historic moonstone cameo was fixed at the centre of the lead dancer's silver sash. It was visible when she entered for the moonlit duet and gone when the scene ended five minutes later.",
+      "The dancer remained under audience view, nobody touched her costume directly, and the sash showed no tear. Three crew members had prepared objects or costumes used in the scene."
+    ],
+    "question": "Who took the moonstone cameo, and how was it removed in full view?",
+    "suspects": [
+      {
+        "id": "theo-wynn",
+        "name": "Theo Wynn",
+        "role": "Stage properties designer",
+        "initials": "TW",
+        "statement": "The bouquet held only silk roses. I sealed it in the prop basket before the curtain rose."
+      },
+      {
+        "id": "lena-dae",
+        "name": "Lena Dae",
+        "role": "Wardrobe supervisor",
+        "initials": "LD",
+        "statement": "I checked the sash clasp at the places call. It was secure when the dancer stepped onstage."
+      },
+      {
+        "id": "iris-cole",
+        "name": "Iris Cole",
+        "role": "Ballet understudy",
+        "initials": "IC",
+        "statement": "I watched from the prompt corner and handled only my own rehearsal costume."
+      }
+    ],
+    "theories": [
+      {
+        "id": "magnetic-bouquet",
+        "label": "Pulled the detachable cameo into a magnetized bouquet when the dancer held it against her sash"
+      },
+      {
+        "id": "fly-line-thread",
+        "label": "Attached a fine thread to the cameo and lifted it into the overhead scenery on a fly line"
+      },
+      {
+        "id": "pre-show-replica-drop",
+        "label": "Replaced the cameo with a stage copy that fell through a concealed pocket during the duet"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "▷",
+        "tag": "STAGE VIDEO",
+        "title": "Present until the roses",
+        "text": "The cameo's distinctive blue flash is visible for the first three minutes. It disappears immediately after the dancer presses the bouquet to her sash during the final pose."
+      },
+      {
+        "glyph": "⊙",
+        "tag": "COSTUME",
+        "title": "The clasp stayed closed",
+        "text": "The sash fabric and rear clasp are intact. For fast costume changes, the cameo's decorated face sits on a thin steel backing plate that detaches from two brass snap posts; no thread or broken replica remains."
+      },
+      {
+        "glyph": "✦",
+        "tag": "PETAL TRACE",
+        "title": "Lavender where silver was",
+        "text": "A crushed lavender petal and violet floral resin cling to the empty brass snap posts. The approved prop list specifies silk roses only."
+      },
+      {
+        "glyph": "⊕",
+        "tag": "BOUQUET",
+        "title": "A heavy hidden heart",
+        "text": "Inside the bouquet handle is a strong ring magnet above a velvet recess exactly the width of the cameo. The missing jewel is lodged behind the lavender stems."
+      },
+      {
+        "glyph": "▦",
+        "tag": "PROP CHECKOUT",
+        "title": "A basket reopened",
+        "text": "The stage-door camera shows Theo reopen the sealed prop basket at 8:39 and replace the approved rose bouquet with the lavender one. No other suspect handles it before the duet."
+      }
+    ],
+    "hints": [
+      "The video narrows the disappearance to one choreographed contact between the costume and a prop.",
+      "A steel-backed ornament does not require a hand if a strong magnet comes close enough."
+    ],
+    "solution": {
+      "culpritId": "theo-wynn",
+      "theoryId": "magnetic-bouquet",
+      "title": "The final pose completed the theft.",
+      "explanation": "Theo replaced the approved bouquet with one built around a ring magnet. When the dancer pressed it to her sash, the magnet caught the cameo's thin steel backing plate and pulled the detachable face from its two brass snap posts into the velvet recess among the lavender stems. The stage video fixes the moment, the intact clasp rules out force, and the lavender trace, hidden magnet, recovered jewel, and checkout footage all lead to Theo's substituted prop.",
+      "proof": [
+        "The cameo vanishes only when the bouquet meets the sash",
+        "The intact detachable clasp and magnetic handle explain the removal",
+        "Theo alone substituted and handled the altered bouquet"
+      ]
+    }
+  },
+  {
+    "id": "batch-c-weighing-pan",
+    "caseNumber": 26,
+    "title": "The Smooth-Edged Pilgrim",
+    "subtitle": "The evidence bag stayed sealed around an object that had passed every checkpoint.",
+    "location": "Aurelia Excavation, Finds Tent",
+    "incident": "11:18–11:27 AM",
+    "difficulty": "Sharp",
+    "fileMark": "ARCHAEOLOGY / COIN",
+    "brief": [
+      "A rare silver pilgrim token was photographed, weighed, and heat-sealed in a clear evidence bag at the Aurelia excavation. At the afternoon inventory, the sealed bag contained a painted plaster copy.",
+      "The table camera lost sight of the evidence twice: first when the registrar leaned over the field scale, and later when a label board passed in front of the sealed bag. Either brief obstruction could conceal an exchange. Three team members stood within the finds tent."
+    ],
+    "question": "Who swapped the pilgrim token, and how did the exchange happen before the bag was sealed?",
+    "suspects": [
+      {
+        "id": "jonas-pell",
+        "name": "Jonas Pell",
+        "role": "Field registrar",
+        "initials": "JP",
+        "statement": "I moved the token from the scale straight into the bag. The pan was empty when I began."
+      },
+      {
+        "id": "cora-vale",
+        "name": "Cora Vale",
+        "role": "Ceramics analyst",
+        "initials": "CV",
+        "statement": "I sorted pottery trays across the tent. I never prepared or touched the coin scale."
+      },
+      {
+        "id": "mika-orr",
+        "name": "Mika Orr",
+        "role": "Documentary camera operator",
+        "initials": "MO",
+        "statement": "My camera stayed on the evidence table except when I changed its battery."
+      }
+    ],
+    "theories": [
+      {
+        "id": "spring-pan-swap",
+        "label": "Used a spring-loaded false floor in the weighing pan to hide the real token and raise a plaster copy"
+      },
+      {
+        "id": "label-pocket-slip",
+        "label": "Slipped the real token into the bag's external label pocket and later removed it without breaking the seal"
+      },
+      {
+        "id": "reopened-heat-seam",
+        "label": "Reheated the evidence bag's top seam, exchanged the token, and resealed the same plastic"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "▱",
+        "tag": "EVIDENCE BAG",
+        "title": "Sealed around the substitute",
+        "text": "The heat seam is one uninterrupted weld, and the external label pocket is too shallow for either token. A sealing-frame close-up already shows the copy's smooth edge inside the bag."
+      },
+      {
+        "glyph": "◒",
+        "tag": "PHOTO SEQUENCE",
+        "title": "The nick that did not return",
+        "text": "The genuine token's crescent nick is visible as it enters the scale pan. When Jonas lifts a token out seconds later, the edge is smooth. The exchange occurred inside the raised rim of the pan."
+      },
+      {
+        "glyph": "⚖",
+        "tag": "SCALE",
+        "title": "A pan too deep",
+        "text": "The brass pan weighs forty grams more than its catalogue specification. Its apparent floor depresses under a probe, revealing a thin spring-loaded plate and a cavity beneath."
+      },
+      {
+        "glyph": "⇅",
+        "tag": "MECHANISM",
+        "title": "One down, one up",
+        "text": "Pressure from the real coin released the false floor: the coin dropped into the cavity while a preloaded plaster copy rose beside it. Grey plaster dust remains on the spring."
+      },
+      {
+        "glyph": "▧",
+        "tag": "REFLECTION",
+        "title": "Preparation in a water flask",
+        "text": "Mika's wide shot catches a reflection in a steel water flask: Cora opens the scale pan and loads the smooth-edged copy while Jonas fetches a label. The copy's grey casting plaster contains the same violet fluorescent tracer as the mixture missing from Cora's teaching kit."
+      }
+    ],
+    "hints": [
+      "The sealing close-up proves the wrong object entered the bag. Concentrate on the last place the genuine token disappears from view.",
+      "A weighing pan can contain more than one level—and a reflection can preserve what the main camera missed."
+    ],
+    "solution": {
+      "culpritId": "cora-vale",
+      "theoryId": "spring-pan-swap",
+      "title": "The scale balanced a hidden exchange.",
+      "explanation": "Cora modified the scale pan with a spring-loaded false floor and preloaded her plaster copy. When the real token was placed in the pan, it tripped the plate and fell into the cavity while the copy rose into reach. Jonas unknowingly sealed that copy in the bag. The intact seam fixes the swap before sealing, the edge nick fixes it inside the pan, and the reflected preparation plus the violet-traced plaster mixture identifies Cora.",
+      "proof": [
+        "The uninterrupted seam and sealing image eliminate a later bag swap",
+        "The edge sequence and concealed spring floor locate the exchange in the pan",
+        "The reflected footage and matched casting foam identify Cora"
+      ]
+    }
+  },
+  {
+    "id": "batch-c-vanishing-formula",
+    "caseNumber": 27,
+    "title": "The Formula That Vanished at Noon",
+    "subtitle": "No page was torn, no cabinet opened, and still the blue equation disappeared.",
+    "location": "Halley Science Hall, Discovery Gallery",
+    "incident": "11:56 AM–12:04 PM",
+    "difficulty": "Gentle",
+    "fileMark": "CHEMISTRY / SABOTAGE",
+    "brief": [
+      "For a public science demonstration, Dr Mira Sen wrote a new battery formula in blue ink and placed the open notebook inside a locked acrylic cabinet. At noon, the gallery lights rose for photographs. Eight minutes later, the page looked blank.",
+      "The cabinet seal and notebook binding were intact. Three people controlled equipment near the display, and each insists the formula disappeared without their help."
+    ],
+    "question": "Who made the formula vanish, and how was the writing erased through a locked cabinet?",
+    "suspects": [
+      {
+        "id": "sol-ferris",
+        "name": "Sol Ferris",
+        "role": "Exhibit lighting technician",
+        "initials": "SF",
+        "statement": "Every gallery spotlight is a cool LED. I did not change the noon lighting scene."
+      },
+      {
+        "id": "asha-nair",
+        "name": "Asha Nair",
+        "role": "Laboratory technician",
+        "initials": "AN",
+        "statement": "I fetched ice packs from the preparation room and stayed away from the cabinet."
+      },
+      {
+        "id": "ben-cho",
+        "name": "Ben Cho",
+        "role": "Science journalist",
+        "initials": "BC",
+        "statement": "I filmed the notebook continuously from behind the visitor rail."
+      }
+    ],
+    "theories": [
+      {
+        "id": "heated-erasable-ink",
+        "label": "Heated thermochromic erasable ink with a concealed halogen spotlight until the formula turned colourless"
+      },
+      {
+        "id": "solvent-mist-vent",
+        "label": "Sprayed an ink-removing solvent through the cabinet's air vent without disturbing its seal"
+      },
+      {
+        "id": "blank-page-projection",
+        "label": "Projected a blank page over the notebook so the written formula was merely hidden from view"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "▤",
+        "tag": "PAPER EXAM",
+        "title": "The strokes are still there",
+        "text": "Raking light reveals every pen groove on the original numbered page. There is no solvent smell, dampness, loose fibre, or projected light at the cabinet."
+      },
+      {
+        "glyph": "❄",
+        "tag": "COLD TEST",
+        "title": "Blue returns with the cold",
+        "text": "When an ice pack is held against the acrylic, the nearest symbols slowly reappear in blue. Warming that corner makes them fade again."
+      },
+      {
+        "glyph": "≈",
+        "tag": "INK",
+        "title": "A pen that forgets heat",
+        "text": "The demonstration pen uses thermochromic ink that becomes colourless above 60°C. Dr Sen borrowed it openly after her usual pen ran dry during rehearsal."
+      },
+      {
+        "glyph": "☀",
+        "tag": "TEMPERATURE",
+        "title": "A small noon heatwave",
+        "text": "The cabinet sensor climbs from 22°C to 64°C between 11:56 and 12:04. One track fixture contains a hot halogen bulb behind an LED-labelled shell and points directly at the notebook."
+      },
+      {
+        "glyph": "▥",
+        "tag": "LIGHTING LOG",
+        "title": "Scene twelve, manually called",
+        "text": "At 11:55, Sol's console passcode activated a hidden scene that raised the disguised halogen fixture to full power. Gallery video shows him at the console, while his inventory sheet falsely lists that fixture as an LED."
+      }
+    ],
+    "hints": [
+      "The page is still numbered and indented. Test whether the writing is absent or simply colourless.",
+      "Follow the reversible temperature effect to the only equipment that could heat the sealed cabinet."
+    ],
+    "solution": {
+      "culpritId": "sol-ferris",
+      "theoryId": "heated-erasable-ink",
+      "title": "The equation was hidden by heat.",
+      "explanation": "Sol knew from rehearsal that Dr Sen had used a thermochromic erasable pen. He disguised a hot halogen lamp as an LED and triggered a private lighting scene that warmed the cabinet above the ink's clearing temperature. The page never left and the formula was not chemically erased; cooling makes it return. The heat spike, altered fixture, passcode log, and false inventory statement identify Sol.",
+      "proof": [
+        "The intact grooved page rules out removal, solvent, and projection",
+        "Cold restoration and thermochromic ink explain the reversible disappearance",
+        "Sol's altered lamp and manual lighting command supplied the heat"
+      ]
+    }
+  },
+  {
+    "id": "batch-c-absent-signature",
+    "caseNumber": 28,
+    "title": "The Signature That Left the Canvas",
+    "subtitle": "The painting never moved. Its red monogram vanished before forty witnesses.",
+    "location": "Vesper Gallery, Auction Preview",
+    "incident": "7:28–7:36 PM",
+    "difficulty": "Sharp",
+    "fileMark": "ART / ILLUSION",
+    "brief": [
+      "A newly attributed landscape carried painter Elara Venn's tiny red monogram beside a pale stone bridge. During its auction preview, the gallery dimmed for a curator's talk. When the controlled display lighting returned, the monogram appeared to be gone.",
+      "The frame alarm never triggered, the canvas stayed under continuous camera view, and forty guests saw the change. Three specialists had challenged or defended the painting's attribution."
+    ],
+    "question": "Who made the monogram disappear, and how was the painting altered without being touched?",
+    "suspects": [
+      {
+        "id": "mae-li",
+        "name": "Mae Li",
+        "role": "Gallery lighting designer",
+        "initials": "ML",
+        "statement": "The track lights ran the approved static scene. None of my fixtures can project an image."
+      },
+      {
+        "id": "tomas-avel",
+        "name": "Tomas Avel",
+        "role": "Painting conservator",
+        "initials": "TA",
+        "statement": "I completed a condition check before the guests arrived and did not cross the floor afterward."
+      },
+      {
+        "id": "noor-bell",
+        "name": "Noor Bell",
+        "role": "Art-history critic",
+        "initials": "NB",
+        "statement": "I watched from the second row and recorded the curator's entire talk on my phone."
+      }
+    ],
+    "theories": [
+      {
+        "id": "projected-paint-patch",
+        "label": "Projected bridge-coloured texture onto a transparent film mounted just in front of the monogram"
+      },
+      {
+        "id": "reversible-solvent-wipe",
+        "label": "Applied a clear reversible solvent that dissolved only the red signature pigment"
+      },
+      {
+        "id": "unsigned-canvas-swap",
+        "label": "Exchanged the painting for an unsigned study during the darkened curator talk"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "▣",
+        "tag": "FRAME ALARM",
+        "title": "Not one millimetre moved",
+        "text": "Frame sensors, hanging-wire tension, and continuous side-camera footage remain unchanged. The craquelure pattern also matches the pre-talk photograph exactly, ruling out a canvas swap."
+      },
+      {
+        "glyph": "◒",
+        "tag": "FOCUS TEST",
+        "title": "Two surfaces, one image",
+        "text": "With the track fixture switched off, a close-focus lamp reveals the raised red monogram intact on the canvas. A nearly invisible rectangular projection film sits on the inner glazing, twenty-eight millimetres in front of it; no solvent touched the varnish."
+      },
+      {
+        "glyph": "⌖",
+        "tag": "VIEWING ANGLE",
+        "title": "An edge that will not stay put",
+        "text": "From far left, the pale image on the foreground film shifts clear of the red monogram; from the room's centre it aligns perfectly. The parallax proves the concealment sits in front of the canvas."
+      },
+      {
+        "glyph": "◈",
+        "tag": "TRACK FIXTURE",
+        "title": "A lens inside a lamp",
+        "text": "The track light facing the bridge contains a bright thumbnail projector. Its memory holds a cropped photograph of the unsigned bridge stone, mapped onto the small high-gain film rather than the canvas."
+      },
+      {
+        "glyph": "▥",
+        "tag": "CONTROL NETWORK",
+        "title": "A scene outside the programme",
+        "text": "The projector joined the lighting network under Mae's installer key at 7:27 and received the bridge patch from her tablet. Her claim that every fixture was a static light is false."
+      }
+    ],
+    "hints": [
+      "If the red pigment is intact, focus on the narrow space between the painting and the viewer.",
+      "Parallax requires two different planes. Inspect both the glazing and the fixture aimed at it."
+    ],
+    "solution": {
+      "culpritId": "mae-li",
+      "theoryId": "projected-paint-patch",
+      "title": "The signature disappeared behind borrowed light.",
+      "explanation": "During authorised lighting preparation, Mae fixed a nearly transparent high-gain projection film to the inner glazing, twenty-eight millimetres in front of the monogram. She then used the hidden projector to place a bright image of the unsigned bridge stone on that foreground film. From the audience's central viewpoint, the image masked the red mark without touching the canvas. The parallax exposes the second plane, the fixture contains the source image, and the network record ties the installation and command to Mae.",
+      "proof": [
+        "The fixed frame and matching craquelure rule out a swapped canvas",
+        "Intact pigment, foreground film, and parallax prove optical concealment",
+        "The mapped projector and Mae's installer-key log identify its operator"
+      ]
+    }
+  }
+]

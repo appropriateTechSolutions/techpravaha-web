@@ -1,0 +1,695 @@
+[
+  {
+    "id": "batch-a-dahlia-above-plot-twelve",
+    "caseNumber": 8,
+    "title": "The Dahlia Above Plot Twelve",
+    "subtitle": "The greenhouse stayed locked. Someone simply reached farther.",
+    "location": "Hearthside Community Garden",
+    "incident": "6:00–6:20 AM",
+    "difficulty": "Measured",
+    "fileMark": "GARDEN / FLOWER",
+    "brief": [
+      "On judging morning, the single prize bloom of Hearthside's midnight dahlia was found neatly removed from its stem. The rooftop greenhouse door was still tied with the chairperson's numbered paper seal.",
+      "Only three early visitors were on the community-centre roof. None had the greenhouse key, and each insists they stayed outside the railing around Plot Twelve."
+    ],
+    "question": "Who removed the dahlia, and how did they reach it without opening the greenhouse?",
+    "suspects": [
+      {
+        "id": "mara",
+        "name": "Mara Sen",
+        "role": "Garden chairperson",
+        "initials": "MS",
+        "statement": "I checked the door seal from the stairwell, then went downstairs to fetch the ribbons."
+      },
+      {
+        "id": "theo",
+        "name": "Theo Brook",
+        "role": "Bird-count volunteer",
+        "initials": "TB",
+        "statement": "I recorded swifts from the far parapet. My equipment never went near Plot Twelve."
+      },
+      {
+        "id": "elsie",
+        "name": "Elsie Quill",
+        "role": "Neighbourhood florist",
+        "initials": "EQ",
+        "statement": "I delivered empty vases at six and left them beside the lift. I had no cutting tools."
+      }
+    ],
+    "theories": [
+      {
+        "id": "picker-through-vent",
+        "label": "Reached through the roof louver with a telescoping litter picker and pulled the bloom out"
+      },
+      {
+        "id": "duplicate-door-key",
+        "label": "Opened the sealed door with a duplicate key, then replaced the paper seal"
+      },
+      {
+        "id": "cut-night-before",
+        "label": "Cut the flower the previous evening and propped it on the stem until morning"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "◇",
+        "tag": "DOOR SEAL",
+        "title": "One unbroken number",
+        "text": "Seal 041 is genuine, its gum is fully dry, and its fibres remain continuous across the door gap. The greenhouse door did not open after closing."
+      },
+      {
+        "glyph": "↥",
+        "tag": "ROOF LOUVER",
+        "title": "A gap above the bloom",
+        "text": "A twenty-two-centimetre-wide ventilation louver stands directly above the dahlia. Its insect screen is unhooked at one corner. The fourteen-centimetre bloom is 1.8 metres below it; the picker's closed head is nine centimetres, so both fit through the opening."
+      },
+      {
+        "glyph": ")(",
+        "tag": "STEM",
+        "title": "Crushed, not clipped",
+        "text": "The stem ends in two opposing crescent dents. Sharp shears would leave a flat slice; padded gripping jaws made this crushed break."
+      },
+      {
+        "glyph": "▰",
+        "tag": "FOAM TRACE",
+        "title": "Yellow in the green",
+        "text": "A fleck of yellow closed-cell foam clings to the broken stem. Theo's telescoping litter picker has yellow foam lining both jaws."
+      },
+      {
+        "glyph": "⌖",
+        "tag": "BIRD LOG",
+        "title": "The recording moved",
+        "text": "Theo's 6:12 swift recording contains the greenhouse vent fan at full volume, not the distant parapet wind. A red dahlia petal is folded inside his picker's telescoping joint."
+      }
+    ],
+    "hints": [
+      "Treat the intact door seal as reliable. Look for an opening meant for air rather than people.",
+      "The shape of the damage identifies a gripping tool, and one suspect brought an extendable one to the roof."
+    ],
+    "solution": {
+      "culpritId": "theo",
+      "theoryId": "picker-through-vent",
+      "title": "The flower was taken at arm's length.",
+      "explanation": "Theo unhooked one corner of the louver's insect screen, lowered his telescoping litter picker, gripped the fourteen-centimetre dahlia through the padded jaws, and drew it back through the twenty-two-centimetre opening. The door seal is truly intact. The twin crescent dents and yellow foam identify the tool, while the loud vent fan and trapped petal place Theo and his picker beside the greenhouse rather than at the far parapet.",
+      "proof": [
+        "The roof louver bypasses the sealed door",
+        "Padded jaws explain the paired crush marks",
+        "Theo's recording and picker carry traces from the scene"
+      ]
+    }
+  },
+  {
+    "id": "batch-a-moustache-in-cobalt",
+    "caseNumber": 9,
+    "title": "The Moustache in Cobalt",
+    "subtitle": "A portrait was defaced without touching a drop of paint.",
+    "location": "Maple Lane Portrait Show",
+    "incident": "Saturday, 3:10–3:35 PM",
+    "difficulty": "Gentle",
+    "fileMark": "GALLERY / MISCHIEF",
+    "brief": [
+      "Minutes before the neighbourhood portrait show opened, a sweeping blue moustache appeared across Mrs. D'Souza's painted face. The frame's signed hanging wire and all four backing seals were intact.",
+      "The artist insists the portrait was clean at three o'clock. Three exhibitors crossed the little gallery before the mark was noticed."
+    ],
+    "question": "Who added the moustache, and how was the sealed portrait left unharmed?",
+    "suspects": [
+      {
+        "id": "mara",
+        "name": "Mara D'Souza",
+        "role": "Portrait artist",
+        "initials": "MD",
+        "statement": "It is my grandmother's portrait. I checked the paint, glass, and seals before hanging it."
+      },
+      {
+        "id": "felix",
+        "name": "Felix Ward",
+        "role": "Volunteer framer",
+        "initials": "FW",
+        "statement": "I dusted the frames with a dry cloth. I never unsealed Mara's backing board."
+      },
+      {
+        "id": "kit",
+        "name": "Kit Rowan",
+        "role": "Cartoon workshop tutor",
+        "initials": "KR",
+        "statement": "I pinned up children's drawings. I did not touch the serious portraits."
+      }
+    ],
+    "theories": [
+      {
+        "id": "window-crayon",
+        "label": "Drew on the outside of the glazing with washable window crayon"
+      },
+      {
+        "id": "painted-acetate",
+        "label": "Slipped a painted transparent sheet between the frame and portrait"
+      },
+      {
+        "id": "presealed-paint",
+        "label": "Painted the moustache on the portrait before the backing seals were signed"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "✕",
+        "tag": "FRAME BACK",
+        "title": "Four honest seals",
+        "text": "Every backing seal bears matching paper fibres and Mara's continuous signature. No sheet or brush entered from behind after the frame was closed."
+      },
+      {
+        "glyph": "◫",
+        "tag": "VIEWING ANGLE",
+        "title": "A face that slips sideways",
+        "text": "Viewed from the far left, the blue curve shifts a few millimetres away from the painted upper lip. The mark sits on a surface in front of the portrait."
+      },
+      {
+        "glyph": "·",
+        "tag": "GLASS EDGE",
+        "title": "A blue crumb",
+        "text": "A soft cobalt crumb rests against the outer frame lip. It smears under a damp cotton bud while the varnished painting beneath remains untouched."
+      },
+      {
+        "glyph": "≈",
+        "tag": "PIGMENT",
+        "title": "Made for windows",
+        "text": "The mark contains wax, soap, and washable dye rather than artist's oil pigment. It matches the window crayons used in the children's cartoon workshop."
+      },
+      {
+        "glyph": "K",
+        "tag": "SUPPLY CARD",
+        "title": "Cobalt at the glass",
+        "text": "Kit signed out the only cobalt window crayon at 3:08. A 3:24 setup time-lapse shows it in Kit's hand against Mrs. D'Souza's glass while Felix dusts the opposite wall and Mara staffs the lobby. Kit returned it at 3:37 with its tip flattened into the moustache's broad curve."
+      }
+    ],
+    "hints": [
+      "Move your viewpoint. If two marks shift relative to one another, they are not on the same plane.",
+      "The backing seals protect the painting, but they do not protect the outside face of the glass."
+    ],
+    "solution": {
+      "culpritId": "kit",
+      "theoryId": "window-crayon",
+      "title": "The joke was only glass-deep.",
+      "explanation": "Kit drew the moustache directly on the outside of the glazing with the cartoon workshop's cobalt window crayon. Parallax separates the mark from the painted face, and the washable wax-and-soap pigment confirms that the portrait itself was never defaced. The time-lapse places the signed-out crayon in Kit's hand at the glass while the other suspects are elsewhere, and its newly flattened tip matches the curve.",
+      "proof": [
+        "Parallax places the mark in front of the painting",
+        "The pigment is washable window crayon",
+        "The time-lapse shows Kit holding the matching crayon at the glass"
+      ]
+    }
+  },
+  {
+    "id": "batch-a-lantern-that-would-not-light",
+    "caseNumber": 10,
+    "title": "The Lantern That Would Not Light",
+    "subtitle": "The oil was sound. The wick had been dressed for another job.",
+    "location": "Riverside Lantern Festival",
+    "incident": "7:05–7:25 PM",
+    "difficulty": "Measured",
+    "fileMark": "FESTIVAL / SABOTAGE",
+    "brief": [
+      "The festival's lead lantern passed its afternoon test, yet refused to light when the river procession began at 7:20. Its reservoir was full, the air holes were open, and a fresh-looking wick sat in the burner.",
+      "Three volunteers worked around the lantern table after the successful test. One replaced a useful piece of cotton with something that only looked like it."
+    ],
+    "question": "Who disabled the lead lantern, and what was substituted for its wick?",
+    "suspects": [
+      {
+        "id": "lian",
+        "name": "Lian Park",
+        "role": "Lantern maker",
+        "initials": "LP",
+        "statement": "I tested the real wick at four. After that, I only repaired the paper shade."
+      },
+      {
+        "id": "niko",
+        "name": "Niko Bell",
+        "role": "Procession drummer",
+        "initials": "NB",
+        "statement": "I tightened my drum in the music tent. I never handled the lantern burners."
+      },
+      {
+        "id": "bea",
+        "name": "Bea Moss",
+        "role": "Festival beekeeper",
+        "initials": "BM",
+        "statement": "I left beeswax candles on the table, but wax near a wick is hardly suspicious."
+      }
+    ],
+    "theories": [
+      {
+        "id": "shellacked-drum-cord",
+        "label": "Replaced the cotton wick with shellacked drum cord that could not draw oil"
+      },
+      {
+        "id": "watered-oil",
+        "label": "Diluted the reservoir with water so fuel could not reach the flame"
+      },
+      {
+        "id": "blocked-vents",
+        "label": "Sealed the air vents with clear wax so the flame suffocated"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "◉",
+        "tag": "FUEL TEST",
+        "title": "Good oil, open air",
+        "text": "A spoonful from the reservoir burns cleanly, and a wire passes through every vent. Neither watered fuel nor blocked airflow caused the failure."
+      },
+      {
+        "glyph": "║",
+        "tag": "FALSE WICK",
+        "title": "Cotton that will not bend",
+        "text": "The supposed wick is glossy and rigid. After ten minutes in oil, its core remains dry instead of darkening by capillary action."
+      },
+      {
+        "glyph": "◒",
+        "tag": "COATING",
+        "title": "Amber at the cut",
+        "text": "A cut cross-section reveals cotton cord sealed beneath amber shellac. Beeswax would soften with hand warmth; this coating does not."
+      },
+      {
+        "glyph": "≋",
+        "tag": "DRUM BENCH",
+        "title": "The red tracer",
+        "text": "Niko's drum-repair cord uses the same three-strand braid, amber shellac, and single red tracer thread as the false wick. Twelve centimetres are missing from his spool."
+      },
+      {
+        "glyph": "◈",
+        "tag": "GROUP PHOTO",
+        "title": "A reflection in brass",
+        "text": "A 7:14 group photo—six minutes before the first lighting attempt—reflects Niko beside the burner tray, holding the lantern's brass wick cap. Lian and Bea are visible together across the square."
+      }
+    ],
+    "hints": [
+      "A wick must carry fuel as well as resemble cotton. Check whether this one absorbs anything.",
+      "The hard amber coating belongs to an instrument-repair material, not to the beekeeper's soft wax."
+    ],
+    "solution": {
+      "culpritId": "niko",
+      "theoryId": "shellacked-drum-cord",
+      "title": "The false wick was tuned, not woven.",
+      "explanation": "Niko removed the tested wick and replaced it with a short length of shellacked drum cord before the 7:20 lighting attempt. The cord looked like braided cotton but its hard coating prevented oil from rising to the flame. Its weave, red tracer, and amber shellac match Niko's missing repair cord exactly, and the 7:14 photograph places the wick cap in his hand during the available interval.",
+      "proof": [
+        "The fuel and air supply both work",
+        "Shellac prevents the false wick from absorbing oil",
+        "The matching cord and photograph identify Niko"
+      ]
+    }
+  },
+  {
+    "id": "batch-a-silver-thimble",
+    "caseNumber": 11,
+    "title": "The Silver Thimble",
+    "subtitle": "The cabinet never opened. Its dust travelled toward the wall.",
+    "location": "Rosebank Stitching Room",
+    "incident": "Tuesday, 8:00–9:10 AM",
+    "difficulty": "Sharp",
+    "fileMark": "CRAFT HALL / HEIRLOOM",
+    "brief": [
+      "Rosebank's engraved centennial thimble vanished from a locked wall cabinet before the quilting circle arrived. The glass door's wax seal was undisturbed, and the nineteen-millimetre thimble was too wide for any eight-millimetre slot in the rear vent's apparently fixed mesh.",
+      "Three people entered the stitching room that morning. Each knew the heirloom would be photographed at ten."
+    ],
+    "question": "Who removed the thimble, and how did it pass mesh slots narrower than the object itself?",
+    "suspects": [
+      {
+        "id": "june",
+        "name": "June Alder",
+        "role": "Community-hall caretaker",
+        "initials": "JA",
+        "statement": "I dusted and vacuumed the room. The display cabinet and my vacuum hose were never connected."
+      },
+      {
+        "id": "ruth",
+        "name": "Ruth Webb",
+        "role": "Quilting-circle chair",
+        "initials": "RW",
+        "statement": "I arranged fabric beneath the cabinet, then fetched tea before anyone else arrived."
+      },
+      {
+        "id": "leo",
+        "name": "Leo Finch",
+        "role": "Anniversary photographer",
+        "initials": "LF",
+        "statement": "I measured the light and unpacked my tripod. I never touched the display."
+      }
+    ],
+    "theories": [
+      {
+        "id": "vacuum-through-vent",
+        "label": "Loosened the vent mesh and used suction to pull the thimble into a vacuum hose"
+      },
+      {
+        "id": "hinge-pin",
+        "label": "Removed the cabinet hinge pin and lifted the sealed glass door away as one piece"
+      },
+      {
+        "id": "adhesive-rod",
+        "label": "Pushed a sticky rod through the keyhole and drew the thimble to the lock"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "✣",
+        "tag": "WAX SEAL",
+        "title": "The door stayed shut",
+        "text": "The wax bridges glass and frame without a crack. Both hinge pins retain old oxidation, and the keyhole's dust is undisturbed."
+      },
+      {
+        "glyph": "⌁",
+        "tag": "PLINTH DUST",
+        "title": "A curved clean trail",
+        "text": "Dust forms a swept arc from the thimble's plinth to the rear vent. A loose red thread from the display points along the same route."
+      },
+      {
+        "glyph": "▦",
+        "tag": "VENT MESH",
+        "title": "A larger opening behind the slots",
+        "text": "Each fixed-looking mesh slot is only eight millimetres wide, but the whole mesh is a removable fifty-five-millimetre cassette. Its two lower clips are freshly bent outward, exposing an aperture wide enough for June's thirty-four-millimetre nozzle."
+      },
+      {
+        "glyph": "◎",
+        "tag": "VACUUM HOSE",
+        "title": "Felt in the elbow",
+        "text": "June's nozzle has a twenty-six-millimetre inner bore, wide enough for the nineteen-millimetre thimble. Red display felt and silver-polish dust coat its interior, and something metallic rattles beyond the hose elbow."
+      },
+      {
+        "glyph": "Ⅲ",
+        "tag": "MACHINE METER",
+        "title": "Three minutes of suction",
+        "text": "The hall vacuum's service meter advanced by three minutes after June signed the room clean. The thimble is lodged behind its hose filter, wrapped harmlessly in red thread."
+      }
+    ],
+    "hints": [
+      "The thimble did not need to fit through the fixed mesh if the mesh itself could be moved.",
+      "Follow the direction of the dust and thread. Both point toward a tool that moves objects with air."
+    ],
+    "solution": {
+      "culpritId": "june",
+      "theoryId": "vacuum-through-vent",
+      "title": "The heirloom took a very short vacuum journey.",
+      "explanation": "June bent back the vent cassette's lower clips, lifted the whole mesh away from its fifty-five-millimetre aperture, and inserted the vacuum nozzle. Its twenty-six-millimetre bore admitted the nineteen-millimetre thimble, which suction dragged across the felt and into the hose. She then replaced the mesh, leaving the sealed glass door untouched. The dust trail, bent clips, felt inside her nozzle, and thimble behind the hose filter establish one continuous route.",
+      "proof": [
+        "The cabinet door and keyhole were never disturbed",
+        "Dust and thread trace a route to the loosened vent",
+        "June's nozzle and hose contain the display traces and thimble"
+      ]
+    }
+  },
+  {
+    "id": "batch-a-moon-that-tore-itself",
+    "caseNumber": 12,
+    "title": "The Moon That Tore Itself",
+    "subtitle": "The workshop was empty when the scenery began to move.",
+    "location": "Juniper Street Theatre Workshop",
+    "incident": "4:20–4:35 PM",
+    "difficulty": "Sharp",
+    "fileMark": "THEATRE / RIGGED DAMAGE",
+    "brief": [
+      "A hand-painted canvas moon was locked inside the theatre workshop at four. When the director opened the room at 4:35, a fresh tear ran from the moon's lower edge almost to its centre. The numbered door tape was intact.",
+      "Three cast members handled the scenery before lockup. The damage happened later, in a room with no person inside but one machine still following its schedule."
+    ],
+    "question": "Who rigged the tear, and what movement triggered it after the room was locked?",
+    "suspects": [
+      {
+        "id": "priya",
+        "name": "Priya Lake",
+        "role": "Scenic painter",
+        "initials": "PL",
+        "statement": "I retouched the moon, photographed the clean canvas, and sealed my paint box before four."
+      },
+      {
+        "id": "milo",
+        "name": "Milo Hart",
+        "role": "Understudy",
+        "initials": "MH",
+        "statement": "I returned my coat to wardrobe. I never touched a pulley or the painted moon."
+      },
+      {
+        "id": "ren",
+        "name": "Ren Ortiz",
+        "role": "Fly-system technician",
+        "initials": "RO",
+        "statement": "I locked the controls after programming the routine safety cycle. No manual cue ran."
+      }
+    ],
+    "theories": [
+      {
+        "id": "brooch-on-fly-line",
+        "label": "Hooked a sharp costume brooch to the neighbouring fly line so its scheduled movement tore the canvas"
+      },
+      {
+        "id": "drying-paint-split",
+        "label": "Applied fast-shrinking paint that pulled the canvas apart as it dried"
+      },
+      {
+        "id": "remote-blade",
+        "label": "Hid a clockwork blade behind the moon and timed it to open after lockup"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "▯",
+        "tag": "DOOR TAPE",
+        "title": "An empty workshop",
+        "text": "The numbered tape is original and unbroken. A corridor camera shows nobody entering between 4:00 and 4:35, so the damage was prepared before lockup."
+      },
+      {
+        "glyph": "↑",
+        "tag": "TEAR DIRECTION",
+        "title": "Pulled from behind",
+        "text": "Canvas fibres curl toward the audience side while the tear climbs upward. A sharp point caught the back lower edge and was hauled vertically."
+      },
+      {
+        "glyph": "✦",
+        "tag": "TRACE",
+        "title": "Silver in the fibres",
+        "text": "The tear holds the broken point of a steel brooch pin and fine silver stage glitter. There is no blade housing, spring oil, or unusual paint shrinkage."
+      },
+      {
+        "glyph": "☾",
+        "tag": "WARDROBE",
+        "title": "One crescent on the line",
+        "text": "Milo's understudy coat is missing its glittered crescent brooch. The broken crescent body and clasp remain tied to the neighbouring fly line; their snapped pin fits the steel point embedded in the canvas."
+      },
+      {
+        "glyph": "↟",
+        "tag": "FLY LOG",
+        "title": "The 4:27 safety rise",
+        "text": "Priya's timestamped 3:58 photo of the clean canvas reflects Milo behind the moon tying black thread at that line while Ren locks the control cage. At 4:27, the automatic safety cycle raised the same line by eighty centimetres."
+      }
+    ],
+    "hints": [
+      "An intact door means the culprit arranged a delayed action before four o'clock.",
+      "Match the direction of the tear to the only object in the empty room that moved upward on schedule."
+    ],
+    "solution": {
+      "culpritId": "milo",
+      "theoryId": "brooch-on-fly-line",
+      "title": "The moon tore on cue.",
+      "explanation": "Before lockup, Milo tied his sharp crescent brooch to the neighbouring fly line and hooked its pin into the moon's lower back edge. Priya's 3:58 photo catches him tying the line while Ren locks the controls. The programmed 4:27 safety cycle then raised the line, snapping the brooch pin and dragging its point upward through the canvas while the workshop remained empty. The recovered brooch body, embedded point, photograph, and fly log reconstruct the delayed sabotage.",
+      "proof": [
+        "The sealed room requires a prepared delayed action",
+        "The upward tear follows the scheduled fly-line movement",
+        "The 3:58 photograph places Milo rigging the recovered brooch"
+      ]
+    }
+  },
+  {
+    "id": "batch-a-vanishing-letter-q",
+    "caseNumber": 13,
+    "title": "The Vanishing Letter Q",
+    "subtitle": "The tile bag held a perfect count and one piece that was never wood.",
+    "location": "Oak Room Word-Game Final",
+    "incident": "2:40–3:05 PM",
+    "difficulty": "Measured",
+    "fileMark": "GAME HALL / MISSING TILE",
+    "brief": [
+      "Officials counted one hundred wooden tiles into a canvas bag, weighed it, and sealed the drawstring before the neighbourhood word-game final. When play began, the letter Q was missing. The seal remained intact.",
+      "A cup of tea had spilled across the bag while the finalists took their seats. Everyone assumed the damp patch was merely bad luck."
+    ],
+    "question": "Who made the Q disappear from a sealed bag, and what temporary substitute fooled the count?",
+    "suspects": [
+      {
+        "id": "celia",
+        "name": "Celia Crumb",
+        "role": "Baker and scorekeeper",
+        "initials": "CC",
+        "statement": "I brought refreshments and read out the tile count. I never added anything to the bag."
+      },
+      {
+        "id": "owen",
+        "name": "Owen Reed",
+        "role": "Tournament host",
+        "initials": "OR",
+        "statement": "I pulled the seal tight myself. The correct weight was written down before the spill."
+      },
+      {
+        "id": "nora",
+        "name": "Nora Vale",
+        "role": "Library volunteer",
+        "initials": "NV",
+        "statement": "I fetched score sheets from the next room. The tiles were already on the counting cloth."
+      }
+    ],
+    "theories": [
+      {
+        "id": "sugar-tile-dissolved",
+        "label": "Removed the wooden Q before sealing and replaced it with a hollow painted sugar tile matched to its weight"
+      },
+      {
+        "id": "double-seam-pocket",
+        "label": "Worked the Q into a concealed pocket inside the bag's double seam"
+      },
+      {
+        "id": "magnet-under-table",
+        "label": "Pulled a metal-backed Q through the canvas with a magnet beneath the table"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "100",
+        "tag": "COUNT SHEET",
+        "title": "A correct count and weight",
+        "text": "At 2:44 the bag held one hundred tile-shaped pieces at the expected total weight on the officials' whole-gram scale. The original string seal has not moved since that measurement."
+      },
+      {
+        "glyph": "≈",
+        "tag": "DAMP PATCH",
+        "title": "Sticky inside, clean outside",
+        "text": "The tea dried normally on the outer canvas, but the lining beneath it is tacky and slightly sweet-smelling. The bag seam contains no hidden pocket."
+      },
+      {
+        "glyph": "□",
+        "tag": "RESIDUE",
+        "title": "An ivory outline",
+        "text": "Inside the damp patch lies a tile-sized square of glucose residue with two ivory paint flakes, one curved like the tail of a capital Q."
+      },
+      {
+        "glyph": "Q",
+        "tag": "REFEREE PHOTO",
+        "title": "One letter too glossy",
+        "text": "A photograph taken during the count shows a glossy Q among the matte wooden tiles. Celia's hand is beside it while Owen reaches for the sealing cord."
+      },
+      {
+        "glyph": "▦",
+        "tag": "SUGAR MOULD",
+        "title": "The missing place card",
+        "text": "Celia brought hollow pulled-sugar place cards moulded to the exact tile dimensions. An unused card and a wooden tile both register three grams on the officials' scale. Her tray has an empty Q cavity, and matching ivory food paint dries on her pastry brush."
+      }
+    ],
+    "hints": [
+      "The count can be correct even if one counted object is only pretending to be a wooden tile.",
+      "The tea did not remove anything through the sealed bag. It changed one water-soluble object already inside."
+    ],
+    "solution": {
+      "culpritId": "celia",
+      "theoryId": "sugar-tile-dissolved",
+      "title": "The Q was counted, weighed, and then dissolved.",
+      "explanation": "Celia pocketed the wooden Q during counting and substituted a hollow painted sugar replica made in her tile-sized place-card mould. Its thin shell matched the wooden tile's three-gram reading, so it supplied the correct shape, count, and measured weight when Owen sealed the bag. Tea soaking through the canvas dissolved the false tile, leaving glucose and ivory food-paint flakes behind. The referee's photograph and Celia's empty Q mould identify the substitution.",
+      "proof": [
+        "The intact seal means the bag contained the trick from the start",
+        "Sugar and Q-shaped paint remain in the damp patch",
+        "Celia made a matching sugar piece and handled it during counting"
+      ]
+    }
+  },
+  {
+    "id": "batch-a-blank-kitchen-clue",
+    "caseNumber": 14,
+    "title": "The Blank Kitchen Clue",
+    "subtitle": "Dinner grew warmer. The handwriting quietly disappeared.",
+    "location": "Flat 4B Puzzle Supper",
+    "incident": "7:15–7:50 PM",
+    "difficulty": "Gentle",
+    "fileMark": "HOME / VANISHING INK",
+    "brief": [
+      "At an apartment puzzle supper, the final handwritten clue was sealed in a clear box above the kitchen warming shelf. Everyone read it at 7:15. When the teams returned at 7:50, the card was blank although the box's paper lock remained intact.",
+      "Three organisers prepared the clue station. No one needed to reopen the box to make its message vanish."
+    ],
+    "question": "Who made the clue disappear, and what ordinary change in the kitchen activated the trick?",
+    "suspects": [
+      {
+        "id": "anika",
+        "name": "Anika Shah",
+        "role": "Supper host",
+        "initials": "AS",
+        "statement": "I sealed the box, then switched on the warming shelf when dinner arrived."
+      },
+      {
+        "id": "dev",
+        "name": "Dev Linn",
+        "role": "Invitation letterer",
+        "initials": "DL",
+        "statement": "I copied the clue using the permanent black pen Anika left beside the card."
+      },
+      {
+        "id": "mira",
+        "name": "Mira Bose",
+        "role": "Puzzle setter",
+        "initials": "MB",
+        "statement": "I wrote the wording, but Dev made the display copy while I checked the answers."
+      }
+    ],
+    "theories": [
+      {
+        "id": "heat-erasable-ink",
+        "label": "Lettered the card in heat-erasable ink that turned clear above the warming shelf"
+      },
+      {
+        "id": "sliding-white-sheet",
+        "label": "Rigged a white sheet inside the frame to slide over the writing as the box warmed"
+      },
+      {
+        "id": "cleaning-vapour",
+        "label": "Placed a hidden cleaning capsule in the box whose vapour bleached ordinary ink"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "✕",
+        "tag": "PAPER LOCK",
+        "title": "Still sealed, still simple",
+        "text": "The paper lock and clear box are intact. Inside are only one card and two clips—no sliding sheet, capsule, thread, or mechanical part."
+      },
+      {
+        "glyph": "✎",
+        "tag": "CARD SURFACE",
+        "title": "Words without colour",
+        "text": "Side lighting reveals pen-pressure grooves spelling the original clue. The card was genuinely written on; the coloured ink alone became invisible."
+      },
+      {
+        "glyph": "54°",
+        "tag": "THERMOMETER",
+        "title": "A warm little shelf",
+        "text": "After Anika switched it on, air around the clue box reached 54°C. Ordinary permanent ink remains black at that temperature."
+      },
+      {
+        "glyph": "❄",
+        "tag": "COLD TEST",
+        "title": "The letters return",
+        "text": "Held against a freezer pack, the card's dark violet words slowly reappear. Reversible heat-erasing ink can regain colour when chilled."
+      },
+      {
+        "glyph": "DL",
+        "tag": "PEN CASE",
+        "title": "The switched cap",
+        "text": "Dev's lettering case contains a violet heat-erasable tailoring pen fitted with the black cap from Anika's permanent marker. The permanent pen is in his case under Dev's violet cap."
+      }
+    ],
+    "hints": [
+      "The grooves prove the words were not covered or removed. Only their colour changed.",
+      "Compare what happened near the warming shelf with what happens when the card is chilled again."
+    ],
+    "solution": {
+      "culpritId": "dev",
+      "theoryId": "heat-erasable-ink",
+      "title": "The kitchen erased the clue on schedule.",
+      "explanation": "Dev switched pen caps and lettered the card with his violet heat-erasable tailoring pen while claiming to use Anika's permanent marker. Once the warming shelf raised the box to 54°C, the ink turned clear without anyone breaking the seal. The pressure grooves show the message was written, the freezer pack restores it, and the exchanged caps tie the deliberate substitution to Dev.",
+      "proof": [
+        "The intact, empty mechanism rules out a physical cover",
+        "Heat erased the colour and cold restored it",
+        "Dev's switched pen caps reveal the deliberate ink swap"
+      ]
+    }
+  }
+]

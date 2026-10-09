@@ -1,0 +1,10 @@
+node_modules
+build
+.react-router
+.env
+.env.*.local
+test-results
+playwright-report
+.DS_Store
+.superpowers/
+.lighthouseci

@@ -1,0 +1,696 @@
+[
+  {
+    "id": "crimson-orchid",
+    "caseNumber": 1,
+    "title": "The Crimson Orchid",
+    "subtitle": "A locked glasshouse. An empty pot. Twelve missing minutes.",
+    "location": "Marrow House Conservatory",
+    "incident": "8:32–8:45 PM",
+    "difficulty": "Gentle",
+    "fileMark": "BOTANY / THEFT",
+    "brief": [
+      "At 8:45, the curator unlocked the public doors and found Marrow House's priceless Crimson Orchid missing. Its ceramic display pot was untouched, and the conservatory alarm never sounded.",
+      "Three people were still inside the estate. One of them moved a living plant out of a room that records every opening of its main door."
+    ],
+    "question": "Who took the orchid, and how did it leave the glasshouse?",
+    "suspects": [
+      {
+        "id": "nadia",
+        "name": "Nadia Moss",
+        "role": "Assistant botanist",
+        "initials": "NM",
+        "statement": "I misted the east bench until closing. I never touched the potting trolley."
+      },
+      {
+        "id": "rohan",
+        "name": "Rohan Pike",
+        "role": "Estate electrician",
+        "initials": "RP",
+        "statement": "The lights fluttered. I stayed at the fuse cabinet until they steadied."
+      },
+      {
+        "id": "celeste",
+        "name": "Celeste Vane",
+        "role": "Patron of the exhibit",
+        "initials": "CV",
+        "statement": "I waited in the marble lobby. Orchids dislike me almost as much as I dislike humidity."
+      }
+    ],
+    "theories": [
+      {
+        "id": "cart-hatch",
+        "label": "Hidden in a nursery sleeve beneath the potting cart, then passed through the service hatch"
+      },
+      {
+        "id": "coat-door",
+        "label": "Wrapped in a coat and carried through the alarmed main door"
+      },
+      {
+        "id": "label-switch",
+        "label": "Relabelled days earlier and collected as ordinary greenhouse stock"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "▥",
+        "tag": "ACCESS LOG",
+        "title": "One badge, one visit",
+        "text": "Nadia's badge opened the main door at 8:32 and logged her exit at 8:44. No other door event occurred before the orchid was reported missing."
+      },
+      {
+        "glyph": "◌",
+        "tag": "POT",
+        "title": "A clean crescent",
+        "text": "The ceramic display pot contains undisturbed compost and a clean crescent where a removable black nursery sleeve had rested. The orchid was lifted without its display pot."
+      },
+      {
+        "glyph": "⌇",
+        "tag": "WATER LOG",
+        "title": "The dry east bench",
+        "text": "Automatic misting finished at 7:55. The east-bench leaves and floor are bone-dry, contradicting Nadia's account of twelve minutes spent misting there."
+      },
+      {
+        "glyph": "▰",
+        "tag": "TROLLEY",
+        "title": "A damp ring below",
+        "text": "The potting cart's lower shelf holds a damp crescent, black nursery grit, and one red petal. Its canvas skirt hides the entire shelf from view."
+      },
+      {
+        "glyph": "↗",
+        "tag": "FLOOR PLAN",
+        "title": "The door that is not a door",
+        "text": "A waist-high service hatch beside the potting cart opens into the loading corridor. It moves supplies but is absent from the alarm's door log."
+      }
+    ],
+    "hints": [
+      "The alarm log proves how people entered—not necessarily how a plant left.",
+      "Compare Nadia's statement with the water log, then follow the black nursery grit."
+    ],
+    "solution": {
+      "culpritId": "nadia",
+      "theoryId": "cart-hatch",
+      "title": "The flower travelled freight class.",
+      "explanation": "Nadia lifted the orchid in its removable nursery sleeve, hid it behind the potting cart's canvas skirt, and rolled the cart beside the unmonitored service hatch. Her misting story covered the time she needed; the dry bench proves that story false. The damp crescent, nursery grit, and petal trace the orchid to the cart, while the hatch explains how it left without another door event.",
+      "proof": [
+        "The dry bench breaks Nadia's alibi",
+        "The cart carries a physical trace of the orchid",
+        "The service hatch bypasses the logged door"
+      ]
+    }
+  },
+  {
+    "id": "platform-four",
+    "caseNumber": 2,
+    "title": "The Letter at Platform Four",
+    "subtitle": "Sixty seconds of darkness was enough to steal only the words.",
+    "location": "Northcross Station Café",
+    "incident": "6:14–6:15 PM",
+    "difficulty": "Measured",
+    "fileMark": "RAIL / MANUSCRIPT",
+    "brief": [
+      "A sealed display envelope in the station café held the final page of novelist Vera Bell's unpublished book. During a one-minute blackout, the page vanished. The envelope's red wax seal remained perfect.",
+      "The glass case was in view of the counter, the departure board, and a café table. Everyone insists the blackout caught them where they stood."
+    ],
+    "question": "Who stole the page, and how was the intact seal defeated?",
+    "suspects": [
+      {
+        "id": "milo",
+        "name": "Milo Penn",
+        "role": "Café manager",
+        "initials": "MP",
+        "statement": "I stayed behind the till. In the dark, I could barely find the candles."
+      },
+      {
+        "id": "june",
+        "name": "June Sato",
+        "role": "Bicycle courier",
+        "initials": "JS",
+        "statement": "I was scanning my platform ticket when the lights failed."
+      },
+      {
+        "id": "arun",
+        "name": "Arun Bell",
+        "role": "Novelist's nephew",
+        "initials": "AB",
+        "statement": "I watched the departure clock. I wanted the page, but not badly enough to miss my train."
+      }
+    ],
+    "theories": [
+      {
+        "id": "rear-panel",
+        "label": "Opened the case's rear service panel and removed the page without touching the envelope seal"
+      },
+      {
+        "id": "wax-cast",
+        "label": "Made a duplicate wax seal, opened the envelope, and resealed it during the blackout"
+      },
+      {
+        "id": "glass-slit",
+        "label": "Pulled the page through a narrow gap in the front glass with wire"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "◆",
+        "tag": "RED WAX",
+        "title": "A truly intact seal",
+        "text": "The wax bears Vera Bell's tiny fingerprint and has no reheating marks. The envelope was not opened after it entered the case."
+      },
+      {
+        "glyph": "□",
+        "tag": "DISPLAY CASE",
+        "title": "Built for quick changes",
+        "text": "The display has a rear service panel for replacing menus. It opens with the same square pantry key kept on the café manager's ring."
+      },
+      {
+        "glyph": "ϟ",
+        "tag": "POWER BOX",
+        "title": "A theatrical blackout",
+        "text": "Nothing failed. The café's lighting breaker was manually lowered. It sits eighteen centimetres below the till."
+      },
+      {
+        "glyph": "◒",
+        "tag": "CUP",
+        "title": "Coffee behind the case",
+        "text": "A fresh dark-coffee ring marks the hidden rear shelf. Milo drinks black coffee; June ordered tea and Arun carried no cup."
+      },
+      {
+        "glyph": "⌁",
+        "tag": "TIMESTAMPS",
+        "title": "Two clocks agree",
+        "text": "June's platform scanner registered at 6:14:22. Arun's train gate opened under camera at 6:14:31. Both were outside the café before the lights returned."
+      }
+    ],
+    "hints": [
+      "An intact envelope does not mean an intact display case.",
+      "Only one person could reach both the breaker and the square pantry key without moving from his claimed position."
+    ],
+    "solution": {
+      "culpritId": "milo",
+      "theoryId": "rear-panel",
+      "title": "The seal was never the lock.",
+      "explanation": "Milo staged the blackout from the breaker beneath his till, used his square pantry key on the case's rear panel, and slid the manuscript page out of the still-sealed envelope through its open top. The fresh coffee ring places him behind the case. June and Arun were both captured outside the café during the crucial minute.",
+      "proof": [
+        "The seal was never disturbed",
+        "Milo controlled the breaker and service key",
+        "His coffee marks the concealed access point"
+      ]
+    }
+  },
+  {
+    "id": "silent-bell",
+    "caseNumber": 3,
+    "title": "The Silent Bell",
+    "subtitle": "The museum alarm trusted weight. The thief trusted theatre paint.",
+    "location": "Aster Museum, East Gallery",
+    "incident": "Thursday, 5:40–6:00 PM",
+    "difficulty": "Measured",
+    "fileMark": "MUSEUM / SUBSTITUTION",
+    "brief": [
+      "The Aster Museum's silver Pilgrim Bell disappeared from a pressure-alarmed plinth. The alarm never changed weight, and the object under the glass looked correct until a curator noticed it made no sound.",
+      "The silent object is a painted brass rehearsal bell. Someone prepared a replacement and balanced it precisely."
+    ],
+    "question": "Who made the substitution, and how was the weight alarm fooled?",
+    "suspects": [
+      {
+        "id": "inez",
+        "name": "Inez Vale",
+        "role": "Metal conservator",
+        "initials": "IV",
+        "statement": "I polished the real bell on Tuesday. I have not handled the rehearsal pieces this month."
+      },
+      {
+        "id": "bo",
+        "name": "Bo Mercer",
+        "role": "Night guard",
+        "initials": "BM",
+        "statement": "My round passed the east gallery every ten minutes. The display never looked disturbed."
+      },
+      {
+        "id": "mae",
+        "name": "Mae Aster",
+        "role": "Museum benefactor",
+        "initials": "MA",
+        "statement": "I donated it. Selling it would be a rather circular form of generosity."
+      }
+    ],
+    "theories": [
+      {
+        "id": "weighted-replica",
+        "label": "Swapped in a painted rehearsal bell weighted internally with conservation lead"
+      },
+      {
+        "id": "plinth-brace",
+        "label": "Braced the pressure plate from beneath while removing the bell"
+      },
+      {
+        "id": "alarm-magnet",
+        "label": "Held the weight sensor in place with a strong magnet during the theft"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "⚖",
+        "tag": "PLINTH",
+        "title": "Exact to the gram",
+        "text": "The false bell weighs 1,842 grams—the exact registered weight of the original. A loose object shifts inside its hollow base."
+      },
+      {
+        "glyph": "◐",
+        "tag": "X-RAY",
+        "title": "A hidden half-moon",
+        "text": "Imaging reveals a crescent of soft lead screwed inside the replica. The lead has been cut with fine conservation shears."
+      },
+      {
+        "glyph": "▧",
+        "tag": "LOAN BOOK",
+        "title": "Rehearsal piece 3B",
+        "text": "Inez signed out rehearsal bell 3B on Wednesday for 'surface comparison.' She returned it Thursday morning."
+      },
+      {
+        "glyph": "✦",
+        "tag": "PAINT FLAKE",
+        "title": "Silver over brass",
+        "text": "A metallic paint flake under Inez's drying rack matches the replica's fresh coating. It contains the museum workshop's rare mica binder."
+      },
+      {
+        "glyph": "⌚",
+        "tag": "GUARD CLOCK",
+        "title": "A narrow workshop window",
+        "text": "Bo's mechanical checkpoint card confirms every round. Mae was speaking on the gallery stage when Inez alone wheeled a covered conservation crate past the plinth."
+      }
+    ],
+    "hints": [
+      "The alarm did exactly what it was designed to do: notice a change in weight.",
+      "Ask who had access to the replica, the lead, the right shears, and the matching paint."
+    ],
+    "solution": {
+      "culpritId": "inez",
+      "theoryId": "weighted-replica",
+      "title": "A perfect weight, and a hollow alibi.",
+      "explanation": "Inez prepared rehearsal bell 3B with silver paint and a carefully cut crescent of conservation lead until it matched the Pilgrim Bell gram for gram. During her authorised crate movement, she exchanged the objects. The pressure alarm saw no change. The loan signature, workshop-only mica paint, and shear-cut lead make the preparation uniquely hers.",
+      "proof": [
+        "The replica was tuned to the alarm's exact weight",
+        "Workshop materials link the preparation to Inez",
+        "Her crate supplied the opportunity"
+      ]
+    }
+  },
+  {
+    "id": "midnight-broadcast",
+    "caseNumber": 4,
+    "title": "The Midnight Broadcast",
+    "subtitle": "The ending leaked before the actors spoke it aloud.",
+    "location": "WNR Radio Theatre",
+    "incident": "11:20–11:48 PM",
+    "difficulty": "Sharp",
+    "fileMark": "RADIO / LEAK",
+    "brief": [
+      "At 11:48, minutes before WNR's live mystery drama, a rival station broadcast the secret final line. Only three numbered script copies existed, and all three were still in their owners' hands.",
+      "The rival received a typed note, not a photograph. Someone copied the ending without surrendering their script."
+    ],
+    "question": "Who leaked the ending, and what copying trick did they use?",
+    "suspects": [
+      {
+        "id": "ada",
+        "name": "Ada North",
+        "role": "Lead actor",
+        "initials": "AN",
+        "statement": "My script stayed on my music stand while I warmed up in Studio B."
+      },
+      {
+        "id": "sol",
+        "name": "Sol Reed",
+        "role": "Sound engineer",
+        "initials": "SR",
+        "statement": "I was cueing shellac effects. I heard the final line for the first time on air."
+      },
+      {
+        "id": "viola",
+        "name": "Viola Crane",
+        "role": "Programme sponsor",
+        "initials": "VC",
+        "statement": "My courtesy copy remained sealed in its blue folder. I never even read the thing."
+      }
+    ],
+    "theories": [
+      {
+        "id": "carbon-copy",
+        "label": "Typed the ending with carbon paper hidden beneath the sheet, creating a second copy in one pass"
+      },
+      {
+        "id": "vent-recording",
+        "label": "Recorded rehearsal through the studio vent and transcribed the final line"
+      },
+      {
+        "id": "cue-sheet",
+        "label": "Reconstructed the ending from sound-effect cues and actor entrances"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "C",
+        "tag": "SCRIPT COPIES",
+        "title": "A private correction",
+        "text": "The leaked line includes 'the harbour keeps its dead'—a correction handwritten only on copy C, Viola's sponsor copy. Copies A and B still say 'secrets.'"
+      },
+      {
+        "glyph": "▤",
+        "tag": "BLUE FOLDER",
+        "title": "Sealed, but not untouched",
+        "text": "Viola's folder seal is intact. Its bottom edge, however, was never glued; the script slides out cleanly without breaking the seal."
+      },
+      {
+        "glyph": "≋",
+        "tag": "TYPEWRITER",
+        "title": "The ghost beneath the words",
+        "text": "The rival's note carries faint blue pressure marks behind the black letters. They are characteristic of a carbon sheet placed under the typed page."
+      },
+      {
+        "glyph": "V",
+        "tag": "RIBBON TEST",
+        "title": "A chipped capital V",
+        "text": "The note's capital V has a missing left serif. The same defect appears on the sponsor lounge typewriter and nowhere else in WNR."
+      },
+      {
+        "glyph": "☎",
+        "tag": "SWITCHBOARD",
+        "title": "One brief outside line",
+        "text": "At 11:42, the sponsor lounge placed a forty-second call to the rival station's news desk. Viola signed the room register at 11:39."
+      }
+    ],
+    "hints": [
+      "The unique corrected wording identifies which script supplied the leak.",
+      "The note was produced by a particular machine, and its pale blue marks reveal a second sheet."
+    ],
+    "solution": {
+      "culpritId": "viola",
+      "theoryId": "carbon-copy",
+      "title": "Copy C made copy D.",
+      "explanation": "Viola slid copy C through the unglued bottom of its ceremonial folder, typed the corrected final line in the sponsor lounge with carbon paper beneath it, and phoned the duplicate to WNR's rival. The unique correction identifies her script; the chipped V identifies her typewriter; the blue pressure marks reveal the carbon copy.",
+      "proof": [
+        "Only Viola's copy contains the leaked correction",
+        "The sponsor typewriter left its broken-serif signature",
+        "The lounge call delivered the line"
+      ]
+    }
+  },
+  {
+    "id": "cabin-nine",
+    "caseNumber": 5,
+    "title": "Cabin Nine",
+    "subtitle": "A jewel vanished from a room no stranger entered.",
+    "location": "The Night Meridian, Sleeper Car",
+    "incident": "1:05–1:40 AM",
+    "difficulty": "Sharp",
+    "fileMark": "RAIL / INSURANCE",
+    "brief": [
+      "Journalist Noor Dey reported her emerald brooch stolen from locked Cabin Nine while she dined two cars away. The corridor seal was unbroken, the window opens only eight centimetres, and the porter retained his passkey.",
+      "At 1:40, a green stone was found beneath Noor's washbasin. She called it proof that a thief had fumbled the jewel while escaping."
+    ],
+    "question": "Who engineered the impossible theft, and what was the real aim?",
+    "suspects": [
+      {
+        "id": "noor",
+        "name": "Noor Dey",
+        "role": "Journalist and owner",
+        "initials": "ND",
+        "statement": "The brooch was on my washstand. Someone entered despite the seal—I cannot explain it."
+      },
+      {
+        "id": "elias",
+        "name": "Elias Ward",
+        "role": "Sleeper-car porter",
+        "initials": "EW",
+        "statement": "My passkey stayed chained to my belt. I sealed the corridor myself."
+      },
+      {
+        "id": "sable",
+        "name": "Sable Fox",
+        "role": "Touring illusionist",
+        "initials": "SF",
+        "statement": "An impossible room is usually a very possible lie. This one is not my trick."
+      }
+    ],
+    "theories": [
+      {
+        "id": "staged-claim",
+        "label": "Replaced the real brooch with paste, disposed of the fake stone, and staged an insurance claim"
+      },
+      {
+        "id": "window-fishing",
+        "label": "Hooked the brooch through the narrow window from the carriage platform"
+      },
+      {
+        "id": "copied-passkey",
+        "label": "Made a wax impression of the porter's passkey and entered before the corridor was sealed"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "◇",
+        "tag": "GREEN STONE",
+        "title": "Glass under the basin",
+        "text": "The loose green stone scratches at hardness 5.5. Emerald should score 7.5 or higher. The recovered stone is bottle glass."
+      },
+      {
+        "glyph": "⌁",
+        "tag": "BROOCH CLASP",
+        "title": "A deliberate fracture",
+        "text": "The clasp found on the washstand has parallel file marks and fresh brass beneath them. It was weakened before the train departed."
+      },
+      {
+        "glyph": "▭",
+        "tag": "TELEGRAM",
+        "title": "Insured in a hurry",
+        "text": "Noor tripled the brooch's insurance yesterday afternoon and requested coverage beginning precisely at midnight."
+      },
+      {
+        "glyph": "✧",
+        "tag": "PAWNSHOP WIRE",
+        "title": "An emerald heading south",
+        "text": "A dealer in the previous city logged the real brooch's maker mark at 4:10 PM—two hours before Noor boarded the Night Meridian."
+      },
+      {
+        "glyph": "▣",
+        "tag": "CORRIDOR SEAL",
+        "title": "The locked room holds",
+        "text": "The numbered paper seal, window soot, and key chain are all intact. There is no physical evidence that anyone entered Cabin Nine after dinner."
+      }
+    ],
+    "hints": [
+      "Start by asking whether the recovered stone was ever part of an emerald brooch.",
+      "The real jewel's timeline ends before the train journey begins."
+    ],
+    "solution": {
+      "culpritId": "noor",
+      "theoryId": "staged-claim",
+      "title": "There was no theft aboard the train.",
+      "explanation": "Noor sold or pledged the real brooch before boarding, weakened a cheap replica's clasp, and dropped its glass stone beneath the basin. She then reported an impossible locked-cabin theft to activate newly increased insurance. The dealer's maker-mark record places the real jewel off the train, and every cabin seal confirms that no intruder was needed.",
+      "proof": [
+        "The recovered 'emerald' is bottle glass",
+        "The clasp was prepared to fail",
+        "The real brooch was logged in another city"
+      ]
+    }
+  },
+  {
+    "id": "saffron-impression",
+    "caseNumber": 6,
+    "title": "The Saffron Impression",
+    "subtitle": "The recipe never left its drawer. Its shadow did.",
+    "location": "Sunroom Bakery",
+    "incident": "Monday, 4:50–6:00 PM",
+    "difficulty": "Gentle",
+    "fileMark": "BAKERY / SECRET",
+    "brief": [
+      "Sunroom Bakery locked its prize saffron-bun recipe in a desk at closing. At dawn, a rival shop displayed the exact recipe—including its strange pinch of black salt. The drawer's paper seal was intact.",
+      "Three afternoon visitors stood beside the recipe before it was locked away. One copied it without a camera, a key, or even a pencil."
+    ],
+    "question": "Who copied the recipe, and what ordinary material carried the words away?",
+    "suspects": [
+      {
+        "id": "pippa",
+        "name": "Pippa Lo",
+        "role": "Bakery apprentice",
+        "initials": "PL",
+        "statement": "I weighed saffron at the far counter. I know most of the recipe already, but not the salt."
+      },
+      {
+        "id": "basil",
+        "name": "Basil Crow",
+        "role": "Food critic",
+        "initials": "BC",
+        "statement": "I wrote tasting notes beside the desk. Trade secrets make terribly dry reading."
+      },
+      {
+        "id": "emi",
+        "name": "Emi Rose",
+        "role": "Florist and supplier",
+        "initials": "ER",
+        "statement": "I set down a damp bouquet, collected my invoice, and left. I never opened a drawer."
+      }
+    ],
+    "theories": [
+      {
+        "id": "wax-transfer",
+        "label": "Pressed damp waxed bouquet paper onto the violet-pencil recipe and read the reversed transfer later"
+      },
+      {
+        "id": "blotter-rubbing",
+        "label": "Made a pencil rubbing of indentations left on the desk blotter"
+      },
+      {
+        "id": "memory-tasting",
+        "label": "Deduced every quantity by tasting a finished bun and guessing the method"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "▱",
+        "tag": "DRAWER SEAL",
+        "title": "A secret that stayed put",
+        "text": "The recipe card remains inside the desk. Its numbered paper seal and old lock dust are undisturbed. The information—not the card—was stolen."
+      },
+      {
+        "glyph": "✎",
+        "tag": "RECIPE CARD",
+        "title": "Violet pencil",
+        "text": "The baker writes with a soft violet copying pencil. When dampened, its pigment transfers readily onto paper pressed against it."
+      },
+      {
+        "glyph": "❧",
+        "tag": "DESK SURFACE",
+        "title": "Fern-shaped moisture",
+        "text": "The recipe card bears a faint damp outline shaped like fern leaves. Emi's bouquet used the same fern as packing greenery."
+      },
+      {
+        "glyph": "↔",
+        "tag": "RIVAL'S NOTE",
+        "title": "Letters in reverse",
+        "text": "Beneath the rival baker's black-ink copy are faint reversed violet words: 'black salt, one pinch.' They read correctly in a mirror."
+      },
+      {
+        "glyph": "◫",
+        "tag": "DELIVERY PAPER",
+        "title": "One sheet too few",
+        "text": "Emi's delivery roll is waxed on one side and missing its final numbered sheet. A torn corner in her invoice book carries violet pigment."
+      }
+    ],
+    "hints": [
+      "The reversed words were transferred by contact, not written from memory.",
+      "Violet copying pencil, moisture, and one missing sheet of bouquet paper form a complete copying method."
+    ],
+    "solution": {
+      "culpritId": "emi",
+      "theoryId": "wax-transfer",
+      "title": "The bouquet took an impression.",
+      "explanation": "Emi laid damp waxed wrapping over the face-up recipe while collecting her invoice. Moisture activated the soft violet copying pencil, leaving a reversed impression on the paper. She removed that sheet with the bouquet and read it in a mirror. The fern-shaped moisture mark, reversed violet text, and missing numbered paper all trace the copy to her.",
+      "proof": [
+        "The recipe itself never left the sealed drawer",
+        "The rival's note preserves a reversed violet transfer",
+        "Emi's damp wrapping supplied the copying surface"
+      ]
+    }
+  },
+  {
+    "id": "clockmakers-tuesday",
+    "caseNumber": 7,
+    "title": "The Clockmaker's Tuesday",
+    "subtitle": "At quarter past four, a clock that cannot chime gave someone away.",
+    "location": "Morrow & Son, Watchmakers",
+    "incident": "4:10–4:20 PM",
+    "difficulty": "Sharp",
+    "fileMark": "WATCH / LOCKED COUNTER",
+    "brief": [
+      "A prototype silver pocket watch vanished from a velvet tray behind the shop counter. The front door stayed in view, no one crossed the counter gate, and the tray glass was found closed.",
+      "Three visitors stood close enough to admire the watch. Only one describes a sound the shop could never make."
+    ],
+    "question": "Who took the watch, and how did they lift it without crossing the counter?",
+    "suspects": [
+      {
+        "id": "elian",
+        "name": "Elian Morrow",
+        "role": "Clockmaker's apprentice",
+        "initials": "EM",
+        "statement": "I stepped out for tea at ten past four and returned before the hour."
+      },
+      {
+        "id": "ruth",
+        "name": "Ruth Kline",
+        "role": "Parcel courier",
+        "initials": "RK",
+        "statement": "I signed the delivery book, set two boxes down, and left at 4:14."
+      },
+      {
+        "id": "vale",
+        "name": "August Vale",
+        "role": "Watch collector",
+        "initials": "AV",
+        "statement": "I remained by the front case. I distinctly heard the shop clock chime quarter past four."
+      }
+    ],
+    "theories": [
+      {
+        "id": "magnet-cane",
+        "label": "Used a magnet concealed in a hollow cane to lift the watch by its steel chain"
+      },
+      {
+        "id": "parcel-switch",
+        "label": "Lowered an open parcel over the tray and trapped the watch inside it"
+      },
+      {
+        "id": "thread-pulley",
+        "label": "Looped thread through the counter grille and dragged the watch across the velvet"
+      }
+    ],
+    "clues": [
+      {
+        "glyph": "¼",
+        "tag": "SHOP CLOCK",
+        "title": "No quarter chime",
+        "text": "The regulator clock strikes only on the hour. Its movement has no quarter-chime train and never has. August's vivid 4:15 memory is invented."
+      },
+      {
+        "glyph": "○",
+        "tag": "VELVET TRAY",
+        "title": "A round absence",
+        "text": "Dust on the glass above the tray shows a clean circular mark, 28 millimetres wide—the exact diameter of August's silver cane ferrule."
+      },
+      {
+        "glyph": "↟",
+        "tag": "COUNTER GLASS",
+        "title": "The lid lifts upward",
+        "text": "The tray's glass lid is not locked. From the customer side, a long object can raise it through the ornamental brass grille."
+      },
+      {
+        "glyph": "⊕",
+        "tag": "COMPASS",
+        "title": "North follows the cane",
+        "text": "A watchmaker's compass swings forty degrees when August's cane passes. The ferrule conceals a strong horseshoe magnet."
+      },
+      {
+        "glyph": "⌁",
+        "tag": "CHAIN LINK",
+        "title": "One link left behind",
+        "text": "A broken steel chain link clings inside the magnetised ferrule. The prototype's silver case is non-magnetic, but its safety chain is steel."
+      }
+    ],
+    "hints": [
+      "August supplies a precise time marker, but verify whether the clock could supply it.",
+      "The watch case is silver; another attached part would still answer a magnet."
+    ],
+    "solution": {
+      "culpritId": "vale",
+      "theoryId": "magnet-cane",
+      "title": "The cane had an attraction to fine watches.",
+      "explanation": "August invented the quarter chime to anchor his false alibi. From the customer side, he fed his hollow cane through the brass grille, lifted the unlocked glass lid, and caught the watch's steel safety chain with the concealed magnet. The circular dust mark fixes the cane above the tray, and the broken chain link remains attached to the ferrule.",
+      "proof": [
+        "August describes a chime the clock cannot make",
+        "His cane matches the circular trace on the glass",
+        "Its hidden magnet holds the watch's broken chain link"
+      ]
+    }
+  }
+]
+

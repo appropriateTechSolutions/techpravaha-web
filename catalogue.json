@@ -1,0 +1,403 @@
+{
+  "currency": "INR",
+  "gst": 0.18,
+  "services": [
+    {
+      "id": "websites",
+      "name": "Websites & landing pages",
+      "short": "Fast, searchable sites with the copy and tracking already in place.",
+      "route": "/services/websites",
+      "order": 1,
+      "tiers": [
+        {
+          "id": "websites-launch",
+          "name": "Launch",
+          "label": "Launch",
+          "tagline": "One page that converts",
+          "price": 35000,
+          "buyable": true,
+          "weeks": 2,
+          "badge": null,
+          "payment": "Full payment at checkout",
+          "includes": [
+            "1 landing page, up to 6 sections",
+            "Copy and layout written to one clear goal",
+            "Mobile-first build, Lighthouse 90+ on all four scores",
+            "Contact form and WhatsApp button wired up",
+            "Analytics and search basics: meta tags, sitemap, indexing",
+            "Hosted on your domain, handover walkthrough included"
+          ]
+        },
+        {
+          "id": "websites-growth",
+          "name": "Growth",
+          "label": "Growth",
+          "tagline": "The full site",
+          "price": 95000,
+          "buyable": true,
+          "weeks": 4,
+          "badge": "Recommended",
+          "payment": "50% at checkout, 50% at launch",
+          "includes": [
+            "Up to 8 pages: home, services, about, contact and more",
+            "Custom design system: colours, type and components",
+            "Blog or case-study section you can edit yourself",
+            "On-page SEO for each page and structured data",
+            "Lead capture sent to your email or Google Sheet",
+            "30 days of fixes after launch"
+          ]
+        },
+        {
+          "id": "websites-bespoke",
+          "name": "Bespoke",
+          "label": "Bespoke",
+          "tagline": "Something specific",
+          "price": null,
+          "from": 150000,
+          "buyable": false,
+          "badge": null,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "Multi-language or multi-region sites",
+            "Custom integrations: CRM, payments, booking",
+            "Member areas, dashboards or gated content",
+            "Migration from an existing site with redirects kept",
+            "Fixed scope and price agreed before we start"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "apps",
+      "name": "Apps",
+      "short": "Mobile and web apps, from a clickable prototype to a shipped MVP.",
+      "route": "/services/apps",
+      "order": 2,
+      "tiers": [
+        {
+          "id": "apps-launch",
+          "name": "Launch",
+          "label": "Prototype",
+          "tagline": "See it before you build it",
+          "price": 45000,
+          "buyable": true,
+          "weeks": 1,
+          "badge": null,
+          "payment": "Full payment at checkout",
+          "includes": [
+            "Clickable prototype of the core flows, up to 8 screens",
+            "User flow map and screen-by-screen notes",
+            "Feature list split into must-have and later",
+            "Tech stack recommendation with rough build estimate",
+            "Walkthrough call to test it with your team"
+          ]
+        },
+        {
+          "id": "apps-growth",
+          "name": "Growth",
+          "label": "MVP",
+          "tagline": "A working first version",
+          "price": null,
+          "from": 250000,
+          "buyable": false,
+          "badge": null,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "Working app on Android and iOS, or a responsive web app",
+            "Sign-in, one core workflow and an admin view",
+            "Backend, database and hosting set up on your accounts",
+            "Test builds shared every week",
+            "Store submission support",
+            "Source code and handover documentation"
+          ]
+        },
+        {
+          "id": "apps-bespoke",
+          "name": "Bespoke",
+          "label": "Bespoke",
+          "tagline": "Something specific",
+          "price": null,
+          "from": 600000,
+          "buyable": false,
+          "badge": null,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "Multi-role apps with admin and reporting",
+            "Payments, notifications and third-party integrations",
+            "Offline mode and data sync where needed",
+            "Phased delivery with a fixed price per phase",
+            "Fixed scope and price agreed before we start"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai",
+      "name": "AI assistants & call centre",
+      "short": "Chat and voice assistants trained on your own documents and processes.",
+      "route": "/services/ai",
+      "order": 3,
+      "tiers": [
+        {
+          "id": "ai-launch",
+          "name": "Launch",
+          "label": "Assistant",
+          "tagline": "An assistant that knows your business",
+          "price": 60000,
+          "buyable": true,
+          "weeks": 2,
+          "badge": null,
+          "payment": "Full payment at checkout",
+          "includes": [
+            "Chat assistant trained on your documents and FAQs",
+            "Embedded on your website or connected to WhatsApp",
+            "Handover to a human when it is unsure",
+            "Conversation log you can review",
+            "Test set of 50 real questions checked before launch",
+            "Usage costs explained before go-live"
+          ]
+        },
+        {
+          "id": "ai-growth",
+          "name": "Growth",
+          "label": "Call centre",
+          "tagline": "Voice agents that answer the phone",
+          "price": null,
+          "from": 120000,
+          "buyable": false,
+          "badge": null,
+          "terms": "Setup fee plus usage, scoped on a call",
+          "includes": [
+            "Inbound and outbound voice agent on your phone number",
+            "Call scripts and escalation rules written with you",
+            "Calls logged and summarised into your CRM or Sheet",
+            "Call recordings and transcripts with search",
+            "Live dashboard for call volume and outcomes",
+            "Setup fee plus per-minute usage billed at cost"
+          ]
+        },
+        {
+          "id": "ai-bespoke",
+          "name": "Bespoke",
+          "label": "Bespoke",
+          "tagline": "Something specific",
+          "price": null,
+          "from": 300000,
+          "buyable": false,
+          "badge": null,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "Agents that take actions: bookings, orders, ticket updates",
+            "Integration with your internal systems and databases",
+            "Multi-language voice and chat",
+            "Evaluation set and monitoring for answer quality",
+            "Fixed scope and price agreed before we start"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "whatsapp",
+      "name": "WhatsApp marketing & automation",
+      "short": "Broadcasts, lead capture and follow-ups on the WhatsApp Business API.",
+      "route": "/services/whatsapp",
+      "order": 4,
+      "tiers": [
+        {
+          "id": "whatsapp-launch",
+          "name": "Launch",
+          "label": "Setup",
+          "tagline": "Get on the Business API",
+          "price": 25000,
+          "buyable": true,
+          "weeks": 1,
+          "badge": null,
+          "payment": "Full payment at checkout",
+          "includes": [
+            "WhatsApp Business API account set up and verified",
+            "Business profile, catalogue and green-tick guidance",
+            "Up to 5 approved message templates",
+            "Shared inbox for your team",
+            "Click-to-WhatsApp links for your site and ads"
+          ]
+        },
+        {
+          "id": "whatsapp-growth",
+          "name": "Growth",
+          "label": "Automation",
+          "tagline": "Replies and follow-ups on autopilot",
+          "price": 65000,
+          "buyable": true,
+          "weeks": 3,
+          "badge": "Recommended",
+          "payment": "50% at checkout, 50% at launch",
+          "includes": [
+            "Everything in Setup",
+            "Automated lead capture and qualification flow",
+            "Follow-up sequences with delay and reply rules",
+            "Broadcast campaigns with opt-in lists",
+            "Leads and orders synced to your Sheet or CRM",
+            "Monthly report: sent, delivered, replied"
+          ]
+        },
+        {
+          "id": "whatsapp-bespoke",
+          "name": "Bespoke",
+          "label": "Bespoke",
+          "tagline": "Something specific",
+          "price": null,
+          "from": 120000,
+          "buyable": false,
+          "badge": null,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "In-chat ordering, payments and appointment booking",
+            "Integration with your ERP, POS or booking system",
+            "AI-assisted replies with human handover",
+            "Multi-agent inbox with routing rules",
+            "Fixed scope and price agreed before we start"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "content",
+      "name": "Content automation",
+      "short": "A pipeline that drafts, schedules and publishes your content for review.",
+      "route": "/services/content",
+      "order": 5,
+      "tiers": [
+        {
+          "id": "content-launch",
+          "name": "Launch",
+          "label": "Starter",
+          "tagline": "A steady stream of drafts",
+          "price": 40000,
+          "buyable": true,
+          "weeks": 2,
+          "badge": null,
+          "payment": "Full payment at checkout",
+          "includes": [
+            "Topic sheet in Google Sheets that drives the pipeline",
+            "Automated first drafts in your brand voice",
+            "Review step: nothing publishes without your approval",
+            "Publishing to one channel, such as your blog or LinkedIn",
+            "Style guide built from your existing writing",
+            "Walkthrough and a written runbook"
+          ]
+        },
+        {
+          "id": "content-growth",
+          "name": "Growth",
+          "label": "Studio",
+          "tagline": "Many channels from one idea",
+          "price": 85000,
+          "buyable": true,
+          "weeks": 3,
+          "badge": "Recommended",
+          "payment": "50% at checkout, 50% at launch",
+          "includes": [
+            "Everything in Starter",
+            "One idea repurposed for blog, LinkedIn, X and email",
+            "Image and social card generation",
+            "Scheduling calendar with approval queue",
+            "Search and performance tracking per post",
+            "30 days of tuning after launch"
+          ]
+        },
+        {
+          "id": "content-bespoke",
+          "name": "Bespoke",
+          "label": "Bespoke",
+          "tagline": "Something specific",
+          "price": null,
+          "from": 150000,
+          "buyable": false,
+          "badge": null,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "Video and audio pipelines: scripts, captions, clips",
+            "Multi-brand or multi-language publishing",
+            "Pipelines fed by your own data or product catalogue",
+            "Custom approval flow for your team",
+            "Fixed scope and price agreed before we start"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "design",
+      "name": "UI/UX design",
+      "short": "Audits and redesigns for products and sites that people find hard to use.",
+      "route": "/services/design",
+      "order": 6,
+      "tiers": [
+        {
+          "id": "design-launch",
+          "name": "Launch",
+          "label": "Audit",
+          "tagline": "Find what is costing you users",
+          "price": 15000,
+          "buyable": true,
+          "days": 5,
+          "badge": null,
+          "payment": "Full payment at checkout",
+          "includes": [
+            "Review of up to 10 key screens or pages",
+            "Usability and accessibility findings, ranked by impact",
+            "Annotated screenshots for every issue",
+            "Quick wins you can ship this week",
+            "Recorded walkthrough of the findings"
+          ]
+        },
+        {
+          "id": "design-growth",
+          "name": "Growth",
+          "label": "Redesign",
+          "tagline": "A cleaner, clearer interface",
+          "price": 70000,
+          "buyable": true,
+          "weeks": 3,
+          "badge": "Recommended",
+          "payment": "50% at checkout, 50% at launch",
+          "includes": [
+            "Everything in Audit",
+            "Redesign of up to 10 screens in Figma",
+            "Design system: colours, type, components",
+            "Mobile and desktop layouts",
+            "Developer-ready handoff with specs",
+            "Two rounds of revisions on the redesigned screens"
+          ]
+        },
+        {
+          "id": "design-bespoke",
+          "name": "Bespoke",
+          "label": "Bespoke",
+          "tagline": "Something specific",
+          "price": null,
+          "from": 150000,
+          "buyable": false,
+          "badge": null,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "Full product redesign across all flows",
+            "User research and usability testing with your customers",
+            "Design system with documented, reusable components",
+            "Front-end implementation of the new design",
+            "Fixed scope and price agreed before we start"
+          ]
+        }
+      ]
+    }
+  ],
+  "addons": [
+    {
+      "id": "care",
+      "name": "Care",
+      "from": 5000,
+      "per": "month",
+      "buyable": false,
+      "blurb": "Hosting, monitoring and small changes, billed monthly."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "name": "techpravaha-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "react-router dev",
+    "build": "react-router build && tsx scripts/postbuild.ts",
+    "preview": "npx serve build/client",
+    "typecheck": "react-router typegen && tsc",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "og": "tsx scripts/og.ts"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "@react-router/node": "^7.18.4",
+    "isbot": "^5.2.2",
+    "marked": "^18.1.0",
+    "motion": "^14.1.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router": "^7.18.4"
+  },
+  "devDependencies": {
+    "@lhci/cli": "^0.15.1",
+    "@playwright/test": "^1.64.0",
+    "@react-router/dev": "^7.18.4",
+    "@tailwindcss/vite": "^4.3.3",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "axe-core": "^4.14.0",
+    "jsdom": "^29.1.1",
+    "serve": "^14.2.6",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.4",
+    "vitest": "^4.1.11"
+  }
+}

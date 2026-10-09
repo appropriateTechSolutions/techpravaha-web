@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meeting Meter — this meeting is costing you</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#101014;--panel:#1A1A21;--line:#2C2C36;--txt:#F2F2F5;--dim:#8B8B98;--money:#4ADE80;--burn:#F87171;--amber:#FBBF24}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:'Space Grotesk',system-ui,sans-serif;min-height:100vh;padding:28px 16px 70px}
+  .wrap{max-width:620px;margin:0 auto}
+  h1{font-size:clamp(1.6rem,6vw,2.3rem);font-weight:700;text-align:center}
+  h1 span{color:var(--burn)}
+  .tag{text-align:center;color:var(--dim);margin:6px 0 26px;font-size:.95rem}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px}
+  label{display:block;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:0 0 6px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  input,select{width:100%;background:#111117;border:1px solid var(--line);border-radius:10px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:1rem;padding:12px}
+  input:focus,select:focus{outline:2px solid var(--amber)}
+  .presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .preset{font-size:.75rem;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--dim);cursor:pointer}
+  .preset:hover{border-color:var(--amber);color:var(--amber)}
+  .cur{display:flex;gap:8px;margin-top:4px}
+  .cur button{flex:1;padding:9px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--dim);cursor:pointer;font-family:'JetBrains Mono',monospace}
+  .cur button.on{background:var(--amber);color:#111;border-color:var(--amber);font-weight:800}
+  .meter{text-align:center;padding:34px 18px}
+  .cost{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:clamp(2.6rem,12vw,4.6rem);color:var(--money);letter-spacing:-.02em;transition:color .3s}
+  .cost.hot{color:var(--amber)}.cost.fire{color:var(--burn)}
+  .sub{color:var(--dim);margin-top:8px;font-size:.92rem}
+  .equiv{margin-top:14px;font-size:.95rem;color:var(--txt);min-height:1.4em}
+  .btns{display:flex;gap:10px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+  .btn{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;padding:14px 26px;border-radius:12px;cursor:pointer;border:1px solid var(--line);background:#111117;color:var(--txt)}
+  .btn.go{background:var(--money);color:#08210F;border-color:var(--money)}
+  .btn.stop{background:var(--burn);color:#2A0808;border-color:var(--burn)}
+  .btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  .report{display:none;text-align:center}
+  .report h2{font-size:1.2rem;margin-bottom:10px}
+  .cardOut{background:#111117;border:1px dashed var(--amber);border-radius:12px;padding:18px;font-family:'JetBrains Mono',monospace;font-size:.92rem;line-height:1.7;white-space:pre-wrap;text-align:left;margin:12px 0}
+  .note{color:var(--money);font-size:.85rem;min-height:1.2em;margin-top:8px}
+  footer{text-align:center;color:var(--dim);font-size:.78rem;margin-top:40px;font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>MEETING <span>METER</span></h1>
+  <p class="tag">Watch the money leave the room in real time.</p>
+
+  <div class="panel" id="setup">
+    <div class="grid">
+      <div><label for="ppl">People in the meeting</label><input type="number" id="ppl" min="1" max="500" value="6"></div>
+      <div><label for="rate">Avg salary (per year)</label><input type="number" id="rate" min="1" value="1200000"></div>
+    </div>
+    <div class="presets" id="presets"></div>
+    <label style="margin-top:16px">Currency</label>
+    <div class="cur">
+      <button class="on" data-c="₹">₹ INR</button>
+      <button data-c="$">$ USD</button>
+      <button data-c="€">€ EUR</button>
+    </div>
+  </div>
+
+  <div class="panel meter">
+    <div class="cost" id="cost">₹0</div>
+    <div class="sub" id="elapsed">00:00 elapsed · ₹0/minute</div>
+    <div class="equiv" id="equiv"></div>
+    <div class="btns">
+      <button class="btn go" id="startBtn">▶ Start the burn</button>
+      <button class="btn" id="pauseBtn" style="display:none">⏸ Pause</button>
+      <button class="btn stop" id="endBtn" style="display:none">■ End meeting</button>
+    </div>
+  </div>
+
+  <div class="panel report" id="report">
+    <h2>Post-mortem</h2>
+    <div class="cardOut" id="cardOut"></div>
+    <button class="btn go" id="copyBtn">Copy share card</button>
+    <button class="btn" id="resetBtn">New meeting</button>
+    <div class="note" id="copyNote"></div>
+  </div>
+
+  <footer>Assumes ~2,080 working hours/year. Emotional cost not included.</footer>
+</div>
+
+<script>
+const PRESETS = [
+  {label:"Startup team", ppl:6, rate:1200000},
+  {label:"Enterprise all-hands", ppl:40, rate:1800000},
+  {label:"Leadership sync", ppl:8, rate:4000000},
+  {label:"US tech team ($)", ppl:8, rate:150000, cur:"$"},
+  {label:"'Quick' standup", ppl:10, rate:1500000}
+];
+const EQUIVS = [
+  {n:20, u:"cutting chais"}, {n:180, u:"vada pavs"}, {n:300, u:"movie tickets"},
+  {n:600, u:"biryanis"}, {n:15000, u:"months of someone's Netflix"},
+  {n:45000, u:"decent smartphones"}, {n:200000, u:"scooters"}
+];
+let cur = "₹", running = false, paused = false;
+let startT = 0, accum = 0, timer = null;
+
+const $ = id => document.getElementById(id);
+
+const presetWrap = $("presets");
+PRESETS.forEach(p=>{
+  const b = document.createElement("button");
+  b.className = "preset"; b.textContent = p.label;
+  b.addEventListener("click", ()=>{
+    $("ppl").value = p.ppl; $("rate").value = p.rate;
+    if(p.cur) setCur(p.cur);
+  });
+  presetWrap.appendChild(b);
+});
+document.querySelectorAll(".cur button").forEach(b=>{
+  b.addEventListener("click", ()=>setCur(b.dataset.c));
+});
+function setCur(c){
+  cur = c;
+  document.querySelectorAll(".cur button").forEach(b=>b.classList.toggle("on", b.dataset.c===c));
+  tick();
+}
+function perSecond(){
+  const ppl = Math.max(1, +$("ppl").value || 1);
+  const rate = Math.max(1, +$("rate").value || 1);
+  return ppl * rate / (2080*3600); // salary/yr → per working second
+}
+function fmt(n){
+  const r = Math.round(n);
+  return cur + r.toLocaleString(cur==="₹" ? "en-IN" : "en-US");
+}
+function elapsedMs(){ return accum + (running && !paused ? Date.now()-startT : 0); }
+function tick(){
+  const sec = elapsedMs()/1000;
+  const total = sec * perSecond();
+  const c = $("cost");
+  c.textContent = fmt(total);
+  c.className = "cost" + (total > perSecond()*3600 ? " fire" : total > perSecond()*1200 ? " hot" : "");
+  const mm = String(Math.floor(sec/60)).padStart(2,"0");
+  const ss = String(Math.floor(sec%60)).padStart(2,"0");
+  $("elapsed").textContent = `${mm}:${ss} elapsed · ${fmt(perSecond()*60)}/minute`;
+  // equivalence line (only meaningful in ₹; scale roughly for others)
+  const inr = cur==="₹" ? total : total*80;
+  const eq = [...EQUIVS].reverse().find(e => inr >= e.n*2);
+  $("equiv").textContent = eq ? "That's ~" + Math.floor(inr/eq.n).toLocaleString("en-IN") + " " + eq.u + " so far." : "";
+}
+$("startBtn").addEventListener("click", ()=>{
+  running = true; paused = false; startT = Date.now();
+  $("startBtn").style.display="none"; $("pauseBtn").style.display=""; $("endBtn").style.display="";
+  $("report").style.display="none";
+  timer = setInterval(tick, 250);
+});
+$("pauseBtn").addEventListener("click", ()=>{
+  if(paused){ paused=false; startT=Date.now(); $("pauseBtn").textContent="⏸ Pause"; }
+  else{ accum += Date.now()-startT; paused=true; $("pauseBtn").textContent="▶ Resume"; }
+});
+$("endBtn").addEventListener("click", ()=>{
+  accum = elapsedMs(); running=false; clearInterval(timer); tick();
+  const sec = accum/1000, total = sec*perSecond();
+  const mins = Math.max(1, Math.round(sec/60));
+  const emailCost = fmt(perSecond()*120); // ~2 min to write an email
+  window._card =
+`📉 MEETING METER REPORT
+─────────────────────
+Duration: ${mins} min · ${$("ppl").value} people
+Total cost: ${fmt(total)}
+Rate: ${fmt(perSecond()*60)}/minute
+
+An email would have cost ${emailCost}.
+It could have been an email.`;
+  $("cardOut").textContent = window._card;
+  $("report").style.display="block";
+  $("startBtn").style.display=""; $("pauseBtn").style.display="none"; $("endBtn").style.display="none";
+  $("startBtn").textContent = "▶ Start another burn";
+  $("report").scrollIntoView({behavior:"smooth"});
+});
+$("copyBtn").addEventListener("click", async ()=>{
+  try{ await navigator.clipboard.writeText(window._card); $("copyNote").textContent="Copied. Post it where the organizer will see it."; }
+  catch(e){ $("copyNote").textContent="Select the card text and copy manually."; }
+});
+$("resetBtn").addEventListener("click", ()=>{
+  accum=0; running=false; paused=false; clearInterval(timer);
+  $("report").style.display="none"; $("pauseBtn").textContent="⏸ Pause"; tick();
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+["ppl","rate"].forEach(id=>$(id).addEventListener("input", tick));
+tick();
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<!--
+  OG image template, rendered by scripts/og.ts at 1200x630.
+  Query params: title, eyebrow, theme (dark only for now).
+  Brand tokens are inlined here because this file is a standalone screenshot
+  source, not part of the app bundle.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>OG template</title>
+  <style>
+    @font-face {
+      font-family: 'OG Bricolage';
+      font-weight: 200 800;
+      src: url('../node_modules/@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-opsz-normal.woff2') format('woff2-variations');
+    }
+    @font-face {
+      font-family: 'OG Mono';
+      font-weight: 500;
+      src: url('../node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2') format('woff2');
+    }
+    :root { --ground: #0A0A0C; --ink: #F4F4F6; --muted: #9A9AA6; --accent: #A8BD9A; }
+    * { box-sizing: border-box; margin: 0; }
+    html, body { width: 1200px; height: 630px; overflow: hidden; background: var(--ground); }
+    .card {
+      position: relative; width: 1200px; height: 630px; padding: 72px 80px;
+      background:
+        radial-gradient(900px 500px at 85% -10%, rgba(168, 189, 154, 0.10), transparent 60%),
+        var(--ground);
+      color: var(--ink); font-family: 'OG Bricolage', sans-serif;
+    }
+    .mark { position: absolute; top: 72px; right: 80px; width: 48px; height: 48px; color: var(--ink); }
+    .eyebrow {
+      font-family: 'OG Mono', monospace; font-weight: 500; font-size: 22px;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+    }
+    .title {
+      position: absolute; left: 80px; right: 160px; top: 235px;
+      font-weight: 600; font-size: 92px; line-height: 1.02; letter-spacing: -0.035em;
+      text-wrap: balance;
+    }
+    .title.long { font-size: 72px; }
+    .foot {
+      position: absolute; left: 80px; right: 80px; bottom: 64px;
+      display: flex; justify-content: space-between; align-items: baseline;
+    }
+    .wordmark { font-weight: 600; font-size: 30px; letter-spacing: -0.02em; }
+    .url { font-family: 'OG Mono', monospace; font-weight: 500; font-size: 22px; letter-spacing: 0.06em; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <svg class="mark" viewBox="0 0 100 100" aria-hidden="true">
+      <path d="M 18 18 H 50 A 32 32 0 0 1 82 50 V 82 H 18 Z" fill="currentColor" />
+      <circle cx="34" cy="66" r="8" fill="#A8BD9A" />
+    </svg>
+    <p class="eyebrow" id="eyebrow"></p>
+    <h1 class="title" id="title"></h1>
+    <div class="foot">
+      <span class="wordmark">Tech Pravaha</span>
+      <span class="url">techpravaha.com</span>
+    </div>
+  </div>
+  <script>
+    const q = new URLSearchParams(location.search);
+    const title = q.get('title') || 'Beautiful things, shipped.';
+    document.getElementById('eyebrow').textContent = q.get('eyebrow') || 'Tech Pravaha';
+    const t = document.getElementById('title');
+    t.textContent = title;
+    if (title.length > 34) t.classList.add('long');
+    document.documentElement.dataset.theme = q.get('theme') || 'dark';
+  </script>
+</body>
+</html>

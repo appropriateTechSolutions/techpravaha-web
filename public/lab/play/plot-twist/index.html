@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1d1d1a">
+    <meta name="description" content="Plot Twist is a one-minute daily mystery. Inspect the clues, name the culprit, and close the case.">
+    <title>Plot Twist — The Daily Mystery</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%2320211e'/%3E%3Cpath d='M22 23c1-9 19-11 21-1 2 9-10 9-10 18' fill='none' stroke='%23d39425' stroke-width='5' stroke-linecap='round'/%3E%3Ccircle cx='33' cy='50' r='3' fill='%23d39425'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="js/data.js"></script>
+    <script defer src="js/game.js"></script>
+    <script defer src="js/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to the case file</a>
+    <div class="grain" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#" id="brand-home" aria-label="Plot Twist daily case">
+        <span class="brand-emblem" aria-hidden="true">
+          <span>?</span>
+        </span>
+        <span class="brand-copy">
+          <span class="brand-kicker">The daily case file</span>
+          <span class="brand-name">Plot <i>Twist</i></span>
+        </span>
+      </a>
+
+      <nav class="site-nav" aria-label="Game navigation">
+        <button class="nav-button is-active" type="button" id="daily-button" aria-current="page">
+          <span class="nav-index">01</span>
+          Daily case
+        </button>
+        <button class="nav-button" type="button" id="archive-button">
+          <span class="nav-index">02</span>
+          Case archive
+        </button>
+      </nav>
+
+      <div class="streak-seal" aria-label="Current solving streak">
+        <span class="streak-flame" aria-hidden="true">✦</span>
+        <span>
+          <strong id="header-streak">0</strong>
+          <small>day streak</small>
+        </span>
+      </div>
+    </header>
+
+    <div class="folio-rule" aria-hidden="true">
+      <span></span><b>Private &amp; confidential</b><span></span>
+    </div>
+
+    <main id="main-content" tabindex="-1">
+      <section class="case-heading" aria-labelledby="case-title">
+        <div class="case-heading__copy">
+          <p class="case-label">
+            <span id="case-mode-label">Today’s dossier</span>
+            <span class="case-label__divider" aria-hidden="true">/</span>
+            <span id="case-date-label">Filed today</span>
+          </p>
+          <h1 id="case-title">Loading case file…</h1>
+          <p class="case-subtitle" id="case-subtitle"></p>
+        </div>
+
+        <div class="case-heading__facts" aria-label="Case facts">
+          <div class="fact">
+            <span class="fact__label">File</span>
+            <strong id="case-number">CASE 000</strong>
+          </div>
+          <div class="fact">
+            <span class="fact__label">Difficulty</span>
+            <strong id="case-difficulty">—</strong>
+          </div>
+          <div class="fact fact--timer">
+            <span class="fact__label">Elapsed</span>
+            <strong id="case-timer">00:00</strong>
+          </div>
+          <button class="icon-button" type="button" id="restart-button" title="Restart this case" aria-label="Restart this case">
+            <span aria-hidden="true">↺</span>
+          </button>
+        </div>
+      </section>
+
+      <div class="case-workspace">
+        <aside class="dossier-panel" aria-labelledby="dossier-title">
+          <section class="paper-card paper-card--dossier">
+            <div class="file-tab" aria-hidden="true">OPEN FILE</div>
+            <header class="section-heading">
+              <p class="eyebrow" id="case-file-mark">INCIDENT REPORT</p>
+              <h2 id="dossier-title">The setup</h2>
+            </header>
+
+            <div class="incident-line">
+              <span>
+                <small>Location</small>
+                <strong id="case-location">—</strong>
+              </span>
+              <span>
+                <small>Window</small>
+                <strong id="case-incident">—</strong>
+              </span>
+            </div>
+
+            <div class="case-brief" id="case-brief"></div>
+
+            <blockquote class="case-question" id="case-question"></blockquote>
+
+            <div class="investigation-meter">
+              <div class="investigation-meter__label">
+                <span>Evidence exposed</span>
+                <strong><span id="clue-count">0</span>/<span id="clue-total">5</span></strong>
+              </div>
+              <div class="meter-track" aria-hidden="true"><span id="meter-fill"></span></div>
+            </div>
+
+            <div class="dossier-actions">
+              <button class="primary-button" type="button" id="reveal-clue-button">
+                <span>Reveal next clue</span>
+                <b aria-hidden="true">→</b>
+              </button>
+              <button class="text-button" type="button" id="hint-button">
+                Need a nudge? <span>−150 pts</span>
+              </button>
+            </div>
+
+            <div class="hint-notes" id="hint-notes" aria-live="polite"></div>
+          </section>
+        </aside>
+
+        <section class="evidence-panel" aria-labelledby="evidence-title">
+          <header class="section-heading section-heading--row">
+            <div>
+              <p class="eyebrow">Evidence desk</p>
+              <h2 id="evidence-title">What we know</h2>
+            </div>
+            <div class="evidence-dots" id="evidence-dots" aria-label="Clue progress"></div>
+          </header>
+
+          <div class="clue-board" id="clue-board" aria-live="polite">
+            <div class="clue-placeholder" id="clue-placeholder">
+              <span class="placeholder-mark" aria-hidden="true">?</span>
+              <p><strong>The file is still sealed.</strong><br>Reveal evidence when you are ready to start the clock.</p>
+            </div>
+          </div>
+        </section>
+
+        <aside class="deduction-panel" aria-labelledby="deduction-title">
+          <section class="paper-card paper-card--deduction">
+            <header class="section-heading">
+              <p class="eyebrow">Your deduction</p>
+              <h2 id="deduction-title">Name your theory</h2>
+            </header>
+
+            <form id="verdict-form">
+              <fieldset class="suspect-fieldset">
+                <legend><span>01</span> Who did it?</legend>
+                <div class="suspect-list" id="suspect-list"></div>
+              </fieldset>
+
+              <fieldset class="theory-fieldset">
+                <legend><span>02</span> How was it done?</legend>
+                <div class="theory-list" id="theory-list"></div>
+              </fieldset>
+
+              <p class="verdict-note" id="verdict-note">Reveal at least two clues before filing a verdict.</p>
+              <button class="verdict-button" type="submit" id="verdict-button" disabled>
+                <span>File the verdict</span>
+                <small>Lock in your deduction</small>
+              </button>
+            </form>
+
+            <div class="previous-best" id="previous-best" hidden></div>
+          </section>
+        </aside>
+      </div>
+
+      <section class="result-sheet" id="result-sheet" aria-labelledby="result-title" hidden>
+        <div class="result-stamp" id="result-stamp" aria-hidden="true">CASE CLOSED</div>
+        <div class="result-main">
+          <p class="eyebrow">Final report</p>
+          <h2 id="result-title">The truth, reconstructed</h2>
+          <p class="result-lede" id="result-lede"></p>
+          <p class="result-explanation" id="result-explanation"></p>
+          <ol class="proof-list" id="proof-list"></ol>
+        </div>
+        <aside class="score-slip" aria-label="Round score">
+          <span class="score-slip__label">Case score</span>
+          <strong id="result-score">000</strong>
+          <span class="score-slip__rank" id="result-rank">Case Closer</span>
+          <dl class="score-breakdown" id="score-breakdown"></dl>
+          <div class="result-actions">
+            <button class="primary-button primary-button--ink" type="button" id="share-button">
+              Copy result <span aria-hidden="true">↗</span>
+            </button>
+            <button class="text-button" type="button" id="replay-button">Replay this case</button>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>One curious case, every day.</p>
+      <p>Made for sharp eyes &amp; idle minutes.</p>
+    </footer>
+
+    <dialog class="archive-dialog" id="archive-dialog" aria-labelledby="archive-title">
+      <div class="archive-shell">
+        <header class="archive-header">
+          <div>
+            <p class="eyebrow">Records room</p>
+            <h2 id="archive-title">Case archive</h2>
+          </div>
+          <button class="close-button" type="button" id="archive-close-button" aria-label="Close case archive">×</button>
+        </header>
+
+        <div class="archive-stats" aria-label="Solving history">
+          <div>
+            <span>Cases closed</span>
+            <strong id="archive-solved">0</strong>
+          </div>
+          <div>
+            <span>Current streak</span>
+            <strong id="archive-streak">0</strong>
+          </div>
+          <div>
+            <span>Best score</span>
+            <strong id="archive-best">—</strong>
+          </div>
+        </div>
+
+        <div class="archive-list" id="archive-list"></div>
+
+        <p class="archive-footnote">Past files remain open for practice. Archive solves do not alter your daily streak.</p>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <noscript>
+      <div class="noscript-note">Plot Twist needs JavaScript to reveal clues and check your deductions.</div>
+    </noscript>
+  </body>
+</html>

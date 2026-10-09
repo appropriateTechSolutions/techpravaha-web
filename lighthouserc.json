@@ -1,0 +1,44 @@
+{
+  "ci": {
+    "collect": {
+      "staticDistDir": "build/client",
+      "url": [
+        "http://localhost/",
+        "http://localhost/services/websites/"
+      ],
+      "numberOfRuns": 3
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": [
+          "error",
+          {
+            "aggregationMethod": "median-run",
+            "minScore": 0.9
+          }
+        ],
+        "categories:seo": [
+          "error",
+          {
+            "aggregationMethod": "median-run",
+            "minScore": 1
+          }
+        ],
+        "categories:accessibility": [
+          "error",
+          {
+            "aggregationMethod": "median-run",
+            "minScore": 0.95
+          }
+        ],
+        "categories:best-practices": [
+          "error",
+          {
+            "aggregationMethod": "median-run",
+            "minScore": 0.9
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "id": "unique-case-slug",
+  "caseNumber": 29,
+  "releaseDate": "2026-08-17",
+  "title": "The Case Title",
+  "subtitle": "A compact, intriguing setup in one sentence.",
+  "location": "Specific location",
+  "incident": "Time window",
+  "difficulty": "Measured",
+  "fileMark": "SETTING / INCIDENT",
+  "brief": [
+    "What happened, what is missing or impossible, and why it matters.",
+    "What the three suspects share, plus the central contradiction."
+  ],
+  "question": "Who did it, and how was it done?",
+  "suspects": [
+    {
+      "id": "first-suspect",
+      "name": "First Suspect",
+      "role": "Relevant role",
+      "initials": "FS",
+      "statement": "A short statement that can be tested against the evidence."
+    },
+    {
+      "id": "second-suspect",
+      "name": "Second Suspect",
+      "role": "Relevant role",
+      "initials": "SS",
+      "statement": "A plausible statement."
+    },
+    {
+      "id": "third-suspect",
+      "name": "Third Suspect",
+      "role": "Relevant role",
+      "initials": "TS",
+      "statement": "A plausible statement."
+    }
+  ],
+  "theories": [
+    {
+      "id": "correct-method",
+      "label": "The correct method, described without naming the culprit"
+    },
+    {
+      "id": "plausible-method",
+      "label": "A plausible but contradicted alternative"
+    },
+    {
+      "id": "second-alternative",
+      "label": "Another plausible but contradicted alternative"
+    }
+  ],
+  "clues": [
+    {
+      "glyph": "◇",
+      "tag": "EVIDENCE",
+      "title": "First observation",
+      "text": "A broad clue that starts the deduction without solving it."
+    },
+    {
+      "glyph": "⌁",
+      "tag": "TIMELINE",
+      "title": "A useful contradiction",
+      "text": "A clue that weakens one claim or method."
+    },
+    {
+      "glyph": "◎",
+      "tag": "TRACE",
+      "title": "The physical link",
+      "text": "Evidence connecting the correct method to the scene."
+    },
+    {
+      "glyph": "▧",
+      "tag": "RECORD",
+      "title": "The suspect link",
+      "text": "Evidence narrowing the culprit fairly."
+    },
+    {
+      "glyph": "→",
+      "tag": "RECONSTRUCTION",
+      "title": "The final inference",
+      "text": "The decisive clue that makes culprit and method uniquely solvable."
+    }
+  ],
+  "hints": [
+    "A nudge toward the central contradiction.",
+    "A stronger nudge connecting the physical trace to the culprit."
+  ],
+  "solution": {
+    "culpritId": "first-suspect",
+    "theoryId": "correct-method",
+    "title": "A satisfying reveal line.",
+    "explanation": "A concise reconstruction that cites the decisive evidence and explains why the alternatives fail.",
+    "proof": [
+      "First decisive fact",
+      "Second decisive fact",
+      "Third decisive fact"
+    ]
+  }
+}
