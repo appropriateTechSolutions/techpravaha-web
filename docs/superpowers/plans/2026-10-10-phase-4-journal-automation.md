@@ -43,3 +43,15 @@
 ### Task 4: Verification
 
 - `npm run typecheck && npm test && npm run build`; `npm run journal:draft -- --dry-run` prints the next topic; a local run with a real key is a morning item (needs `ANTHROPIC_API_KEY`); morning notes: add the Actions secret, decide the weekly cadence, review the seed topics.
+- Journal topic 'How we scope a bespoke quote in 48 hours' assumes a 48-hour quote turnaround (also on the service pages' Bespoke cards); confirm or change the number.
+
+### Morning notes (Task 3)
+
+- Add the `ANTHROPIC_API_KEY` Actions secret (Settings, Secrets and variables, Actions).
+- Enable Settings, Actions, General, "Allow GitHub Actions to create and approve pull requests", or the workflow cannot open the PR.
+- PRs opened with the built-in token do not trigger the `CI` workflow; close and reopen the first journal PR to run it (or switch to a PAT/GitHub App token later).
+- Confirm the weekly cadence (Monday 08:30 IST, cron `0 3 * * 1`) or change it.
+- Review the six seed topics in `content/journal-topics.json` before the first run.
+- Confirm the "48 hours" quote turnaround (noted above).
+- First real run: dispatch "Journal draft" manually and read the PR before trusting the schedule.
+

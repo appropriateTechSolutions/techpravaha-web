@@ -295,7 +295,7 @@ export const SERVICES: Record<string, ServiceContent> = {
       faqScope('More channels, video scripts or a second language can be added.'),
       {
         q: 'Who owns the pipeline and the content?',
-        a: 'You do. The topic sheet, the pipeline, every draft and the accounts it publishes to are yours, handed over at launch.',
+        a: 'You do. The topic sheet, the pipeline, every draft and the accounts it publishes to are yours, handed over at launch. We built the same kind of pipeline for our own journal: a topic queue, a drafting model, a style check, and a person approving every post before it goes live.',
       },
       faqTimeline('content'),
       {

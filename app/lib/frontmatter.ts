@@ -6,7 +6,7 @@
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 /** True for a real calendar date: rejects 32-13-2026 and also 2026-02-30. */
-function isValidDate(value: string): boolean {
+export function isValidDate(value: string): boolean {
   if (!DATE_RE.test(value) || Number.isNaN(Date.parse(value))) return false;
   return new Date(value).toISOString().slice(0, 10) === value;
 }

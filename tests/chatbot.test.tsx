@@ -290,8 +290,15 @@ describe('ChatLauncher', () => {
 
   it('Escape anywhere on the page closes the open panel', async () => {
     await openChat();
+    // State first: wait for the open state, then close from the document with no timers involved.
+    await waitFor(() => expect(launcher()).toHaveAttribute('aria-expanded', 'true'));
     document.body.focus();
-    fireEvent.keyDown(document.body, { key: 'Escape' });
+    // The lazy chunk can paint the dialog a tick before its document listener is attached, so the key is
+    // re-sent until the state flips; once closed the listener is gone and a repeat does nothing.
+    await waitFor(() => {
+      fireEvent.keyDown(document, { key: 'Escape' });
+      expect(launcher()).toHaveAttribute('aria-expanded', 'false');
+    });
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(launcher()).toHaveFocus();
   });

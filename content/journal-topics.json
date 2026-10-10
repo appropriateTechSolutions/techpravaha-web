@@ -1,0 +1,40 @@
+{
+  "topics": [
+    {
+      "slug": "what-a-35000-landing-page-includes",
+      "title": "What a ₹35,000 landing page includes and why",
+      "angle": "Walk through each line of the Websites Launch package, using the includes list, timeline and payment line given for that tier in the brief and nothing else, say what each line is for, and explain why we leave the rest out on purpose.",
+      "status": "queued"
+    },
+    {
+      "slug": "whatsapp-templates-approved-first-time",
+      "title": "WhatsApp templates that get approved first time",
+      "angle": "Explain what reviewers look for in a message template and how to write one that reads as useful rather than promotional.",
+      "status": "queued"
+    },
+    {
+      "slug": "when-an-app-should-be-a-website",
+      "title": "When an app should be a website instead",
+      "angle": "Give founders a short set of questions that show whether they need an installed app or a fast site, and what each choice costs in upkeep.",
+      "status": "queued"
+    },
+    {
+      "slug": "real-cost-of-a-free-website-builder",
+      "title": "The real cost of a free website builder",
+      "angle": "List what a free builder asks for later: time, lock-in, slow pages and a template that looks like everyone else's. No scare stories, only trade-offs.",
+      "status": "queued"
+    },
+    {
+      "slug": "how-we-scope-a-bespoke-quote",
+      "title": "How we scope a bespoke quote in 48 hours",
+      "angle": "Describe the questions we ask, what we need from the founder, and what a written scope looks like when it arrives.",
+      "status": "queued"
+    },
+    {
+      "slug": "what-a-gst-invoice-should-show",
+      "title": "What a GST invoice from a studio should show",
+      "angle": "Set out the fields a founder should expect on an invoice from any studio, and why we show prices ex-GST with the tax added on top.",
+      "status": "queued"
+    }
+  ]
+}

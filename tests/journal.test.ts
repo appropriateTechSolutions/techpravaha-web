@@ -1,8 +1,11 @@
+// @vitest-environment node
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { countWords, getPost, JOURNAL_SLUGS, parseFrontmatter, POSTS, sortPosts } from '../app/lib/journal';
+import { getPost, JOURNAL_SLUGS, parseFrontmatter, POSTS, sortPosts } from '../app/lib/journal';
+import { SEED_POSTS } from '../scripts/journal/prompt';
 import { prerenderPaths } from '../scripts/lib/paths';
+import { journalPostProblems, POST_WORDS } from './helpers/journal-post';
 
 const SAMPLE = `---
 title: A sample post
@@ -60,9 +63,9 @@ describe('POSTS', () => {
     expect(titles).toContain('Running a business from WhatsApp without losing your mind');
   });
 
+  // No pin on POSTS[0]: a pipeline post dated after the seeds sorts first.
   it('is sorted by date, newest first', () => {
     for (let i = 1; i < POSTS.length; i++) expect(POSTS[i - 1].date >= POSTS[i].date).toBe(true);
-    expect(POSTS[0].slug).toBe('why-fixed-prices');
   });
 
   it('gives every post a reading time of at least one minute', () => {
@@ -114,30 +117,32 @@ describe('sortPosts', () => {
   });
 });
 
-describe('seed posts (raw markdown)', () => {
+describe('journal posts (raw markdown)', () => {
   const dir = join(process.cwd(), 'app/content/journal');
   const files = readdirSync(dir).filter((f) => f.endsWith('.md'));
 
-  it('exist', () => {
+  it('include the seed posts', () => {
     expect(files.length).toBeGreaterThanOrEqual(3);
+    for (const seed of SEED_POSTS) expect(files).toContain(seed);
   });
 
+  // Pipeline posts may run to LIMITS.maxWords (700); the hand-written seeds keep their tighter 400 to 600.
   for (const file of files) {
     const raw = readFileSync(join(dir, file), 'utf8');
+    const seed = (SEED_POSTS as readonly string[]).includes(file);
+    const words = seed ? { min: 400, max: 600 } : POST_WORDS;
 
-    it(`${file} has 400 to 600 words`, () => {
-      const { body } = parseFrontmatter(raw, file);
-      const words = countWords(body);
-      expect(words, `${file}: ${words} words`).toBeGreaterThanOrEqual(400);
-      expect(words, `${file}: ${words} words`).toBeLessThanOrEqual(600);
-    });
-
-    it(`${file} has no em-dash`, () => {
-      expect(raw).not.toContain('—');
-    });
-
-    it(`${file} leaves the h1 to the page`, () => {
-      expect(raw).not.toMatch(/^# /m);
+    it(`${file} meets the journal post rules (${words.min} to ${words.max} words, no em-dash, no h1)`, () => {
+      expect(journalPostProblems(raw, file, words)).toEqual([]);
     });
   }
+
+  it('the post rules catch what they claim to', () => {
+    const ok = readFileSync(join(dir, SEED_POSTS[0]), 'utf8');
+    expect(journalPostProblems(ok, SEED_POSTS[0])).toEqual([]);
+    expect(journalPostProblems(ok.replace('\n\n', '\n\nOne \u2014 two.\n\n'), SEED_POSTS[0])).toEqual([`${SEED_POSTS[0]}: em-dash`]);
+    expect(journalPostProblems(ok.replace(/\n---\n\n/, '\n---\n\n# Title\n\n'), SEED_POSTS[0])).toHaveLength(1);
+    expect(journalPostProblems(ok, SEED_POSTS[0], { min: 1, max: 10 })[0]).toMatch(/words, expected 1 to 10/);
+    expect(journalPostProblems(ok, 'no-date.md')).toEqual(['no-date.md: file name is not YYYY-MM-DD-<slug>.md']);
+  });
 });

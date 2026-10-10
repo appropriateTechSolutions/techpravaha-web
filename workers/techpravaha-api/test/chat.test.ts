@@ -18,6 +18,7 @@ import {
   buildSystemPrompt,
   factAmounts,
   rupeeAmounts,
+  trailingAmounts,
 } from '../src/prompt';
 // The facts the Worker actually bundles. The deploy workflow regenerates this file from catalogue.json
 // (npm run prompt:data), and the root tests/prompt-data.test.ts checks the generator, so these tests
@@ -271,6 +272,8 @@ describe('POST /chat', () => {
       'Both for Rs. 1,30,000. See /pricing',
       'Both for INR 130000. See /pricing',
       'Both for rs130000. See /pricing',
+      'Together that is 130,000 rupees + GST. See /pricing',
+      'Both for 1.3 lakh + GST. See /pricing',
     ]) {
       gemini = async () => geminiOk(reply);
       const res = await post({ messages: [userMsg('How much for a website and WhatsApp together?')] });
@@ -280,6 +283,10 @@ describe('POST /chat', () => {
     expect(PRICE_ONLY_REPLY).toBe(
       'I can only quote the prices on our pricing page. See /pricing for exact amounts, or message us on WhatsApp.',
     );
+
+    // A trailing marker on a known amount is fine.
+    gemini = async () => geminiOk('Launch is 35,000 rupees + GST. See /pricing');
+    expect(await (await post({ messages: [userMsg()] })).json()).toEqual({ reply: 'Launch is 35,000 rupees + GST. See /pricing' });
 
     // Numbers without a currency marker are not prices: timelines, GST rate, counts.
     gemini = async () => geminiOk('It takes 3 weeks, GST is 18%, and you get 130000 words. See /pricing');
@@ -318,6 +325,16 @@ describe('generationConfig()', () => {
     });
     expect(generationConfig('gemini-3.5-flash-lite')).toEqual({ maxOutputTokens: 600, temperature: 0.4 });
   });
+});
+
+describe('trailingAmounts()', () => {
+  it.each([
+    ['130,000 rupees and 35,000 Rupees', ['130000', '35000']],
+    ['1.3 lakh, 2 crore, 1.5 lakhs', ['130000', '20000000', '150000']],
+    ['5000 Rs and 400 INR', ['5000', '400']],
+    ['founded in 2026. Rupees are the unit', []],
+    ['3 weeks, 18% GST, 130000 hours, 5 rsvp', []],
+  ])('%j -> %j', (input, out) => expect(trailingAmounts(input)).toEqual(out));
 });
 
 describe('rupeeAmounts() and factAmounts()', () => {

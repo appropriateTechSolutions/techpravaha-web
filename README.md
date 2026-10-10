@@ -2,6 +2,9 @@
 
 Marketing and commerce site for Tech Pravaha, a design and build studio for things you launch: websites, apps, AI front-doors and growth automation. Every route is prerendered to static HTML; there is no runtime server.
 
+**Before go-live, read [docs/MORNING-NOTES.md](docs/MORNING-NOTES.md):** accounts and secrets, content decisions, go-live order and known gaps in one checklist.
+
+
 ## Stack
 
 | Piece | Version |
@@ -38,6 +41,7 @@ npm run dev            # http://localhost:3000
 | `npm run typecheck` | `react-router typegen` then `tsc` |
 | `npm test` | Vitest unit tests |
 | `npm run test:e2e` | Playwright smoke tests against `build/client` on port 4173. Run `npm run build` first. First time on a machine: `npx playwright install chromium`. Build with the `VITE_*` ids unset: with `VITE_GA_ID` or `VITE_CLARITY_ID` in `.env` the build loads external scripts, and the "no console errors" test can then fail on third-party noise |
+| `npm run journal:draft` / `journal:pr-body` | Draft the next queued journal post (needs `ANTHROPIC_API_KEY`; `-- --dry-run` makes no API call), and render the PR body from a draft's summary JSON. See Phase 4 |
 | `npm run og` | Regenerate the Open Graph images in `public/og/` |
 | `npm run worker:dev` / `worker:test` / `worker:deploy` | The commerce Worker: local dev on port 8787, its unit tests, deploy (regenerates the chat facts with `prompt:data` first). Node 22 (see Phase 2) |
 | `npx @lhci/cli autorun` | Lighthouse CI against `build/client` (budget below). Run `npm run build` first |
@@ -128,15 +132,16 @@ Add a real entry to `TESTIMONIALS` in `app/content/testimonials.ts`, transcribed
 Site-wide go-live, from spec section 7:
 
 1. Deploy to a Pages preview URL and QA it: every route, theme toggle, mobile layout, WhatsApp links, contact form, env ids set.
-2. Add the custom domain `techpravaha.com` and `www` to the Pages project.
-3. Remove the existing 301 for the domain (a Cloudflare redirect rule, or the ATS `_redirects`, wherever it lives).
-4. Add the Tech Pravaha cross-link to the ATS site footer (a small PR in `ats_website`).
-5. Submit `https://techpravaha.com/sitemap.xml` in Google Search Console.
-6. Run Lighthouse against the Pages preview URL before step 2 (the local budget run uses a plain static server, not Cloudflare), for example `npx lighthouse <preview-url> --form-factor=mobile`.
-7. Check the URL form: `curl -I https://techpravaha.com/services/websites/` must return 200, and `curl -I https://techpravaha.com/services/websites` must return 308 to `/services/websites/`. Canonicals, the sitemap, RSS and JSON-LD all use the trailing-slash form.
-8. Cut over only after phase 2 (checkout) is live, or soften the Razorpay/"at checkout" payment copy first (Terms 4, Privacy "Payments", Refunds 7, the home trust strip, the service-page payment note, the pricing FAQ and the catalogue's "at checkout" payment lines).
+2. Placeholder gate: `npm run build && npm run check:placeholders` must pass. It lists every bracketed placeholder (`[GSTIN]`, `[registered address]`, `[city]`, `[timeline pending]`, `[screenshot pending]` and the like) left in the prerendered pages and SVGs under `build/client`, as `file:match`, and exits 1 if there is any. It is expected to fail today: as of 2026-10-10 it lists the three `/terms` placeholders, "[timeline pending]" on the four work pages and the eight placeholder screenshots.
+3. Add the custom domain `techpravaha.com` and `www` to the Pages project.
+4. Remove the existing 301 for the domain (a Cloudflare redirect rule, or the ATS `_redirects`, wherever it lives).
+5. Add the Tech Pravaha cross-link to the ATS site footer (a small PR in `ats_website`).
+6. Submit `https://techpravaha.com/sitemap.xml` in Google Search Console.
+7. Run Lighthouse against the Pages preview URL before step 3 (the local budget run uses a plain static server, not Cloudflare), for example `npx lighthouse <preview-url> --form-factor=mobile`.
+8. Check the URL form: `curl -I https://techpravaha.com/services/websites/` must return 200, and `curl -I https://techpravaha.com/services/websites` must return 308 to `/services/websites/`. Canonicals, the sitemap, RSS and JSON-LD all use the trailing-slash form.
+9. Cut over only after phase 2 (checkout) is live, or soften the Razorpay/"at checkout" payment copy first (Terms 4, Privacy "Payments", Refunds 7, the home trust strip, the service-page payment note, the pricing FAQ and the catalogue's "at checkout" payment lines).
 
-Placeholders that must be replaced before announcing are tracked as "Morning notes for Yogesh" at the end of the phase 1 plan in `docs/superpowers/plans/`.
+Placeholders and decisions that need Yogesh before announcing are tracked in `docs/MORNING-NOTES.md`.
 
 ## Quality budget (as of 2026-10-10, phase 1 final run)
 
@@ -235,7 +240,7 @@ The three limits are Workers Rate Limiting bindings in `wrangler.toml` (`[[ratel
 
 **Worker vars** (`wrangler.toml` `[vars]`): `TELEGRAM_CHAT_ID` (required for lead pings), `GEMINI_MODEL` (optional, default `gemini-3.5-flash-lite`; a `gemini-2.5*` id gets `thinkingBudget: 0`, any other id gets no thinking config because 3.x models default to minimal thinking; the reply cap is 600 output tokens), `LAB_MODEL` (optional, default `claude-haiku-5-5`; leave the default). Local dev reads dummies from `.dev.vars` (`.dev.vars.example` lists them all).
 
-**Gemini key.** Use a billed Gemini project: on an unbilled AI Studio project, Google's terms let it use the chat content to improve its products. The default model is `gemini-3.5-flash-lite`. Confirm the model answers on your key with one request (expect a JSON body with `candidates`; a 403 or 404 means the key cannot reach that model):
+**Gemini key.** Use a billed Gemini project: on an unbilled AI Studio project, Google's terms let it use the chat content to improve its products. Set a spend cap on that project before go-live: it is a prerequisite, and a budget alert alone only notifies and does not stop spend. The default model is `gemini-3.5-flash-lite`. Confirm the model answers on your key with one request (expect a JSON body with `candidates`; a 403 or 404 means the key cannot reach that model):
 
 ```sh
 curl -s -H "x-goog-api-key: $KEY" -H "Content-Type: application/json" -d '{"contents":[{"parts":[{"text":"hi"}]}]}' https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent
@@ -247,12 +252,34 @@ curl -s -H "x-goog-api-key: $KEY" -H "Content-Type: application/json" -d '{"cont
 
 **Deploy order.** Publish the new Apps Script version (it routes `type: "lead"` rows to the Leads tab) before deploying the Worker: an old script would put leads in the Orders tab. Then set the secrets, deploy the Worker on Node 22 with `npm run worker:deploy` (it runs `npm run prompt:data` first, so a hand deploy never ships stale chat prices), and deploy the site.
 
+## Phase 4 · Journal automation
+
+A weekly pipeline drafts one journal post from a topic queue, runs a house-voice check, and opens a pull request. Nothing is published until you merge it, and nothing is posted to social: the captions are copy for you to paste.
+
+**How it works.** `.github/workflows/journal-draft.yml` runs `scripts/journal/draft.ts`. It takes the first `queued` topic in `content/journal-topics.json` (or the one named by `--slug`), asks Claude for a draft (title, summary, tags, body and three captions), and lints it. If the lint passes, it writes `app/content/journal/<date>-<slug>.md` and `content/social/<slug>.md` (LinkedIn, X and WhatsApp status captions) and marks the topic `drafted` in the queue. The workflow runs in two jobs: `draft` (read-only token) installs, drafts and lints; `publish` (write token, installs nothing) commits those three files on a `journal/<slug>` branch, opens a PR titled "Journal: <title>" and dispatches the `CI` workflow on that branch. The PR body (`scripts/journal/pr-body.ts`) shows the word count, the lint result, the three captions and a review checklist, so you can review without opening files. Merging to `main` deploys the site through Cloudflare Pages, and the sitemap and RSS pick the post up. The workflow never commits to `main`.
+
+**Schedule.** The job only runs on `main` (`if: github.ref == 'refs/heads/main'`); a manual dispatch from another branch is skipped. Every Monday at 03:17 UTC (08:47 IST), cron `17 3 * * 1` (off the hour, because GitHub delays or drops more scheduled runs at the top of the hour). Run it by hand from the Actions tab: "Journal draft" then "Run workflow", with an optional `slug` (draft that topic instead of the next queued one) and `date` (publish date, `YYYY-MM-DD`; default today in UTC). An empty queue exits cleanly with no PR. If a PR is open for the topic's `journal/<slug>` branch, the run emits a warning annotation and finishes green before the paid call. If the branch is on `origin` with no open PR (a closed draft, or a run whose PR step failed, for example because the Actions PR setting was off), the run fails red before the paid call with "A draft branch exists but no PR was opened": open the PR with `gh pr create --base main --head journal/<slug>` (keeps the paid draft), or delete the branch with `git push origin --delete journal/<slug>` to draft that topic again.
+
+**Secrets and settings.** Add the repo Actions secret `ANTHROPIC_API_KEY` (Settings, Secrets and variables, Actions). It is used by the drafting step only and is never shipped to the browser. Also enable Settings, Actions, General, "Allow GitHub Actions to create and approve pull requests", or `gh pr create` is refused. A PR opened with the built-in token does not trigger the `CI` workflow, so for every journal PR the publish job runs `gh workflow run ci.yml --ref journal/<slug>` (`ci.yml` accepts `workflow_dispatch`, and a dispatch made with the built-in token does start a workflow; the job has `actions: write` for it). That run reports on the PR's head commit, which should satisfy a required `CI` check; confirm it on the first journal PR. If the dispatch fails, the job fails after opening the PR: run the same command yourself, or close and reopen the PR.
+
+**Adding topics.** Append an object to `content/journal-topics.json`: `slug` (lowercase letters, digits and hyphens), `title` (90 characters or fewer), `angle` (the brief the model writes from: what the post argues and what it covers) and `status: "queued"`. Topics are drafted in file order.
+
+**Where facts come from.** Two places, both in the brief the model receives (`scripts/journal/prompt.ts`, `buildUserPrompt`; see it with `--dry-run`): the topic's title and angle, and a package list built from `catalogue.json`. For each buyable tier the list gives the price before and with 18% GST, the GST on the price, the timeline (`weeks` or `days`), the `payment` line, the deposit share and both halves in rupees where `depositPct` is set, and the `includes` list. The model is told not to invent statistics, client names, prices or package items, and to take package details only from that list. The lint backs the numbers up (below): a rupee amount or a percentage may appear only if the catalogue implies it or the title or angle states it. Anything else factual (what a package does for a client, an outcome, a claim about the market) carries no number for the lint to catch, so it is a review item.
+
+**What the lint enforces** (`scripts/journal/lint.ts`; one problem fails the run and writes nothing): no em-dashes or en-dashes, none of the superlatives on the voice blocklist (`scripts/lib/voice.ts`), 400 to 700 words in the body, title, summary, tag and caption length limits, rupee amounts (with a leading ₹, Rs or INR, or a trailing rupees, Rs, INR, thousand, lakh or crore, including `60k rupees` and `20,000-rupee`) only from the catalogue (prices, starting prices, GST totals, the GST on each price, amounts due at checkout and the balance due at launch) or the brief, percentages only 18% and 9% (GST, CGST and SGST), the catalogue's `depositPct` values (50 today) or one the brief states, links only to this site and no raw HTML, a body of `##` headings, paragraphs, lists and links only (no other heading levels, rules, code, tables or images), no client names unless the topic brief names them, and a frontmatter round-trip through the same parser the site uses.
+
+**Run it locally.** `npm run journal:draft -- --dry-run` prints the chosen topic and both prompts and makes no API call. A real run needs `ANTHROPIC_API_KEY` exported in your shell (the script does not read `.env`): `npm run journal:draft -- --slug <slug> --date 2026-10-19`. Add `--summary /tmp/s.json` to also write the JSON summary the workflow reads, and `npm run journal:pr-body -- /tmp/s.json` to preview the PR body.
+
+**If marking the topic drafted fails.** The post and sidecar are already on disk but the topic is still `queued`, so a re-run refuses to overwrite them. The error names the recovery: set that topic's `status` to `"drafted"` in `content/journal-topics.json` by hand, or delete both files and re-run.
+
+**If a run fails.** A lint failure or script error fails the job, opens no PR and uploads the `journal-summary` artifact: the summary (when there is one) and, on a lint failure, the full draft as `journal-summary.draft.json`, so a one-word problem can be fixed by hand (write the post and sidecar, set the topic `drafted`, open the PR yourself) instead of paying for a re-run. Nothing is committed and the topic stays `queued`, so the next run tries it again, and every topic behind it waits: if a topic keeps failing the lint, edit its angle or move it down the file. The `drafted` status exists only on the `journal/<slug>` branch until its PR merges. While that PR is open, the next run sees it and exits green before the API call (a warning in the run log). To abandon a draft, close the PR and delete its branch: `main` still has the topic `queued`, so a later run drafts it again (a paid call). If the stale branch is left behind, the guard sees it on `origin` and fails the run before the paid call, every week, until you delete the branch or open a PR for it. To retire the topic instead, set its status to `published` or remove it from the queue on `main`.
+
 ## Phases
 
 1. **Foundation** (done): brand, layout, all routes with real copy, catalogue display, work, lab, journal, legal pages, SEO, analytics, styleguide. Deployable and indexable without checkout.
 2. **Commerce** (built, this repo state; needs Yogesh's accounts and keys to go live): Cloudflare Worker (`workers/techpravaha-api`), Razorpay test then live, checkout and thanks pages, Sheet and Resend. Booking link is `VITE_BOOKING_URL` / the Worker's `BOOKING_URL`.
 3. **Hooks** (built; needs the Gemini key, the Anthropic key and a Telegram bot to go live): chatbot, teardown lead magnet, order and lead pings, the lab proxy. See Phase 3 above.
-4. **Journal automation**: topic sheet to Claude draft to PR to approve to publish.
+4. **Journal automation** (built; needs the `ANTHROPIC_API_KEY` Actions secret to go live): topic queue to Claude draft to PR to your approval to publish. See Phase 4 above.
 
 ## Docs
 

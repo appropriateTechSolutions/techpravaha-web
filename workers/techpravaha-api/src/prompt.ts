@@ -115,6 +115,23 @@ export function rupeeAmounts(text: string): string[] {
   return out;
 }
 
+const TRAILING_MULTIPLIER: Record<string, number> = { rupee: 1, rupees: 1, rs: 1, inr: 1, lakh: 100_000, lakhs: 100_000, crore: 10_000_000, crores: 10_000_000 };
+
+/**
+ * Rupee amounts written with the marker after the number ("130,000 rupees", "1.3 lakh", "2 crore",
+ * "5000 Rs"), as whole rupees in digits, to match rupeeAmounts. A full stop only counts inside a number
+ * ("1.3"), never at its end, so "in 2026. Rupees" is not an amount. Like rupeeAmounts it errs towards
+ * the fixed pricing reply: "2 lakh visitors" is treated as an amount.
+ */
+export function trailingAmounts(text: string): string[] {
+  const out: string[] = [];
+  for (const m of text.matchAll(/(\d[\d, \u00a0]*(?:\.\d+)?)\s*(rupees?|rs|inr|lakhs?|crores?)\b/gi)) {
+    const n = Number(m[1]!.replace(/[, \u00a0]/g, ''));
+    if (Number.isFinite(n)) out.push(String(Math.round(n * TRAILING_MULTIPLIER[m[2]!.toLowerCase()]!)));
+  }
+  return out;
+}
+
 let cached: string | null = null;
 let amounts: Set<string> | null = null;
 

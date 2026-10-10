@@ -1,0 +1,249 @@
+# Drafts the next queued journal post with Claude and opens a pull request for review.
+# Never commits to main: publishing is a human merge. Needs the repo secret ANTHROPIC_API_KEY and
+# Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests".
+# The job only runs on main (the schedule always does; a manual dispatch from another branch is skipped),
+# so a branch cannot draft against its own copy of the queue.
+# Two jobs: `draft` holds a read-only token (npm ci lifecycle scripts and the draft script never see a
+# write token); `publish` holds the write token, installs nothing, and only commits the three files the
+# draft job hands over, pushes journal/<slug>, opens the PR and dispatches CI on that branch (a PR opened
+# with the built-in token does not trigger CI by itself; a workflow_dispatch made with it does).
+# The topic's `drafted` status lives only on the journal/<slug> branch until the PR merges. While that PR
+# is open the run exits green before the API call. A journal/<slug> branch on origin with no open PR (a
+# closed draft, or a PR that was never opened) fails the run before the API call until it is resolved.
+name: Journal draft
+
+on:
+  schedule:
+    - cron: '17 3 * * 1' # Monday 03:17 UTC = 08:47 IST (off the hour, when GitHub delays fewer scheduled runs)
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: 'Topic slug to draft (default: the next queued topic)'
+        required: false
+        type: string
+      date:
+        description: 'Publish date YYYY-MM-DD (default: today, UTC)'
+        required: false
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: journal-draft
+  cancel-in-progress: false
+
+env:
+  SUMMARY: /tmp/journal-summary.json
+  DRAFT_JSON: /tmp/journal-summary.draft.json
+  PR_BODY: /tmp/journal-pr-body.md
+
+jobs:
+  draft:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      status: ${{ steps.draft.outputs.status }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Skip if a draft PR is already open
+        id: guard
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_SLUG: ${{ inputs.slug }}
+        run: |
+          set -euo pipefail
+          # Same pick as draft.ts: --slug, else the first queued topic in file order.
+          if [ -n "$INPUT_SLUG" ]; then
+            slug="$INPUT_SLUG"
+          else
+            slug=$(jq -r '[.topics[] | select(.status == "queued")][0].slug // empty' content/journal-topics.json)
+          fi
+          if [ -z "$slug" ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT" # the draft step reports the empty queue
+            exit 0
+          fi
+          if ! [[ "$slug" =~ ^[a-z0-9-]+$ ]]; then
+            echo "::error::Unexpected topic slug: $slug"
+            exit 1
+          fi
+          existing=$(gh pr list --head "journal/$slug" --state open --json url --jq '.[0].url // empty')
+          if [ -n "$existing" ]; then
+            echo "::warning::A pull request is already open for journal/$slug: $existing. Not drafting again."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # No open PR, but the branch may be left over: a closed draft, or a run whose PR step failed. A push
+          # would be rejected after the paid call, and a green skip would stall the queue silently, so fail
+          # here. Exit 2 means "no such branch"; any other failure is a real error.
+          set +e
+          git ls-remote --exit-code --heads origin "journal/$slug" > /dev/null
+          rc=$?
+          set -e
+          if [ "$rc" -eq 0 ]; then
+            echo "::error::A draft branch exists but no PR was opened; run \`gh pr create --base main --head journal/$slug\` or delete the branch with \`git push origin --delete journal/$slug\`"
+            exit 1
+          elif [ "$rc" -eq 2 ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::git ls-remote failed (exit $rc)."
+            exit "$rc"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.guard.outputs.skip != 'true'
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install
+        if: steps.guard.outputs.skip != 'true'
+        shell: bash
+        run: npm ci
+
+      - name: Draft the post
+        id: draft
+        if: steps.guard.outputs.skip != 'true'
+        shell: bash
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          INPUT_SLUG: ${{ inputs.slug }}
+          INPUT_DATE: ${{ inputs.date }}
+        run: |
+          set -euo pipefail
+          # Inputs go through env, not into the script text, so a dispatch input cannot inject shell.
+          args=(--summary "$SUMMARY")
+          if [ -n "$INPUT_SLUG" ]; then args+=(--slug "$INPUT_SLUG"); fi
+          if [ -n "$INPUT_DATE" ]; then args+=(--date "$INPUT_DATE"); fi
+          set +e
+          npx tsx scripts/journal/draft.ts "${args[@]}"
+          code=$?
+          set -e
+          # Anything that is not a well-formed summary with no lint problems must never reach "ok".
+          shape='(.slug | type == "string") and (.title | type == "string") and (.postPath | type == "string") and (.socialPath | type == "string") and (.lintProblems | type == "array")'
+          if [ "$code" -ne 0 ]; then
+            echo "status=failed" >> "$GITHUB_OUTPUT"
+          elif [ ! -f "$SUMMARY" ]; then
+            echo "::notice::No queued topics: nothing to draft, no PR."
+            echo "status=empty" >> "$GITHUB_OUTPUT"
+          elif ! jq -e "$shape" "$SUMMARY" > /dev/null; then
+            echo "::error::The draft summary is missing fields or is not valid JSON."
+            echo "status=failed" >> "$GITHUB_OUTPUT"
+          elif jq -e '.lintProblems | length == 0' "$SUMMARY" > /dev/null; then
+            echo "status=ok" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=failed" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Hand the draft to the publish job
+        if: steps.guard.outputs.skip != 'true' && steps.draft.outputs.status == 'ok'
+        shell: bash
+        run: |
+          set -euo pipefail
+          slug=$(jq -er .slug "$SUMMARY")
+          post=$(jq -er .postPath "$SUMMARY")
+          social=$(jq -er .socialPath "$SUMMARY")
+          # The publish job writes these paths with a write token, so pin their exact shape here.
+          if ! [[ "$slug" =~ ^[a-z0-9-]+$ && "$post" =~ ^app/content/journal/[0-9]{4}-[0-9]{2}-[0-9]{2}-${slug}\.md$ && "$social" == "content/social/$slug.md" ]]; then
+            echo "::error::Unexpected slug or paths in the summary: $slug, $post, $social"
+            exit 1
+          fi
+          npm run --silent journal:pr-body -- "$SUMMARY" "$PR_BODY"
+          out="$RUNNER_TEMP/journal-out"
+          for f in "$post" "$social" content/journal-topics.json; do
+            mkdir -p "$out/files/$(dirname "$f")"
+            cp "$f" "$out/files/$f"
+          done
+          cp "$SUMMARY" "$out/summary.json"
+          cp "$PR_BODY" "$out/pr-body.md"
+
+      - name: Upload the draft
+        if: steps.guard.outputs.skip != 'true' && steps.draft.outputs.status == 'ok'
+        uses: actions/upload-artifact@v4
+        with:
+          name: journal-draft
+          path: ${{ runner.temp }}/journal-out
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Keep the summary and the draft when the draft failed
+        if: steps.guard.outputs.skip != 'true' && steps.draft.outputs.status == 'failed'
+        uses: actions/upload-artifact@v4
+        with:
+          name: journal-summary
+          path: |
+            ${{ env.SUMMARY }}
+            ${{ env.DRAFT_JSON }}
+          if-no-files-found: ignore
+
+      - name: Fail the job (no PR)
+        if: steps.guard.outputs.skip != 'true' && steps.draft.outputs.status == 'failed'
+        shell: bash
+        run: |
+          echo "::error::Journal draft failed (script error or lint problems). See the Draft the post step and the journal-summary artifact (the summary, and on a lint failure the full draft). No PR was opened."
+          exit 1
+
+  publish:
+    needs: draft
+    if: needs.draft.outputs.status == 'ok'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: journal-draft
+          path: ${{ runner.temp }}/journal-out
+
+      - name: Commit, push, open the PR and start CI
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/journal-out"
+          slug=$(jq -er .slug "$out/summary.json")
+          title=$(jq -er .title "$out/summary.json")
+          post=$(jq -er .postPath "$out/summary.json")
+          social=$(jq -er .socialPath "$out/summary.json")
+          if ! [[ "$slug" =~ ^[a-z0-9-]+$ && "$post" =~ ^app/content/journal/[0-9]{4}-[0-9]{2}-[0-9]{2}-${slug}\.md$ && "$social" == "content/social/$slug.md" ]]; then
+            echo "::error::Unexpected slug or paths in the summary: $slug, $post, $social"
+            exit 1
+          fi
+          branch="journal/$slug"
+          for f in "$post" "$social" content/journal-topics.json; do
+            mkdir -p "$(dirname "$f")"
+            cp "$out/files/$f" "$f"
+          done
+
+          git config user.name "techpravaha-bot"
+          git config user.email "bot@techpravaha.com"
+          git switch -c "$branch"
+          git add "$post" "$social" content/journal-topics.json
+          git commit -m "content: draft journal post $slug"
+          git push -u origin "$branch"
+
+          if ! url=$(gh pr create --base main --head "$branch" --title "Journal: $title" --body-file "$out/pr-body.md"); then
+            url=$(gh pr list --head "$branch" --state open --json url --jq '.[0].url // empty')
+            if [ -z "$url" ]; then
+              echo "::error::Pushed $branch but could not open the pull request. Check the Actions PR setting, then run gh pr create --base main --head $branch."
+              exit 1
+            fi
+            echo "::warning::A pull request already exists for $branch: $url"
+          fi
+
+          # A PR opened with the built-in token does not trigger CI; a workflow_dispatch made with it does.
+          if ! gh workflow run ci.yml --ref "$branch"; then
+            echo "::error::Opened $url but could not start CI. Run gh workflow run ci.yml --ref $branch, or close and reopen the PR."
+            exit 1
+          fi
+          echo "::notice::Opened $url and started CI on $branch."

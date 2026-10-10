@@ -7,6 +7,7 @@ import { SERVICES } from '../app/content/services';
 import { WORK } from '../app/content/work';
 import { LAB } from '../app/content/lab';
 import { TESTIMONIALS } from '../app/content/testimonials';
+import { findSuperlatives } from '../scripts/lib/voice';
 
 const PUBLIC = join(process.cwd(), 'public');
 const serviceIds = catalogue.services.map((s) => s.id);
@@ -261,9 +262,7 @@ describe('copy rules', () => {
   });
 
   it('has no superlatives', () => {
-    expect(all).not.toMatch(
-      /\b(best|world-class|cutting-edge|seamless|seamlessly|leading|fastest|perfect|ultimate)\b/i,
-    );
+    expect(findSuperlatives(all)).toEqual([]);
   });
 });
 

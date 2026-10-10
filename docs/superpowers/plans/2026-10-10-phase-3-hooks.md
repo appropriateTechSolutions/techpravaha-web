@@ -81,7 +81,7 @@ Everything here needs your accounts or a decision. The site and the Worker work 
 
 **Keys and secrets** (Worker, `npx wrangler secret put <NAME>` on Node 22; README "Phase 3 · Hooks" has the details)
 
-1. Gemini: use a billed Gemini project (on an unbilled AI Studio project, Google's terms let it use chat content to improve its products). Create an API key there, then `npx wrangler secret put GEMINI_API_KEY`. Set a spend cap (or a budget alert) on that Google Cloud project. Leave `GEMINI_MODEL` unset (default `gemini-3.5-flash-lite`). Confirm the model answers on your key with one request; expect a JSON body with `candidates` (a 403 or 404 means the key cannot reach that model):
+1. Gemini: use a billed Gemini project (on an unbilled AI Studio project, Google's terms let it use chat content to improve its products). Create an API key there, then `npx wrangler secret put GEMINI_API_KEY`. Set a spend cap on that project first; a budget alert only notifies and does not stop spend, so it is not a substitute. Leave `GEMINI_MODEL` unset (default `gemini-3.5-flash-lite`). Confirm the model answers on your key with one request; expect a JSON body with `candidates` (a 403 or 404 means the key cannot reach that model):
    ```sh
    curl -s -H "x-goog-api-key: $KEY" -H "Content-Type: application/json" -d '{"contents":[{"parts":[{"text":"hi"}]}]}' https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent
    ```

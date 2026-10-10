@@ -1,7 +1,7 @@
 import { TEXT_CONTROL_RE } from './chars';
 import type { Env } from './env';
 import { json, readBodyCapped } from './http';
-import { buildSystemPrompt, factAmounts, rupeeAmounts } from './prompt';
+import { buildSystemPrompt, factAmounts, rupeeAmounts, trailingAmounts } from './prompt';
 import { allow, clientIp } from './ratelimit';
 import { globalFetch, safeErrorText, UPSTREAM_TIMEOUT_MS, UpstreamError } from './upstream';
 
@@ -131,7 +131,7 @@ export async function chat(
   if (!text) return { reply: CHAT_FALLBACK };
   // The prompt forbids new numbers; this enforces it. Every amount must appear in the FACTS as written.
   const known = factAmounts();
-  if (rupeeAmounts(text).some((a) => !known.has(a))) return { reply: PRICE_ONLY_REPLY };
+  if ([...rupeeAmounts(text), ...trailingAmounts(text)].some((a) => !known.has(a))) return { reply: PRICE_ONLY_REPLY };
   return { reply: text };
 }
 
