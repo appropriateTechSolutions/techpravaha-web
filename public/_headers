@@ -15,3 +15,35 @@
 
 /lab/play/*
   Cache-Control: public, max-age=86400
+
+# Hosted products (public/<slug>/, built by npm run apps:build). Hashed assets are immutable;
+# the entry HTML and service workers are revalidated on every load so updates reach installs.
+/homefind/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/goodfind/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/homefind/
+  Cache-Control: no-cache
+
+/homefind/index.html
+  Cache-Control: no-cache
+
+/homefind/sw.js
+  Cache-Control: no-cache
+
+/homefind/registerSW.js
+  Cache-Control: no-cache
+
+/goodfind/
+  Cache-Control: no-cache
+
+/goodfind/index.html
+  Cache-Control: no-cache
+
+/goodfind/sw.js
+  Cache-Control: no-cache
+
+/plot-twist/*
+  Cache-Control: public, max-age=86400

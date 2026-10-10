@@ -1,14 +1,16 @@
 /**
  * Runs after `react-router build`: writes sitemap.xml and rss.xml, copies the
  * prerendered 404 page to 404.html (Cloudflare Pages serves it for unknown URLs),
- * and refuses to finish if a sitemap URL is missing or noindex.
+ * and refuses to finish if a sitemap URL is missing or noindex. The sitemap also lists
+ * the hosted products (`HOSTED_APP_PATHS`, static builds in `public/<slug>/`), which
+ * must each have an index.html with a title and a meta description.
  */
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseFrontmatter } from '../app/lib/frontmatter';
 import { hasPreloads, PRELOAD_SKIP_DIRS, stripPreloads } from './lib/html';
 import { buildRss, buildSitemap, type FeedPost } from './lib/feeds';
-import { NOINDEX_PATHS, prerenderPaths } from './lib/paths';
+import { HOSTED_APP_PATHS, NOINDEX_PATHS, prerenderPaths } from './lib/paths';
 
 const ROOT = process.cwd();
 const OUT = join(ROOT, 'build/client');
@@ -43,7 +45,8 @@ function htmlFor(path: string): string {
  * mobile links those ~350 KB of scripts compete with the CSS and fonts that
  * paint the already-prerendered HTML (Lighthouse mobile: FCP 3.6 s with them,
  * 2.1 s without). The module script still loads and hydrates the page.
- * Walks the build output (skipping assets/ and lab/play/) and returns the HTML
+ * Walks the build output (skipping PRELOAD_SKIP_DIRS: assets/, lab/play/ and the
+ * hosted products) and returns the HTML
  * files it visited, so the caller can verify none still has a preload.
  */
 function stripModulePreloads(dir: string, rel = ''): { pages: string[]; changed: number; links: number } {
@@ -75,7 +78,7 @@ if (!existsSync(OUT)) fail(`${OUT} does not exist; run react-router build first`
 
 const today = new Date().toISOString().slice(0, 10);
 const posts = readPosts();
-const paths = prerenderPaths().filter((p) => !NOINDEX_PATHS.includes(p));
+const paths = [...prerenderPaths().filter((p) => !NOINDEX_PATHS.includes(p)), ...HOSTED_APP_PATHS];
 const lastmod = Object.fromEntries(posts.map((p) => [`/journal/${p.slug}`, p.date]));
 
 // Every URL we advertise must exist and be indexable.
@@ -84,8 +87,13 @@ for (const p of paths) {
   const file = htmlFor(p);
   if (!existsSync(file)) {
     problems.push(`${p}: no prerendered ${file}`);
-  } else if (/<meta[^>]+name="robots"[^>]*noindex/.test(readFileSync(file, 'utf8'))) {
-    problems.push(`${p}: prerendered page is noindex`);
+  } else {
+    const html = readFileSync(file, 'utf8');
+    if (/<meta[^>]+name="robots"[^>]*noindex/.test(html)) problems.push(`${p}: prerendered page is noindex`);
+    if (HOSTED_APP_PATHS.includes(p)) {
+      if (!/<title>[^<]+<\/title>/.test(html)) problems.push(`${p}: hosted app has no <title>`);
+      if (!/<meta\s+name="description"\s+content="[^"]+"/.test(html)) problems.push(`${p}: hosted app has no meta description`);
+    }
   }
 }
 if (problems.length) fail(`sitemap check failed\n  ${problems.join('\n  ')}`);

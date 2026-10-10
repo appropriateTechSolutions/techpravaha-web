@@ -83,11 +83,11 @@ If the plan only offers a 10 second period, use 2 requests per 10 seconds. Do **
 
 ### Rate limit `/chat` (Workers Rate Limiting binding)
 
-`POST /chat` (the site chatbot, a Gemini call per message) is limited inside the Worker by the `CHAT_RATE` binding in `wrangler.toml` (`[[ratelimits]]`, 12 requests per 60 seconds per IP, keyed on `CF-Connecting-IP`). Over the limit the Worker answers 429 with a friendly reply; if the binding itself errors, the message is allowed through. Nothing to create in the dashboard: `namespace_id` is a number we pick, and the binding deploys with the Worker.
+`POST /chat` (the site chatbot, an Anthropic call per message) is limited inside the Worker by the `CHAT_RATE` binding in `wrangler.toml` (`[[ratelimits]]`, 12 requests per 60 seconds per IP, keyed on `CF-Connecting-IP`). Over the limit the Worker answers 429 with a friendly reply; if the binding itself errors, the message is allowed through. Nothing to create in the dashboard: `namespace_id` is a number we pick, and the binding deploys with the Worker.
 
-- **Per location and approximate.** Counters live in each Cloudflare location and are not synchronised, so a visitor whose requests reach two locations can get more than 12 a minute, and the count can lag slightly. Fine for abuse control; it is not a hard cap on Gemini spend.
+- **Per location and approximate.** Counters live in each Cloudflare location and are not synchronised, so a visitor whose requests reach two locations can get more than 12 a minute, and the count can lag slightly. Fine for abuse control; it is not a hard cap on Anthropic spend.
 - **No KV writes.** It does not touch the KV write allowance (the orders flow is the only KV writer).
-- **Spend backstop.** Because the limit is approximate, set a budget or spend cap on the Google Cloud project that owns `GEMINI_API_KEY`.
+- **Spend backstop.** Because the limit is approximate, set a monthly spend cap on the Anthropic workspace that owns `ANTHROPIC_API_KEY` (the same key serves the lab apps and the journal drafts).
 
 ## 3. Resend
 

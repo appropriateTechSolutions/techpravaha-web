@@ -5,10 +5,13 @@
  * attributes.
  *   tsx scripts/check-placeholders.ts [dir]     (default build/client; run npm run build first)
  * Prints file:match for every hit and exits 1, or prints a one-line pass and exits 0.
+ * The hosted products (`<slug>/` for each HOSTED_APP_SLUGS entry) are skipped: their copy is
+ * built in their own repos, not written for this site.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { HOSTED_APP_SLUGS } from './lib/paths';
 
 /** A bracketed phrase that starts with a letter: 3 to 41 characters inside the brackets. */
 export const PLACEHOLDER_RE = /\[[A-Za-z][^\]]{2,40}\]/g;
@@ -30,7 +33,10 @@ export function readableText(html: string): string {
 
 export function findPlaceholders(dir: string): string[] {
   const hits: string[] = [];
-  const files = (readdirSync(dir, { recursive: true }) as string[]).filter((f) => /\.(html|svg)$/.test(f)).sort();
+  const hosted = new Set<string>(HOSTED_APP_SLUGS);
+  const files = (readdirSync(dir, { recursive: true }) as string[])
+    .filter((f) => /\.(html|svg)$/.test(f) && !hosted.has(f.split(sep)[0]!))
+    .sort();
   for (const f of files) {
     const text = readableText(readFileSync(join(dir, f), 'utf8'));
     const name = relative(dir, join(dir, f)).split(sep).join('/');

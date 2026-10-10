@@ -1,3 +1,4 @@
 /services/ai-systems /services/ai/ 301
 /blog /journal/ 301
 /blog/* /journal/:splat 301
+/lab/play/plot-twist/* /plot-twist/:splat 301

@@ -3,11 +3,11 @@ import worker, { type Env } from '../src/index';
 import {
   CHAT_FALLBACK,
   CHAT_OUTAGE,
+  DEFAULT_CHAT_MODEL,
   PRICE_ONLY_REPLY,
   QUOTA_REPLY,
   TOO_LONG_REPLY,
   chat,
-  generationConfig,
   trimToSentence,
 } from '../src/chat';
 import {
@@ -26,15 +26,14 @@ import {
 import facts from '../src/prompt-data.json';
 import { fakeRateLimit, type FakeRateLimit } from './helpers/fake-ratelimit';
 
-const GEMINI_RE = /^https:\/\/generativelanguage\.googleapis\.com\/v1beta\/models\/([^/:]+):generateContent$/;
 const inr = (n: number) => `₹${new Intl.NumberFormat('en-IN').format(n)}`;
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 const userMsg = (content = 'What does a landing page cost?'): Msg => ({ role: 'user', content });
 
-function geminiOk(text: string, extra: Record<string, unknown> = {}): Response {
+function anthropicOk(text: string, extra: Record<string, unknown> = {}): Response {
   return new Response(
-    JSON.stringify({ candidates: [{ content: { role: 'model', parts: [{ text }] }, finishReason: 'STOP', ...extra }] }),
+    JSON.stringify({ type: 'message', role: 'assistant', content: [{ type: 'text', text }], stop_reason: 'end_turn', ...extra }),
     { status: 200, headers: { 'Content-Type': 'application/json' } },
   );
 }
@@ -43,7 +42,7 @@ describe('POST /chat', () => {
   let rl: FakeRateLimit;
   let env: Env;
   let calls: { url: string; init: RequestInit; body: Record<string, unknown> }[];
-  let gemini: () => Promise<Response>;
+  let upstream: () => Promise<Response>;
   let logs: unknown[][];
 
   const ctx = { waitUntil: () => {}, passThroughOnException: () => {} } as unknown as ExecutionContext;
@@ -69,16 +68,16 @@ describe('POST /chat', () => {
     rl = fakeRateLimit(12);
     env = {
       ALLOWED_ORIGINS: 'https://techpravaha.com',
-      GEMINI_API_KEY: 'gm_test_key',
+      ANTHROPIC_API_KEY: 'sk-ant-chat-test-key',
       CHAT_RATE: rl as unknown as RateLimit,
     } as unknown as Env;
     calls = [];
-    gemini = async () => geminiOk('Launch is ₹35,000 + GST. Start at /checkout/websites-launch');
+    upstream = async () => anthropicOk('Launch is ₹35,000 + GST. Start at /checkout/websites-launch');
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: RequestInfo | URL, init?: RequestInit) => {
         calls.push({ url: String(url), init: init!, body: JSON.parse(String(init!.body)) as Record<string, unknown> });
-        return gemini();
+        return upstream();
       }),
     );
     logs = [];
@@ -91,7 +90,8 @@ describe('POST /chat', () => {
     vi.restoreAllMocks();
   });
 
-  it('happy path: returns the model text, with CORS, and sends the grounded system prompt', async () => {
+  it('happy path: returns the model text, with CORS, and sends the grounded system prompt to Anthropic', async () => {
+    const timeout = vi.spyOn(AbortSignal, 'timeout');
     const res = await post({ messages: [userMsg('hi'), { role: 'assistant', content: 'Hello.' }, userMsg()] });
     expect(res.status).toBe(200);
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://techpravaha.com');
@@ -99,50 +99,61 @@ describe('POST /chat', () => {
 
     expect(calls).toHaveLength(1);
     const call = calls[0]!;
-    expect(GEMINI_RE.exec(call.url)?.[1]).toBe('gemini-3.5-flash-lite');
+    expect(call.url).toBe('https://api.anthropic.com/v1/messages');
+    expect(call.init.method).toBe('POST');
     // The key travels in a header, never in the URL (URLs end up in logs and error messages).
-    expect(call.url).not.toContain('gm_test_key');
-    expect(new Headers(call.init.headers).get('x-goog-api-key')).toBe('gm_test_key');
+    expect(call.url).not.toContain('sk-ant-chat-test-key');
+    const h = new Headers(call.init.headers);
+    expect(h.get('x-api-key')).toBe('sk-ant-chat-test-key');
+    expect(h.get('anthropic-version')).toBe('2023-06-01');
+    expect(h.get('content-type')).toBe('application/json');
     expect(call.init.signal).toBeInstanceOf(AbortSignal);
+    expect(timeout).toHaveBeenCalledWith(10_000);
 
-    const body = call.body as {
-      systemInstruction: { parts: { text: string }[] };
-      contents: { role: string; parts: { text: string }[] }[];
-      generationConfig: Record<string, unknown>;
-      safetySettings: unknown[];
-    };
-    const system = body.systemInstruction.parts[0]!.text;
+    const body = call.body as { system: { type: string; text: string; cache_control?: unknown }[]; messages: { role: string; content: string }[] } & Record<string, unknown>;
+    expect(body.model).toBe('claude-haiku-5-5');
+    expect(DEFAULT_CHAT_MODEL).toBe('claude-haiku-5-5');
+    expect(body.max_tokens).toBe(600);
+    // Haiku 5.5: thinking off (allowed at effort low), effort low, and no sampling params (they 400).
+    expect(body.thinking).toEqual({ type: 'disabled' });
+    expect(body.output_config).toEqual({ effort: 'low' });
+    for (const k of ['temperature', 'top_p', 'top_k']) expect(body).not.toHaveProperty(k);
+    expect(Object.keys(body).sort()).toEqual(['max_tokens', 'messages', 'model', 'output_config', 'system', 'thinking']);
+
+    // System is one cacheable text block carrying the grounded prompt.
+    expect(body.system).toHaveLength(1);
+    expect(body.system[0]).toEqual({ type: 'text', text: buildSystemPrompt(), cache_control: { type: 'ephemeral' } });
+    const system = body.system[0]!.text;
     expect(system).toContain(INJECTION_GUARD);
     expect(system).toContain(PRICE_GUARD);
+    expect(system).toContain(PLAIN_TEXT_RULE);
     for (const s of facts.services) {
       for (const t of s.tiers) {
         if (t.buyable && t.price != null) expect(system).toContain(`${t.label}: ${inr(t.price)} + 18% GST`);
       }
     }
-    expect(body.contents).toEqual([
-      { role: 'user', parts: [{ text: 'hi' }] },
-      { role: 'model', parts: [{ text: 'Hello.' }] },
-      { role: 'user', parts: [{ text: 'What does a landing page cost?' }] },
+    expect(body.messages).toEqual([
+      { role: 'user', content: 'hi' },
+      { role: 'assistant', content: 'Hello.' },
+      { role: 'user', content: 'What does a landing page cost?' },
     ]);
-    // 3.x default: minimal thinking by default, so no thinking config is sent.
-    expect(body.generationConfig).toEqual({ maxOutputTokens: 600, temperature: 0.4 });
-    expect(body.safetySettings.length).toBeGreaterThan(0);
   });
 
-  it('uses GEMINI_MODEL when set; a 2.5 model gets thinkingBudget 0, a 3.x model no thinking config', async () => {
-    env.GEMINI_MODEL = 'gemini-2.5-flash';
-    await post({ messages: [userMsg()] });
-    expect(GEMINI_RE.exec(calls[0]!.url)?.[1]).toBe('gemini-2.5-flash');
-    expect(calls[0]!.body.generationConfig).toEqual({
-      maxOutputTokens: 600,
-      temperature: 0.4,
-      thinkingConfig: { thinkingBudget: 0 },
-    });
+  it('passes consecutive same-role messages through unchanged', async () => {
+    const messages = [userMsg('one'), userMsg('two'), { role: 'assistant' as const, content: 'a' }, { role: 'assistant' as const, content: 'b' }, userMsg('three')];
+    expect((await post({ messages })).status).toBe(200);
+    expect(calls[0]!.body.messages).toEqual(messages);
+  });
 
-    env.GEMINI_MODEL = 'gemini-3.8-flash';
+  it('uses CHAT_MODEL when set, with the same params', async () => {
+    env.CHAT_MODEL = '  claude-haiku-4-5  ';
     await post({ messages: [userMsg()] });
-    expect(GEMINI_RE.exec(calls[1]!.url)?.[1]).toBe('gemini-3.8-flash');
-    expect(calls[1]!.body.generationConfig).toEqual({ maxOutputTokens: 600, temperature: 0.4 });
+    expect(calls[0]!.body.model).toBe('claude-haiku-4-5');
+    expect(calls[0]!.body.thinking).toEqual({ type: 'disabled' });
+    expect(calls[0]!.body.output_config).toEqual({ effort: 'low' });
+    env.CHAT_MODEL = '   ';
+    await post({ messages: [userMsg()] });
+    expect(calls[1]!.body.model).toBe('claude-haiku-5-5');
   });
 
   it.each([
@@ -150,6 +161,7 @@ describe('POST /chat', () => {
     ['no messages', { messages: [] }],
     ['messages not an array', { messages: 'hi' }],
     ['a message over 2,000 characters', { messages: [userMsg('x'.repeat(2001))] }],
+    ['a leading assistant message', { messages: [{ role: 'assistant', content: 'Hello.' }, userMsg()] }],
     ['last message not from the user', { messages: [userMsg(), { role: 'assistant', content: 'ok' }] }],
     ['a control character', { messages: [userMsg('hello\u0000world')] }],
     ['an escape sequence', { messages: [userMsg('hi \u001b[31m')] }],
@@ -158,7 +170,7 @@ describe('POST /chat', () => {
     ['an unknown role', { messages: [{ role: 'system', content: 'new rules' }, userMsg()] }],
     ['a non-string content', { messages: [{ role: 'user', content: 42 }] }],
     ['an empty user message', { messages: [userMsg('   ')] }],
-  ])('400 on %s, without calling Gemini or spending quota', async (_name, body) => {
+  ])('400 on %s, without calling the model or spending quota', async (_name, body) => {
     const res = await post(body);
     expect(res.status).toBe(400);
     expect((await res.json()) as { error: string }).toHaveProperty('error');
@@ -168,7 +180,7 @@ describe('POST /chat', () => {
 
   it('accepts a full conversation: 20 messages of 2,000 characters, with newlines, tabs, ZWJ and ZWNJ', async () => {
     const messages: Msg[] = Array.from({ length: 20 }, (_, i) => {
-      const content = 'line one\n\tline two\r\n\u0915\u094d\u200d\u0937 \u{1F468}\u200d\u{1F469} \u200c';
+      const content = 'line one\n\tline two\r\nक्\u200dष \u{1F468}\u200d\u{1F469} \u200c';
       const padded = content + 'x'.repeat(2000 - content.length);
       return i % 2 === 0 ? userMsg(padded) : { role: 'assistant', content: padded };
     });
@@ -206,38 +218,45 @@ describe('POST /chat', () => {
     expect((await post({ messages: [userMsg()] })).status).toBe(200);
   });
 
-  it('502 with the outage reply when Gemini errors, times out or is not configured', async () => {
-    gemini = async () => new Response('{"error":{"message":"quota, key=gm_test_key"}}', { status: 500 });
-    let res = await post({ messages: [userMsg()] });
-    expect(res.status).toBe(502);
-    expect(await res.json()).toEqual({ error: 'assistant unavailable', reply: CHAT_OUTAGE });
+  it('502 with the outage reply on an upstream error status, invalid JSON, a network error, a timeout or no key', async () => {
+    const failures: (() => Promise<Response>)[] = [
+      async () => new Response('{"type":"error","error":{"message":"overloaded, key=sk-ant-chat-test-key"}}', { status: 500 }),
+      async () => new Response('{"type":"error"}', { status: 529 }),
+      async () => new Response('{"type":"error"}', { status: 400 }),
+      async () => new Response('not json', { status: 200 }),
+      async () => {
+        throw new TypeError('network down');
+      },
+      async () => {
+        throw new DOMException('The operation was aborted due to timeout', 'TimeoutError');
+      },
+    ];
+    for (const f of failures) {
+      upstream = f;
+      const res = await post({ messages: [userMsg()] });
+      expect(res.status).toBe(502);
+      expect(await res.json()).toEqual({ error: 'assistant unavailable', reply: CHAT_OUTAGE });
+    }
     expect(CHAT_OUTAGE).toBe('I cannot answer right now. Message us on WhatsApp or use /contact and a human will reply.');
 
-    gemini = async () => {
-      throw new DOMException('The operation was aborted due to timeout', 'TimeoutError');
-    };
-    res = await post({ messages: [userMsg()] });
-    expect(res.status).toBe(502);
-    expect(((await res.json()) as { reply: string }).reply).toBe(CHAT_OUTAGE);
-
-    gemini = async () => new Response('not json', { status: 200 });
+    delete (env as Partial<Env>).ANTHROPIC_API_KEY;
+    const before = calls.length;
     expect((await post({ messages: [userMsg()] })).status).toBe(502);
-
-    env.GEMINI_API_KEY = '';
-    expect((await post({ messages: [userMsg()] })).status).toBe(502);
-    expect(JSON.stringify(logs)).not.toContain('gm_test_key');
+    expect(calls).toHaveLength(before);
+    expect(JSON.stringify(logs)).not.toContain('sk-ant-chat-test-key');
   });
 
-  it('blocked or empty candidates answer 200 with the friendly reply, never an error', async () => {
+  it('a refusal, an empty answer or no text block answers 200 with the friendly reply, never an error', async () => {
     const cases: (() => Response)[] = [
-      () => new Response(JSON.stringify({ promptFeedback: { blockReason: 'SAFETY' } }), { status: 200 }),
-      () => new Response(JSON.stringify({ candidates: [{ finishReason: 'SAFETY' }] }), { status: 200 }),
-      () => geminiOk('partial text', { finishReason: 'PROHIBITED_CONTENT' }),
-      () => geminiOk('   '),
-      () => new Response(JSON.stringify({ candidates: [] }), { status: 200 }),
+      () => anthropicOk('partial text before the refusal', { stop_reason: 'refusal' }),
+      () => new Response(JSON.stringify({ content: [], stop_reason: 'refusal' }), { status: 200 }),
+      () => anthropicOk('   '),
+      () => new Response(JSON.stringify({ content: [{ type: 'thinking', thinking: '', signature: 'x' }], stop_reason: 'end_turn' }), { status: 200 }),
+      () => new Response(JSON.stringify({ content: [], stop_reason: 'end_turn' }), { status: 200 }),
+      () => new Response(JSON.stringify({}), { status: 200 }),
     ];
     for (const make of cases) {
-      gemini = async () => make();
+      upstream = async () => make();
       const res = await post({ messages: [userMsg()] });
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({ reply: CHAT_FALLBACK });
@@ -245,24 +264,40 @@ describe('POST /chat', () => {
     expect(CHAT_FALLBACK).toBe('I cannot answer that one. Message us on WhatsApp or use /contact and a human will reply.');
   });
 
-  it('MAX_TOKENS: trims to the last full sentence, or falls back when nothing whole is left or a price was cut', async () => {
-    gemini = async () =>
-      geminiOk('Launch is ₹35,000 + GST. It takes 2 weeks from the kickoff call. It inclu', { finishReason: 'MAX_TOKENS' });
+  it('reads text blocks by type: a leading thinking block is skipped, text blocks are joined', async () => {
+    upstream = async () =>
+      new Response(
+        JSON.stringify({
+          content: [
+            { type: 'thinking', thinking: '', signature: 'sig' },
+            { type: 'text', text: 'Launch is ₹35,000 + GST.' },
+            { type: 'text', text: ' See /pricing' },
+          ],
+          stop_reason: 'end_turn',
+        }),
+        { status: 200 },
+      );
+    expect(await (await post({ messages: [userMsg()] })).json()).toEqual({ reply: 'Launch is ₹35,000 + GST. See /pricing' });
+  });
+
+  it('max_tokens: trims to the last full sentence, or falls back when nothing whole is left or a price was cut', async () => {
+    upstream = async () =>
+      anthropicOk('Launch is ₹35,000 + GST. It takes 2 weeks from the kickoff call. It inclu', { stop_reason: 'max_tokens' });
     expect(await (await post({ messages: [userMsg()] })).json()).toEqual({
       reply: 'Launch is ₹35,000 + GST. It takes 2 weeks from the kickoff call.',
     });
-    gemini = async () => geminiOk('Launch is ₹35,000 + GST. Growth is ₹1,12,', { finishReason: 'MAX_TOKENS' });
+    upstream = async () => anthropicOk('Launch is ₹35,000 + GST. Growth is ₹1,12,', { stop_reason: 'max_tokens' });
     expect(await (await post({ messages: [userMsg()] })).json()).toEqual({ reply: CHAT_FALLBACK });
-    gemini = async () => geminiOk('Launch includes one landing page and', { finishReason: 'MAX_TOKENS' });
+    upstream = async () => anthropicOk('Launch includes one landing page and', { stop_reason: 'max_tokens' });
     expect(await (await post({ messages: [userMsg()] })).json()).toEqual({ reply: CHAT_FALLBACK });
-    // STOP is never trimmed.
-    gemini = async () => geminiOk('Write to hello@techpravaha.com for details', { finishReason: 'STOP' });
+    // end_turn is never trimmed.
+    upstream = async () => anthropicOk('Write to hello@techpravaha.com for details', { stop_reason: 'end_turn' });
     expect(await (await post({ messages: [userMsg()] })).json()).toEqual({ reply: 'Write to hello@techpravaha.com for details' });
   });
 
   it('price guard: a FACTS amount passes; a computed amount gets the fixed pricing reply', async () => {
     const launch = facts.services.flatMap((sv) => sv.tiers).find((t) => t.buyable && t.price != null)!;
-    gemini = async () => geminiOk(`${launch.label} is ${inr(launch.price!)} + GST. See /pricing`);
+    upstream = async () => anthropicOk(`${launch.label} is ${inr(launch.price!)} + GST. See /pricing`);
     expect(await (await post({ messages: [userMsg()] })).json()).toEqual({
       reply: `${launch.label} is ${inr(launch.price!)} + GST. See /pricing`,
     });
@@ -275,7 +310,7 @@ describe('POST /chat', () => {
       'Together that is 130,000 rupees + GST. See /pricing',
       'Both for 1.3 lakh + GST. See /pricing',
     ]) {
-      gemini = async () => geminiOk(reply);
+      upstream = async () => anthropicOk(reply);
       const res = await post({ messages: [userMsg('How much for a website and WhatsApp together?')] });
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual({ reply: PRICE_ONLY_REPLY });
@@ -285,45 +320,40 @@ describe('POST /chat', () => {
     );
 
     // A trailing marker on a known amount is fine.
-    gemini = async () => geminiOk('Launch is 35,000 rupees + GST. See /pricing');
+    upstream = async () => anthropicOk('Launch is 35,000 rupees + GST. See /pricing');
     expect(await (await post({ messages: [userMsg()] })).json()).toEqual({ reply: 'Launch is 35,000 rupees + GST. See /pricing' });
 
     // Numbers without a currency marker are not prices: timelines, GST rate, counts.
-    gemini = async () => geminiOk('It takes 3 weeks, GST is 18%, and you get 130000 words. See /pricing');
+    upstream = async () => anthropicOk('It takes 3 weeks, GST is 18%, and you get 130000 words. See /pricing');
     expect(await (await post({ messages: [userMsg()] })).json()).toEqual({
       reply: 'It takes 3 weeks, GST is 18%, and you get 130000 words. See /pricing',
     });
+
+    // A computed price in a max_tokens-trimmed reply is still caught.
+    upstream = async () => anthropicOk('Both come to ₹1,30,000. More soon and', { stop_reason: 'max_tokens' });
+    expect(await (await post({ messages: [userMsg()] })).json()).toEqual({ reply: PRICE_ONLY_REPLY });
   });
 
-  it('logs lengths and status only, never message or reply text', async () => {
-    gemini = async () => geminiOk('SECRET-REPLY-TEXT');
+  it('logs lengths and status only, never message or reply text, the key or the IP', async () => {
+    upstream = async () => anthropicOk('SECRET-REPLY-TEXT');
     await post({ messages: [userMsg('SECRET-QUESTION-TEXT')] });
-    gemini = async () => new Response('SECRET-UPSTREAM-BODY', { status: 503 });
+    upstream = async () => new Response('SECRET-UPSTREAM-BODY', { status: 503 });
     await post({ messages: [userMsg('SECRET-QUESTION-TEXT')] });
     const logged = JSON.stringify(logs);
     expect(logs.length).toBeGreaterThan(0);
     expect(logged).not.toContain('SECRET');
+    expect(logged).not.toContain('sk-ant-chat-test-key');
     expect(logged).not.toContain('203.0.113.7');
+    expect(logged).toContain('inChars');
   });
 });
 
 describe('chat()', () => {
   it('returns { reply } using the injected fetch', async () => {
-    const f = vi.fn(async () => geminiOk('ok'));
-    const env = { GEMINI_API_KEY: 'k' } as unknown as Env;
+    const f = vi.fn(async () => anthropicOk('ok'));
+    const env = { ANTHROPIC_API_KEY: 'k' } as unknown as Env;
     await expect(chat(env, { messages: [userMsg()] }, f as unknown as typeof fetch)).resolves.toEqual({ reply: 'ok' });
     expect(f).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe('generationConfig()', () => {
-  it('sends thinkingBudget 0 only to 2.5 models', () => {
-    expect(generationConfig('gemini-2.5-flash-lite')).toEqual({
-      maxOutputTokens: 600,
-      temperature: 0.4,
-      thinkingConfig: { thinkingBudget: 0 },
-    });
-    expect(generationConfig('gemini-3.5-flash-lite')).toEqual({ maxOutputTokens: 600, temperature: 0.4 });
   });
 });
 

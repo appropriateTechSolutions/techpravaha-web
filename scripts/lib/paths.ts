@@ -26,6 +26,18 @@ export const STATIC_PATHS = [
   '/404',
 ];
 
+/**
+ * Products served as static builds at the site root, from `public/<slug>/`. `npm run apps:build`
+ * (scripts/apps/build-apps.ts) rebuilds them from their own repos with base `/<slug>/`.
+ * React Router does not own these paths: they are not prerendered, but postbuild adds them to the
+ * sitemap, the modulepreload strip and the placeholder gate skip them.
+ */
+export const HOSTED_APP_SLUGS = ['homefind', 'goodfind', 'plot-twist'] as const;
+export type HostedAppSlug = (typeof HOSTED_APP_SLUGS)[number];
+
+/** Sitemap paths for the hosted products, in the trailing-slash form Pages answers with 200. */
+export const HOSTED_APP_PATHS: string[] = HOSTED_APP_SLUGS.map((s) => `/${s}/`);
+
 interface RawCatalogue {
   services: { route: string; tiers: { id: string; buyable: boolean }[] }[];
 }

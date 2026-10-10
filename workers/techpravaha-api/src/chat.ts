@@ -1,13 +1,14 @@
+import { anthropicMessages } from './anthropic';
 import { TEXT_CONTROL_RE } from './chars';
 import type { Env } from './env';
 import { json, readBodyCapped } from './http';
 import { buildSystemPrompt, factAmounts, rupeeAmounts, trailingAmounts } from './prompt';
 import { allow, clientIp } from './ratelimit';
-import { globalFetch, safeErrorText, UPSTREAM_TIMEOUT_MS, UpstreamError } from './upstream';
+import { globalFetch, safeErrorText, UPSTREAM_TIMEOUT_MS } from './upstream';
 
 /** Blocked, empty or unusable answers (200). */
 export const CHAT_FALLBACK = 'I cannot answer that one. Message us on WhatsApp or use /contact and a human will reply.';
-/** Gemini down, slow or not configured (502). */
+/** The model is down, slow or not configured (502). */
 export const CHAT_OUTAGE = 'I cannot answer right now. Message us on WhatsApp or use /contact and a human will reply.';
 /** A reply that quotes a rupee amount not in the FACTS (200): a computed or invented price never reaches a visitor. */
 export const PRICE_ONLY_REPLY =
@@ -21,18 +22,8 @@ export const MAX_MESSAGES = 20;
 export const MAX_CHARS = 2000;
 // 20 messages x 2,000 chars is 40,000 chars: room for that as JSON, with some multi-byte text.
 const MAX_BODY_BYTES = 64 * 1024;
-const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
-const MAX_OUTPUT_TOKENS = 600;
-const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-
-// Finish reasons that mean the answer was withheld; any partial text is dropped.
-const BLOCKED = new Set(['SAFETY', 'RECITATION', 'BLOCKLIST', 'PROHIBITED_CONTENT', 'SPII', 'IMAGE_SAFETY', 'LANGUAGE', 'OTHER']);
-const SAFETY_SETTINGS = [
-  'HARM_CATEGORY_HARASSMENT',
-  'HARM_CATEGORY_HATE_SPEECH',
-  'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-  'HARM_CATEGORY_DANGEROUS_CONTENT',
-].map((category) => ({ category, threshold: 'BLOCK_MEDIUM_AND_ABOVE' }));
+export const DEFAULT_CHAT_MODEL = 'claude-haiku-5-5';
+const MAX_TOKENS = 600;
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -61,73 +52,51 @@ export function validateChat(body: unknown): { ok: true; messages: ChatMessage[]
     if (TEXT_CONTROL_RE.test(content)) return { ok: false, error: 'invalid characters' };
     out.push({ role, content });
   }
+  if (out[0]!.role !== 'user') return { ok: false, error: 'first message must be from the user' };
   if (out[out.length - 1]!.role !== 'user') return { ok: false, error: 'last message must be from the user' };
   return { ok: true, messages: out };
 }
 
-interface GeminiResponse {
-  promptFeedback?: { blockReason?: string };
-  candidates?: { finishReason?: string; content?: { parts?: { text?: string; thought?: boolean }[] } }[];
-}
-
 /**
- * generationConfig for a model id. On 2.5 models thinking tokens count against maxOutputTokens and
- * can leave no answer, so the budget is 0. 3.x models default to minimal thinking, so no thinking
- * config is sent; if a future id needs `thinking_level`, add it here.
+ * Request params for the chat route. claude-haiku-5-5 thinks by default (thinking tokens count against
+ * max_tokens) and 400s on a non-default temperature, top_p or top_k, so no sampling params are sent and
+ * thinking is off at effort low (disabled is accepted at effort high or below).
  */
-export function generationConfig(model: string): Record<string, unknown> {
-  const config: Record<string, unknown> = { maxOutputTokens: MAX_OUTPUT_TOKENS, temperature: 0.4 };
-  if (model.startsWith('gemini-2.5')) config.thinkingConfig = { thinkingBudget: 0 };
-  return config;
-}
+export const CHAT_PARAMS = {
+  max_tokens: MAX_TOKENS,
+  thinking: { type: 'disabled' },
+  output_config: { effort: 'low' },
+} as const;
 
 /**
- * One Gemini generateContent call. Throws ChatInputError for a bad body and UpstreamError (or a
- * fetch/timeout error) when Gemini cannot answer; a blocked or empty answer is CHAT_FALLBACK, not an error.
+ * One Anthropic Messages call. Throws ChatInputError for a bad body and UpstreamError (or a fetch/timeout
+ * error) when the model cannot answer; a refusal or an empty answer is CHAT_FALLBACK, not an error.
  */
 export async function chat(
-  env: Pick<Env, 'GEMINI_API_KEY' | 'GEMINI_MODEL'>,
+  env: Pick<Env, 'ANTHROPIC_API_KEY' | 'CHAT_MODEL'>,
   body: { messages: ChatMessage[] },
   fetchImpl: typeof fetch = globalFetch,
 ): Promise<{ reply: string }> {
   const v = validateChat(body);
   if (!v.ok) throw new ChatInputError(v.error);
-  if (!env.GEMINI_API_KEY) throw new UpstreamError('gemini not configured');
 
-  const model = env.GEMINI_MODEL?.trim() || DEFAULT_MODEL;
-  const res = await fetchImpl(`${GEMINI_BASE}/${encodeURIComponent(model)}:generateContent`, {
-    method: 'POST',
-    // Header rather than ?key=: URLs end up in logs and runtime error messages.
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': env.GEMINI_API_KEY },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: buildSystemPrompt() }] },
-      contents: v.messages.map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })),
-      generationConfig: generationConfig(model),
-      safetySettings: SAFETY_SETTINGS,
-    }),
-    signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
-  });
-  if (!res.ok) {
-    // The body can echo the request; it never reaches logs or the client.
-    await res.body?.cancel().catch(() => {});
-    throw new UpstreamError(`gemini responded ${res.status}`);
-  }
-  let data: GeminiResponse;
-  try {
-    data = (await res.json()) as GeminiResponse;
-  } catch {
-    throw new UpstreamError('gemini returned invalid json');
-  }
+  const { stopReason, text: raw } = await anthropicMessages(
+    env,
+    {
+      model: env.CHAT_MODEL?.trim() || DEFAULT_CHAT_MODEL,
+      ...CHAT_PARAMS,
+      // One text block so the (static) prompt can be cached across turns.
+      system: [{ type: 'text', text: buildSystemPrompt(), cache_control: { type: 'ephemeral' } }],
+      messages: v.messages.map((m) => ({ role: m.role, content: m.content })),
+    },
+    UPSTREAM_TIMEOUT_MS,
+    fetchImpl,
+  );
 
-  if (data.promptFeedback?.blockReason) return { reply: CHAT_FALLBACK };
-  const candidate = data.candidates?.[0];
-  if (!candidate || (candidate.finishReason && BLOCKED.has(candidate.finishReason))) return { reply: CHAT_FALLBACK };
-  let text = (candidate.content?.parts ?? [])
-    .filter((p) => !p.thought && typeof p.text === 'string')
-    .map((p) => p.text)
-    .join('')
-    .trim();
-  if (candidate.finishReason === 'MAX_TOKENS') text = trimToSentence(text);
+  // A refusal is withheld whole; any partial text is dropped (Haiku has no server-side fallback).
+  if (stopReason === 'refusal') return { reply: CHAT_FALLBACK };
+  let text = raw.trim();
+  if (stopReason === 'max_tokens') text = trimToSentence(text);
   if (!text) return { reply: CHAT_FALLBACK };
   // The prompt forbids new numbers; this enforces it. Every amount must appear in the FACTS as written.
   const known = factAmounts();
@@ -136,7 +105,7 @@ export async function chat(
 }
 
 /**
- * A reply cut off by maxOutputTokens, trimmed back to its last full sentence. A cut that lands in a
+ * A reply cut off by max_tokens, trimmed back to its last full sentence. A cut that lands in a
  * rupee amount ("₹1,12,") gives '' (the caller then uses CHAT_FALLBACK): a truncated price must never
  * reach the visitor, even inside a sentence we would otherwise keep.
  */
@@ -148,7 +117,7 @@ export function trimToSentence(text: string): string {
 }
 
 /**
- * POST /chat: body cap, JSON, shape check, per-IP quota (only valid requests spend it), then Gemini.
+ * POST /chat: body cap, JSON, shape check, per-IP quota (only valid requests spend it), then Anthropic.
  * Logs carry turn count, character counts and status only, never message or reply text or the IP.
  */
 export async function handleChat(req: Request, env: Env, fetchImpl: typeof fetch = globalFetch): Promise<Response> {

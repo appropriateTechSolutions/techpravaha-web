@@ -14,6 +14,7 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "og": "tsx scripts/og.ts",
+    "apps:build": "tsx scripts/apps/build-apps.ts",
     "journal:draft": "tsx scripts/journal/draft.ts",
     "journal:pr-body": "tsx scripts/journal/pr-body.ts",
     "check:placeholders": "tsx scripts/check-placeholders.ts",

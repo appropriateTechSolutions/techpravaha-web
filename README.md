@@ -43,6 +43,7 @@ npm run dev            # http://localhost:3000
 | `npm run test:e2e` | Playwright smoke tests against `build/client` on port 4173. Run `npm run build` first. First time on a machine: `npx playwright install chromium`. Build with the `VITE_*` ids unset: with `VITE_GA_ID` or `VITE_CLARITY_ID` in `.env` the build loads external scripts, and the "no console errors" test can then fail on third-party noise |
 | `npm run journal:draft` / `journal:pr-body` | Draft the next queued journal post (needs `ANTHROPIC_API_KEY`; `-- --dry-run` makes no API call), and render the PR body from a draft's summary JSON. See Phase 4 |
 | `npm run og` | Regenerate the Open Graph images in `public/og/` |
+| `npm run apps:build` | Rebuild HomeFind, GoodFind and Plot Twist from their repos into `public/<slug>/` (see Hosted products) |
 | `npm run worker:dev` / `worker:test` / `worker:deploy` | The commerce Worker: local dev on port 8787, its unit tests, deploy (regenerates the chat facts with `prompt:data` first). Node 22 (see Phase 2) |
 | `npx @lhci/cli autorun` | Lighthouse CI against `build/client` (budget below). Run `npm run build` first |
 
@@ -92,7 +93,30 @@ The site and the Worker can disagree for a while: Pages and the Worker deploy se
    Apps that need a language model (Landlord Translator, Excuse Engine, Split the Awkward) call the Worker's `POST /lab/complete` with `{ app, input, options? }` and get back `{ text }`. The Worker holds each app's system prompt (`workers/techpravaha-api/src/lab-prompts.ts`) and calls Anthropic with `ANTHROPIC_API_KEY` (secret), model `LAB_MODEL` (default `claude-haiku-5-5`; Claude 4.x ids get a per-app temperature, newer ids get thinking off), output capped per app (1,200 tokens for Landlord Translator, 600 for the other two), 30 requests per IP per minute (`LAB_RATE` binding). Unknown apps or option shapes get a 400; no key gives 503, quota 429, model failure 502, and a refusal or an answer cut at the token cap 200 `{ text: "" }`, so each app falls back to its own offline or error state. Logs carry lengths and status, never the text. The proxy does not check `Origin` (CORS only stops other sites' browsers reading the reply), so its cost is bounded by the per-IP binding plus the spend cap on the Anthropic workspace.
    These files are served as-is by Pages, so the API host is not inlined at build time: each reads it from `<meta name="tp-api" content="https://api.techpravaha.com">`. If the Worker host changes, edit that tag in all three files (without it they call the relative `/lab/complete`); `public/_headers` caches `/lab/play/*` for 24 hours, so a change can take up to a day to reach returning visitors. Each file's header comment names its source; the only change from the source is the fetch target.
 2. Add `play('<slug>', 'Name', 'One-sentence blurb.', ['tag', 'tag'])` to `LAB` in `app/content/lab.ts`.
-3. Extensions and web apps without a public listing keep `href: '#'` until a store or hosted URL exists.
+3. Extensions and web apps without a public listing keep `href: '#'` until a store or hosted URL exists. Only unlinked extensions show "source on request".
+
+## Hosted products
+
+HomeFind, GoodFind and Plot Twist are served from the site root as static builds: `techpravaha.com/homefind/`, `/goodfind/`, `/plot-twist/`. Their files live in `public/<slug>/` and are committed, like the lab apps. Pages serves static files before anything else, so these paths never reach the React app. The slugs are `HOSTED_APP_SLUGS` in `scripts/lib/paths.ts`: postbuild adds `HOSTED_APP_PATHS` to the sitemap (not to the prerender list) and fails if an app's `index.html` has no `<title>` or meta description; the modulepreload strip (`PRELOAD_SKIP_DIRS`) and the placeholder gate skip them.
+
+To update one, edit its repo, then run `npm run apps:build` here (or `npm run apps:build -- homefind` for one app) and commit the changes under `public/<slug>/`.
+
+| App | Source repo | Build |
+|---|---|---|
+| HomeFind | `~/Documents/ChatGPT/Extensios/homefind` | `tsc -b`, then `vite build --base=/homefind/`. No patches: vite-plugin-pwa registers `/homefind/sw.js` with scope `/homefind/`, and the manifest uses relative URLs. |
+| GoodFind | `~/Documents/ChatGPT/Extensios/goodfind` | `tsc -b`, then `vite build --base=/goodfind/`, then patches for root paths the base flag cannot reach (listed below). |
+| Plot Twist | `~/Documents/ChatGPT/Fun/plot-twist` | Copied as-is (no `drafts/`, no `tests/`, no `README.md`); it only uses relative paths. It lives only at `/plot-twist/`; `public/_redirects` sends old `/lab/play/plot-twist/*` links there. |
+
+What `scripts/apps/build-apps.ts` does:
+
+- Builds into a temp directory, never into the source repo's `dist/`. The source repos are read-only; the only files a build writes there are `tsc` build-info caches under `node_modules/`. HomeFind's `npm run icons` step is skipped because it rewrites PNGs committed in that repo.
+- GoodFind patches, each asserted to match exactly once so a source change fails the build: `register("/sw.js")` in the bundle becomes `register("/goodfind/sw.js",{scope:"/goodfind/"})`; the hand-written `sw.js` caches `/goodfind/`, `/goodfind/manifest.webmanifest` and `/goodfind/icons/goodfind-mark.svg` instead of root paths; its activate step only deletes caches named `goodfind-*` (it used to delete every other cache on the origin, which would include HomeFind's); the manifest `start_url`, `scope`, icons and shortcut URL move under `/goodfind/`; source maps are dropped.
+- Adds a header comment to each `index.html` naming the source repo, commit, build date and base path, and adds a title or meta description only if the source has none.
+- Fails if `index.html` links a root path outside `/<slug>/` or any file names an AI API host. `tests/content.test.ts` re-checks the committed files, including each service worker's scope.
+
+`public/_headers` caches `/homefind/assets/*` and `/goodfind/assets/*` for a year (hashed names) and sends `no-cache` for each app's `index.html` and `sw.js`, so updates reach installed copies on the next visit. All apps share the techpravaha.com origin, so their `localStorage` and IndexedDB sit beside the site's; they use their own key and database names.
+
+AfterBuy is not hosted. Its framework (vinext 1.0.0-beta.5, Next.js on Vite) can export static files at the domain root, but an export with `basePath: '/afterbuy'` renders no pages, and the app hardcodes root paths in its service worker, manifest, preview iframe and worker registration. It needs a subdomain or a source change; see `docs/MORNING-NOTES.md`.
 
 ### A journal post
 
@@ -154,7 +178,7 @@ Lighthouse CI, mobile preset, 3 runs per page, asserted on the median run (`aggr
 
 Individual performance runs in that autorun were 0.91 to 0.95 on `/` and 0.93 to 0.97 on `/services/websites/`. Performance varies by about 0.1 between single runs (simulated mobile throttling); earlier runs the same day ranged 0.88 to 0.99. Accessibility, best practices and SEO were stable. If a run misses, re-run before treating it as a regression. These numbers pre-date the phase 2 checkout and thanks pages, which are `noindex` and not in the LHCI set; re-run `npx @lhci/cli autorun` after a change that touches the shared bundle.
 
-`scripts/postbuild.ts` strips the `modulepreload` links React Router adds to every prerendered page (outside `assets/` and `lab/play/`). They are about 350 KB of scripts that compete with CSS and fonts on slow mobile links; without them mobile FCP went from 3.6 s to 2.1 s. The module script still hydrates the page. Postbuild fails if any page still carries one.
+`scripts/postbuild.ts` strips the `modulepreload` links React Router adds to every prerendered page (outside `assets/`, `lab/play/` and the hosted products). They are about 350 KB of scripts that compete with CSS and fonts on slow mobile links; without them mobile FCP went from 3.6 s to 2.1 s. The module script still hydrates the page. Postbuild fails if any page still carries one.
 
 ## Phase 2 · Commerce
 
@@ -216,7 +240,7 @@ Individual performance runs in that autorun were 0.91 to 0.95 on `/` and 0.93 to
 
 For visitors who are not ready to buy: a site chatbot, a free teardown lead magnet, internal pings to Yogesh for every order and lead, and the three lab apps that need a model, all through the same Worker. Every model call goes through the Worker; the site holds no model key.
 
-**Chat.** A floating launcher (bottom right, 44px target, `aria-label="Chat with Tech Pravaha"`) mounts after hydration and an idle callback and never auto-opens. The `Chatbot` panel is a lazy chunk: it loads on the first hover, focus or click on the launcher, so it is never in the home page's critical path. If the chunk fails to load, a small "The chat could not load" panel takes its place, with "Try again" (fetches the chunk again, no reload) and the contact link. Replies render as plain text (never HTML or markdown), the transcript lives in `localStorage` (`tp-chat`, last 12 turns sent), and every answer can end in WhatsApp or `/contact`. The system prompt (`workers/techpravaha-api/src/prompt.ts`) is built from `workers/techpravaha-api/src/prompt-data.json`, which `npm run prompt:data` generates from `catalogue.json` and `app/content/services.ts`; it carries the price guard, the prompt-injection guard and the plain-text rule. `.github/workflows/deploy-worker.yml` regenerates the JSON before every Worker deploy (it also runs when `app/content/services.ts` changes), so a catalogue edit needs no manual step; `tests/prompt-data.test.ts` checks the generator and the checked-in file's structure (every service, every buyable tier with a price), not byte-equality. Run `npm run prompt:data` yourself only to see an edit in `npm run worker:dev`.
+**Chat.** A floating launcher (bottom right, 44px target, `aria-label="Chat with Tech Pravaha"`) mounts after hydration and an idle callback and never auto-opens. The `Chatbot` panel is a lazy chunk: it loads on the first hover, focus or click on the launcher, so it is never in the home page's critical path. If the chunk fails to load, a small "The chat could not load" panel takes its place, with "Try again" (fetches the chunk again, no reload) and the contact link. Replies render as plain text (never HTML or markdown), the transcript lives in `localStorage` (`tp-chat`, last 12 turns sent), and every answer can end in WhatsApp or `/contact`. The system prompt (`workers/techpravaha-api/src/prompt.ts`) is built from `workers/techpravaha-api/src/prompt-data.json`, which `npm run prompt:data` generates from `catalogue.json` and `app/content/services.ts`; it carries the price guard, the prompt-injection guard and the plain-text rule. The Worker sends the conversation to Anthropic's Messages API (`CHAT_MODEL`, default `claude-haiku-5-5`) with thinking off at effort `low`, no sampling parameters and a 600-token reply cap; a refusal or an empty answer gets the friendly fallback reply, an answer cut at the cap is trimmed to its last full sentence, and a reply that quotes a rupee amount not in the facts is replaced with a pointer to /pricing. `.github/workflows/deploy-worker.yml` regenerates the JSON before every Worker deploy (it also runs when `app/content/services.ts` changes), so a catalogue edit needs no manual step; `tests/prompt-data.test.ts` checks the generator and the checked-in file's structure (every service, every buyable tier with a price), not byte-equality. Run `npm run prompt:data` yourself only to see an edit in `npm run worker:dev`.
 
 **Teardown lead magnet.** `/teardown/` takes a site address, name, email and an optional WhatsApp number and sends a `lead_magnet` lead through `POST /leads`; `/services/websites/`, `/services/design/` and the home page link to it. Delivery is manual in v1: each `lead_magnet` row in the Leads tab needs a reply within two working days (the success copy promises that).
 
@@ -236,14 +260,14 @@ The visitor sees "sent" on the 202, before anything is stored. A lead whose Shee
 
 The three limits are Workers Rate Limiting bindings in `wrangler.toml` (`[[ratelimits]]`): nothing to create in the dashboard, counted per Cloudflare location and approximate.
 
-**Worker secrets** (phase 3, `npx wrangler secret put <NAME>` on Node 22): `GEMINI_API_KEY` (chat; unset, `/chat` answers 502 with the outage reply; create it in a billed Gemini project, see below), `TELEGRAM_BOT_TOKEN` (required for lead pings; see Telegram setup), `ANTHROPIC_API_KEY` (optional, lab apps).
+**Worker secrets** (phase 3, `npx wrangler secret put <NAME>` on Node 22): `ANTHROPIC_API_KEY` (chat and lab apps; unset, `/chat` answers 502 with the outage reply and `/lab/complete` answers 503; see Anthropic key below), `TELEGRAM_BOT_TOKEN` (required for lead pings; see Telegram setup).
 
-**Worker vars** (`wrangler.toml` `[vars]`): `TELEGRAM_CHAT_ID` (required for lead pings), `GEMINI_MODEL` (optional, default `gemini-3.5-flash-lite`; a `gemini-2.5*` id gets `thinkingBudget: 0`, any other id gets no thinking config because 3.x models default to minimal thinking; the reply cap is 600 output tokens), `LAB_MODEL` (optional, default `claude-haiku-5-5`; leave the default). Local dev reads dummies from `.dev.vars` (`.dev.vars.example` lists them all).
+**Worker vars** (`wrangler.toml` `[vars]`): `TELEGRAM_CHAT_ID` (required for lead pings), `CHAT_MODEL` (optional, default `claude-haiku-5-5`; leave the default: the chat request sends thinking disabled at effort `low`, which another model may reject; the reply cap is 600 output tokens), `LAB_MODEL` (optional, default `claude-haiku-5-5`; leave the default). Local dev reads dummies from `.dev.vars` (`.dev.vars.example` lists them all).
 
-**Gemini key.** Use a billed Gemini project: on an unbilled AI Studio project, Google's terms let it use the chat content to improve its products. Set a spend cap on that project before go-live: it is a prerequisite, and a budget alert alone only notifies and does not stop spend. The default model is `gemini-3.5-flash-lite`. Confirm the model answers on your key with one request (expect a JSON body with `candidates`; a 403 or 404 means the key cannot reach that model):
+**Anthropic key.** One `ANTHROPIC_API_KEY` serves the chat and the lab apps (Worker secret) and the journal drafts (the repo Actions secret of the same name, Phase 4). Create it in an Anthropic workspace with a monthly spend cap before go-live: the cap is a prerequisite, because `/chat` and `/lab/complete` are open to anyone and the per-IP limits are approximate. Confirm the chat model answers on your key with one request in the chat route's shape (expect a JSON body with `"type":"message"`; a `"type":"error"` body names the problem):
 
 ```sh
-curl -s -H "x-goog-api-key: $KEY" -H "Content-Type: application/json" -d '{"contents":[{"parts":[{"text":"hi"}]}]}' https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent
+curl -s https://api.anthropic.com/v1/messages -H "x-api-key: $KEY" -H "anthropic-version: 2023-06-01" -H "Content-Type: application/json" -d '{"model":"claude-haiku-5-5","max_tokens":64,"thinking":{"type":"disabled"},"output_config":{"effort":"low"},"messages":[{"role":"user","content":"hi"}]}'
 ```
 
 **Site env.** No new `VITE_*` variable: chat, leads and the teardown form all use `VITE_API_URL`.
@@ -278,7 +302,7 @@ A weekly pipeline drafts one journal post from a topic queue, runs a house-voice
 
 1. **Foundation** (done): brand, layout, all routes with real copy, catalogue display, work, lab, journal, legal pages, SEO, analytics, styleguide. Deployable and indexable without checkout.
 2. **Commerce** (built, this repo state; needs Yogesh's accounts and keys to go live): Cloudflare Worker (`workers/techpravaha-api`), Razorpay test then live, checkout and thanks pages, Sheet and Resend. Booking link is `VITE_BOOKING_URL` / the Worker's `BOOKING_URL`.
-3. **Hooks** (built; needs the Gemini key, the Anthropic key and a Telegram bot to go live): chatbot, teardown lead magnet, order and lead pings, the lab proxy. See Phase 3 above.
+3. **Hooks** (built; needs the Anthropic key and a Telegram bot to go live): chatbot, teardown lead magnet, order and lead pings, the lab proxy. See Phase 3 above.
 4. **Journal automation** (built; needs the `ANTHROPIC_API_KEY` Actions secret to go live): topic queue to Claude draft to PR to your approval to publish. See Phase 4 above.
 
 ## Docs

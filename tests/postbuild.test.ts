@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildRss, buildSitemap, rfc822, SITE, type FeedPost } from '../scripts/lib/feeds';
 import { hasPreloads, PRELOAD_SKIP_DIRS, stripPreloads } from '../scripts/lib/html';
-import { NOINDEX_PATHS, prerenderPaths } from '../scripts/lib/paths';
+import { HOSTED_APP_PATHS, HOSTED_APP_SLUGS, NOINDEX_PATHS, prerenderPaths } from '../scripts/lib/paths';
 
 const POSTS: FeedPost[] = [
   { slug: 'a-post', title: 'A post & more', date: '2026-10-08', summary: 'First <summary>.' },
@@ -31,6 +31,32 @@ describe('buildSitemap', () => {
     expect(out).not.toContain('/404');
     expect(out).toContain(`<loc>${SITE}/services/websites/</loc>`);
     expect((out.match(/<loc>/g) ?? []).length).toBeGreaterThanOrEqual(24);
+  });
+});
+
+describe('hosted products in the sitemap', () => {
+  it('lists /homefind/, /goodfind/ and /plot-twist/ as trailing-slash paths', () => {
+    expect(HOSTED_APP_PATHS).toEqual(['/homefind/', '/goodfind/', '/plot-twist/']);
+    expect(HOSTED_APP_PATHS).toEqual(HOSTED_APP_SLUGS.map((s) => `/${s}/`));
+  });
+
+  it('adds them to the sitemap built the way postbuild builds it', () => {
+    const real = [...prerenderPaths().filter((p) => !NOINDEX_PATHS.includes(p)), ...HOSTED_APP_PATHS];
+    const out = buildSitemap(real, {}, '2026-10-12');
+    for (const p of HOSTED_APP_PATHS) expect(out).toContain(`<loc>${SITE}${p}</loc>`);
+    expect(out).not.toContain('/homefind//');
+  });
+
+  it('keeps them out of the prerender list (React Router does not own these paths)', () => {
+    const paths = prerenderPaths();
+    for (const s of HOSTED_APP_SLUGS) {
+      expect(paths).not.toContain(`/${s}`);
+      expect(paths).not.toContain(`/${s}/`);
+    }
+  });
+
+  it('skips them in the modulepreload strip', () => {
+    for (const s of HOSTED_APP_SLUGS) expect(PRELOAD_SKIP_DIRS).toContain(s);
   });
 });
 

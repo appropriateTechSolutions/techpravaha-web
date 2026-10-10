@@ -11,7 +11,7 @@ Merging to `main` arms two workflows: the Monday journal cron (03:17 UTC) and `d
 3. [ ] Push the branch, open the PR to `main`, review and merge. Expect `Deploy Worker` to go red on the merge push until the KV ids and the Cloudflare secrets exist (go-live step 4 below).
 4. [ ] Branch protection on `main`: require a pull request before merging and require the `CI` check.
 5. [ ] Dispatch "Journal draft" once by hand (Actions tab, Run workflow) and read the PR. The run dispatches `CI` on the PR's branch itself (see the CI note under GitHub Actions); if no `CI` check shows on the PR, close and reopen it.
-6. [ ] Then the commerce go-live order below, then the Gemini, Anthropic (Worker) and Telegram notes, then the content decisions and placeholders, then the README cutover checklist.
+6. [ ] Then the commerce go-live order below, then the Anthropic (Worker) and Telegram notes, then the content decisions and placeholders, then the README cutover checklist.
 
 ## Accounts and secrets
 
@@ -46,14 +46,11 @@ Worker secrets are set with `npx wrangler secret put <NAME>` on Node 22 (details
 - [ ] Rate limits (`/chat` 12, `/leads` 6, `/lab/complete` 30 per IP per minute) are bindings in `wrangler.toml`; no setup, counts are per location and approximate.
 - [ ] Price edits: edit `catalogue.json` and merge; `deploy-worker.yml` regenerates the chat facts and redeploys once the Cloudflare secrets are set (GitHub Actions below); until then run `npm run worker:deploy` on Node 22 after every price edit, or checkout refuses that tier. Adding or removing a tier or service needs `npm run prompt:data` in the same PR.
 
-### Gemini (chat)
-- [ ] Use a billed Gemini project (on an unbilled AI Studio project Google may use chat content to improve its products); create the key there.
-- [ ] Set a spend cap on that project before go-live. This is a prerequisite; a budget alert only notifies and does not stop spend.
-- [ ] `wrangler secret put GEMINI_API_KEY`; leave `GEMINI_MODEL` unset (default `gemini-3.5-flash-lite`).
-- [ ] Confirm the model answers on your key with the one-request curl in README "Gemini key" (a JSON body with `candidates`; 403 or 404 means the key cannot reach it).
-
-### Anthropic (lab apps and journal drafts)
-- [ ] Create the key in a workspace with a monthly spend cap; `wrangler secret put ANTHROPIC_API_KEY`. Leave `LAB_MODEL` unset (default `claude-haiku-5-5`; Opus and Sonnet 5.x reject the disabled-thinking parameter).
+### Anthropic (chat, lab apps and journal drafts)
+- [ ] One key serves the chat, the lab apps and the journal drafts. Create it in a workspace with a monthly spend cap before go-live; the cap is a prerequisite, since `/chat` and `/lab/complete` are open to anyone and the per-IP limits are approximate.
+- [ ] `wrangler secret put ANTHROPIC_API_KEY`. Until it is set, chat answers with the outage reply and the lab apps show their offline state.
+- [ ] Leave `CHAT_MODEL` and `LAB_MODEL` unset (both default to `claude-haiku-5-5`; Opus and Sonnet 5.x reject the disabled-thinking parameter).
+- [ ] Confirm the model answers on your key with the one-request curl in README "Anthropic key".
 - [ ] First real journal draft: prefer the manual dispatch (Start here, step 5). A local run (`ANTHROPIC_API_KEY=... npm run journal:draft`, see `.env.example`) writes the post and the sidecar and flips the topic to `drafted` in your working tree; read the post, then discard all three: `git checkout -- content/journal-topics.json && rm app/content/journal/*-<slug>.md content/social/<slug>.md`.
 
 ### Telegram
@@ -76,7 +73,9 @@ Worker secrets are set with `npx wrangler secret put <NAME>` on Node 22 (details
 - [ ] Work timelines: all four items read "[timeline pending]"; supply build durations in `app/content/work.ts`.
 - [ ] Work facts: check Qui Ambassador App's "shipped" list against what is live and remove the rest (`app/content/work.ts`); `services` tags and each service's `related` list are in `app/content/{work,services}.ts`.
 - [ ] Client names: confirm the exhibition organiser's name and whether it may be shown (`app/content/work.ts`, currently "Trade exhibition organiser, India"); IntPro and Home Manager read "Studio product", confirm or name the client.
-- [ ] Lab store links: Tab Tamer, LocaleLens, Should I Buy This?, AfterBuy, GoodFind and HomeFind are `href: '#'` ("source on request"); add Chrome Web Store or hosted URLs in `app/content/lab.ts`.
+- [ ] Lab store links: the extensions Tab Tamer, LocaleLens and Should I Buy This? are `href: '#'` ("source on request"); add Chrome Web Store URLs in `app/content/lab.ts`. HomeFind, GoodFind and Plot Twist are hosted at `/homefind/`, `/goodfind/` and `/plot-twist/` (README "Hosted products").
+- [ ] AfterBuy is still `href: '#'`: it cannot be hosted at `/afterbuy/` as static files (README "Hosted products"). Decide: a subdomain such as `afterbuy.techpravaha.com` running its own build, or a source change to make it base-path aware, then link it in `app/content/lab.ts`.
+- [ ] Hosted products share the techpravaha.com origin, so their browser data lives there: HomeFind's own rule is not to change its address once people use it. Confirm `/homefind/` (and `/goodfind/`) are the permanent addresses before announcing them.
 - [ ] Legal placeholders: `[GSTIN]` and `[registered address]` in `app/components/LegalPage.tsx` (shown on /terms); add the address and a phone number to /contact for Razorpay's checklist.
 - [ ] Legal placeholder: jurisdiction `[city]` for disputes in `app/components/LegalPage.tsx` (usually the city of the registered address).
 - [ ] Refund formula in /refunds (package price divided by days in the timeline, times calendar days from kickoff to cancellation, capped at the price; no refund after launch): confirm calendar days vs working days. Design Audit is "5 days" in `catalogue.json`; is that calendar or working days? Also ask the CA to confirm the tax handling /refunds promises: we refund the refunded amount plus the GST charged on it, send a credit note, and no refund is due after launch.
@@ -112,7 +111,8 @@ Also before cutover: soften the Razorpay and "at checkout" payment copy if phase
 
 - [ ] Push is blocked: `feat/phase-1-foundation` is local only, with no remote branch. Push it, open the PR to `main` and merge; unpushed work on one laptop is a liability.
 - [ ] Playwright and Lighthouse CI were measured locally against a static server, not against Cloudflare Pages.
-- [ ] Unverified against the live services: Gemini chat, Anthropic lab proxy and journal drafting, Razorpay checkout and webhook, Resend email, Telegram pings. Everything is tested with fakes only.
+- [ ] Hosted products: check `/homefind/`, `/goodfind/` and `/plot-twist/` on the Pages preview (install to a phone home screen, go offline, reload). Verified locally with `serve` only; Cloudflare's `/index.html` redirects and `_headers` were not exercised.
+- [ ] Unverified against the live services: Anthropic chat, lab proxy and journal drafting, Razorpay checkout and webhook, Resend email, Telegram pings. Everything is tested with fakes only.
 - [ ] The workflows (`ci.yml`, `deploy-worker.yml`, `journal-draft.yml`) are validated with `@action-validator/cli` and shell syntax checks but have never run on GitHub.
 - [ ] ATS site (`~/Documents/GitHub/ats_website`) has the same trailing-slash canonical bug (Cloudflare Pages 308s `/x` to `/x/`; this site emits `/x/` everywhere); needs a separate PR there.
 - [ ] GST on advances: the Orders Sheet shows full-order Price, GST and Total; the GST collected on a 50% deposit (for example 8,550 rupees of 56,050 on Websites Growth) is not a separate column. Ask the CA whether receipt vouchers need it, and add a column if so.

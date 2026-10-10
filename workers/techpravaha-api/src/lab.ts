@@ -1,3 +1,4 @@
+import { anthropicMessages } from './anthropic';
 import { TEXT_CONTROL_RE } from './chars';
 import type { Env } from './env';
 import { json, readBodyCapped } from './http';
@@ -11,7 +12,7 @@ import {
   type LabOptions,
 } from './lab-prompts';
 import { allow, clientIp } from './ratelimit';
-import { globalFetch, safeErrorText, UpstreamError } from './upstream';
+import { globalFetch, safeErrorText } from './upstream';
 
 export const LAB_MAX_INPUT = 4000;
 export const LAB_MAX_OPTIONS = 8;
@@ -25,7 +26,6 @@ export const LAB_MAX_TOKENS: Record<LabApp, number> = {
 export const LAB_TIMEOUT_MS = 15_000;
 export const DEFAULT_LAB_MODEL = 'claude-haiku-5-5';
 const MAX_BODY_BYTES = 16 * 1024;
-const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 
 export interface LabRequest {
   app: LabApp;
@@ -105,11 +105,6 @@ export function modelParams(model: string, app: LabApp): Record<string, unknown>
     : { thinking: { type: 'disabled' } };
 }
 
-interface AnthropicResponse {
-  stop_reason?: string;
-  content?: { type?: string; text?: string }[];
-}
-
 /**
  * One Anthropic Messages call. Throws UpstreamError (or a fetch/timeout error) when the model cannot
  * answer; a refusal, a truncated answer or one with no text is '' so the app shows its own empty or offline state.
@@ -119,40 +114,23 @@ export async function complete(
   req: LabRequest,
   fetchImpl: typeof fetch = globalFetch,
 ): Promise<{ text: string }> {
-  if (!env.ANTHROPIC_API_KEY) throw new UpstreamError('anthropic not configured');
   const model = env.LAB_MODEL?.trim() || DEFAULT_LAB_MODEL;
-  const res = await fetchImpl(ANTHROPIC_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
+  const { stopReason, text } = await anthropicMessages(
+    env,
+    {
       model,
       max_tokens: LAB_MAX_TOKENS[req.app],
       ...modelParams(model, req.app),
       system: SYSTEM_PROMPTS[req.app],
       messages: [{ role: 'user', content: buildUserMessage(req.app, req.input, req.options) }],
-    }),
-    signal: AbortSignal.timeout(LAB_TIMEOUT_MS),
-  });
-  if (!res.ok) {
-    // The body can echo the request; it never reaches logs or the client.
-    await res.body?.cancel().catch(() => {});
-    throw new UpstreamError(`anthropic responded ${res.status}`);
-  }
-  let data: AnthropicResponse;
-  try {
-    data = (await res.json()) as AnthropicResponse;
-  } catch {
-    throw new UpstreamError('anthropic returned invalid json');
-  }
+    },
+    LAB_TIMEOUT_MS,
+    fetchImpl,
+  );
   // A refusal has nothing to show, and an answer cut at max_tokens is truncated JSON or half a message:
   // '' sends each app to its own error or offline state.
-  if (data.stop_reason === 'refusal' || data.stop_reason === 'max_tokens') return { text: '' };
-  const block = (data.content ?? []).find((b) => b.type === 'text' && typeof b.text === 'string');
-  return { text: block?.text?.trim() ?? '' };
+  if (stopReason === 'refusal' || stopReason === 'max_tokens') return { text: '' };
+  return { text: text.trim() };
 }
 
 /**

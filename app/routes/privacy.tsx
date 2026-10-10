@@ -7,7 +7,7 @@ export function meta(): Route.MetaDescriptors {
   return pageMeta({
     title: 'Privacy policy',
     description:
-      'What Tech Pravaha collects through its forms, the chat assistant, the lab apps, WhatsApp, payments and analytics (Google Analytics 4 and Microsoft Clarity), where it is kept, and how to have it deleted.',
+      'What Tech Pravaha collects through its forms, the chat assistant, the lab apps, the hosted apps, WhatsApp, payments and analytics (Google Analytics 4 and Microsoft Clarity), where it is kept, and how to have it deleted.',
     path: '/privacy',
   });
 }
@@ -52,12 +52,12 @@ const CLAUSES: Clause[] = [
       <>
         <p>
           The chat assistant on the site is an AI. When you send it a message, your message and the earlier
-          messages in that conversation go through our Cloudflare Worker to Google's Gemini API, which
+          messages in that conversation go through our Cloudflare Worker to Anthropic's API, which
           generates the reply. We do not store the conversation.
         </p>
         <p>
-          The transcript stays in your browser's local storage until you clear it, with "Clear chat" in the
-          chat or by clearing your browser's site data. Do not share passwords, card numbers or other
+          The transcript stays in your browser's local storage until you clear it. Use the "Clear chat" link
+          in the chat first; clearing your browser's site data for techpravaha.com also removes it. Do not share passwords, card numbers or other
           sensitive details in the chat.
         </p>
       </>
@@ -71,6 +71,25 @@ const CLAUSES: Clause[] = [
         goes through our Cloudflare Worker to Anthropic's API to generate a result, and is not stored by us.
         The lab apps load their fonts from Google Fonts, so Google receives that request.
       </p>
+    ),
+  },
+  {
+    title: 'Hosted apps',
+    body: (
+      <>
+        <p>
+          HomeFind, GoodFind and Plot Twist run on techpravaha.com. HomeFind and Plot Twist keep their data
+          on your device only, in your browser's storage. Nothing from them is sent to us.
+        </p>
+        <p>
+          GoodFind sends the label text you enter to the US Consumer Product Safety Commission's public
+          recall search (saferproducts.gov), and loads its text-recognition files from jsDelivr's CDN.
+        </p>
+        <p>
+          These apps share techpravaha.com's browser storage, so clearing site data for techpravaha.com also
+          clears their data.
+        </p>
+      </>
     ),
   },
   {
@@ -152,8 +171,8 @@ const CLAUSES: Clause[] = [
     body: (
       <p>
         We do not sell your data, rent it or share it for advertising. We send it only to the services named
-        on this page (Cloudflare, Google, Microsoft, Anthropic, Razorpay, Resend, Telegram and Meta for
-        WhatsApp), which we use to run the site and our work, or to a government authority when Indian law
+        on this page (Cloudflare, Google, Microsoft, Anthropic, Razorpay, Resend, Telegram, Meta for
+        WhatsApp, and for GoodFind the US Consumer Product Safety Commission and jsDelivr), which we use to run the site and our work, or to a government authority when Indian law
         requires it.
       </p>
     ),

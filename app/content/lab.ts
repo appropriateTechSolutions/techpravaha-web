@@ -4,7 +4,11 @@ export interface LabItem {
   /** One sentence, house voice. */
   blurb: string;
   kind: 'play' | 'extension' | 'pwa';
-  /** `/lab/play/<slug>/` for playable items, an external link, or `#` until one exists. */
+  /**
+   * `/lab/play/<slug>/` for playable items, `/<slug>/` for a hosted product (HOSTED_APP_SLUGS in
+   * scripts/lib/paths.ts, built into `public/<slug>/` by `npm run apps:build`), an external link,
+   * or `#` until one exists.
+   */
   href: string;
   tags: string[];
 }
@@ -20,9 +24,11 @@ const play = (slug: string, name: string, blurb: string, tags: string[]): LabIte
 
 /**
  * Small things built for fun or to test an idea. Playable items are small static
- * apps (most are one HTML file, Plot Twist is a folder) copied verbatim into
- * `public/lab/play/<slug>/`; extensions and web apps stay unlinked (`#`) until
- * they have a public listing. The three apps that use a language model
+ * apps (one HTML file each) copied verbatim into `public/lab/play/<slug>/`. Plot Twist,
+ * HomeFind and GoodFind are hosted products at `/<slug>/` (built from their own repos by
+ * `npm run apps:build`); Plot Twist lives only at `/plot-twist/`, and old
+ * `/lab/play/plot-twist/` links redirect there (public/_redirects). Extensions and AfterBuy stay unlinked (`#`)
+ * until they have a public listing. The three apps that use a language model
  * (Landlord Translator, Excuse Engine, Split the Awkward) call the Worker's
  * `/lab/complete` proxy instead of an AI API (host from their `tp-api` meta tag);
  * tests/content.test.ts scans every lab file for third-party API hosts.
@@ -46,12 +52,15 @@ export const LAB: LabItem[] = [
     'Three one-thumb games for the queue you are standing in, built to drop the moment it is your turn.',
     ['Game', 'One-handed'],
   ),
-  play(
-    'plot-twist',
-    'Plot Twist',
-    'A one-minute daily mystery: read the case file, reveal only the clues you need, name the culprit.',
-    ['Daily game', 'Offline'],
-  ),
+  {
+    ...play(
+      'plot-twist',
+      'Plot Twist',
+      'A one-minute daily mystery: read the case file, reveal only the clues you need, name the culprit.',
+      ['Daily game', 'Offline'],
+    ),
+    href: '/plot-twist/',
+  },
   play(
     'landlord-translator',
     'Landlord Translator',
@@ -107,7 +116,7 @@ export const LAB: LabItem[] = [
     name: 'GoodFind',
     blurb: 'Photograph the label on secondhand baby gear and check it against official US recall records.',
     kind: 'pwa',
-    href: '#',
+    href: '/goodfind/',
     tags: ['Installable', 'OCR'],
   },
   {
@@ -115,7 +124,7 @@ export const LAB: LabItem[] = [
     name: 'HomeFind',
     blurb: 'A household inventory for one question: where did we put it?',
     kind: 'pwa',
-    href: '#',
+    href: '/homefind/',
     tags: ['Installable', 'Offline'],
   },
 ];

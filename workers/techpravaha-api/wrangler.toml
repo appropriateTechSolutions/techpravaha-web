@@ -40,12 +40,13 @@ ALERT_EMAIL = "yogesh@appropriatetechsolutions.com"
 # Optional, used in the receipt email. Leave unset until decided.
 # BOOKING_URL = "https://calendar.app.google/REPLACE"   # absolute https link to the kickoff booking page
 # WHATSAPP_NUMBER = "91XXXXXXXXXX"                       # digits with country code; placeholder is ignored
-# Chat model for POST /chat; defaults to gemini-3.5-flash-lite when unset.
-# GEMINI_MODEL = "gemini-3.5-flash-lite"
+# Chat model for POST /chat; defaults to claude-haiku-5-5 when unset. The chat request sends thinking
+# disabled at effort low and no sampling params; check another model accepts that before setting it.
+# CHAT_MODEL = "claude-haiku-5-5"
 # Lab model for POST /lab/complete; defaults to claude-haiku-5-5 when unset.
 # LAB_MODEL = "claude-haiku-5-5"
 # Order and lead pings go to Telegram when both are set. Without them, order pings go to ALERT_EMAIL
 # and lead pings are skipped (the Leads tab is the record).
 # TELEGRAM_CHAT_ID = "REPLACE"                           # your user id, or a group id like -100...
-# Secrets, never here: `npx wrangler secret put GEMINI_API_KEY`, `npx wrangler secret put TELEGRAM_BOT_TOKEN` and
-# `npx wrangler secret put ANTHROPIC_API_KEY` (lab apps; unset, /lab/complete answers 503 and the apps go offline).
+# Secrets, never here: `npx wrangler secret put ANTHROPIC_API_KEY` (chat and lab apps; unset, /chat answers 502
+# with the outage reply and /lab/complete answers 503 so the apps go offline) and `npx wrangler secret put TELEGRAM_BOT_TOKEN`.

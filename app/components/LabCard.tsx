@@ -17,7 +17,7 @@ function Body({ item, linked }: { item: LabItem; linked: boolean }) {
       <div className="flex items-center justify-between gap-4">
         <span className="label-mono">
           {KIND[item.kind]}
-          {!linked && ' · source on request'}
+          {!linked && item.kind === 'extension' && ' · source on request'}
         </span>
         {linked && (
           <ArrowUpRight
@@ -39,7 +39,10 @@ function Body({ item, linked }: { item: LabItem; linked: boolean }) {
   );
 }
 
-/** A Lab experiment. Linked cards open in a new tab; `#` hrefs render unlinked. */
+/**
+ * A Lab experiment. Linked cards (lab apps, hosted products at `/<slug>/`, external links) open in
+ * a new tab; `#` hrefs render unlinked, and only unlinked extensions say "source on request".
+ */
 export function LabCard({ item }: { item: LabItem }) {
   if (item.href === '#') {
     return (

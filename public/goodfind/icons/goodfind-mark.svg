@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">GoodFind magnifying-glass field mark</title>
+  <desc id="desc">A cream product tag viewed through a forest-green magnifying glass with a red registration dot.</desc>
+  <rect width="512" height="512" rx="112" fill="#f2ead8"/>
+  <path d="M130 109h196l56 56v173a30 30 0 0 1-30 30H130a30 30 0 0 1-30-30V139a30 30 0 0 1 30-30Z" fill="#fffaf0" stroke="#173a31" stroke-width="22"/>
+  <path d="M326 109v56h56" fill="none" stroke="#173a31" stroke-width="22" stroke-linejoin="round"/>
+  <circle cx="232" cy="245" r="75" fill="none" stroke="#173a31" stroke-width="28"/>
+  <path d="m286 300 87 87" fill="none" stroke="#173a31" stroke-width="34" stroke-linecap="round"/>
+  <circle cx="136" cy="146" r="22" fill="#b83a32"/>
+  <path d="M163 214h138M163 250h76" stroke="#c6923d" stroke-width="14" stroke-linecap="round" opacity=".72"/>
+</svg>

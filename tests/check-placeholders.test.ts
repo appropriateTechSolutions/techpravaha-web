@@ -33,4 +33,13 @@ describe('check-placeholders', () => {
       'work/1.svg:[screenshot pending]',
     ]);
   });
+
+  it('skips the hosted products, whose copy is built in their own repos', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'placeholders-'));
+    mkdirSync(join(dir, 'homefind'));
+    mkdirSync(join(dir, 'lab'));
+    writeFileSync(join(dir, 'homefind/index.html'), '<p>[Kitchen drawer]</p>');
+    writeFileSync(join(dir, 'lab/index.html'), '<p>[Kitchen drawer]</p>');
+    expect(findPlaceholders(dir)).toEqual(['lab/index.html:[Kitchen drawer]']);
+  });
 });

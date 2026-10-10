@@ -12,10 +12,8 @@ export interface Env {
   BOOKING_URL?: string;
   /** Optional WhatsApp number for the receipt email, digits with country code (e.g. 919876543210). */
   WHATSAPP_NUMBER?: string;
-  /** Secret. Gemini API key for POST /chat; unset means /chat answers 502 with the friendly reply. */
-  GEMINI_API_KEY: string;
-  /** Optional Gemini model id; defaults to gemini-3.5-flash-lite. */
-  GEMINI_MODEL?: string;
+  /** Optional Anthropic model id for POST /chat; defaults to claude-haiku-5-5. */
+  CHAT_MODEL?: string;
   /** Secret, optional. With TELEGRAM_CHAT_ID, order and lead pings go to Telegram instead of ALERT_EMAIL. */
   TELEGRAM_BOT_TOKEN?: string;
   /** Optional Telegram chat id for pings (a user id, or a group id such as -100...). */
@@ -25,7 +23,10 @@ export interface Env {
   CHAT_RATE: RateLimit;
   /** Workers Rate Limiting binding for POST /leads, keyed per IP (6 per minute; wrangler.toml [[ratelimits]]). */
   LEADS_RATE: RateLimit;
-  /** Secret, optional. Anthropic API key for POST /lab/complete; unset means 503 and the lab apps show their offline state. */
+  /**
+   * Secret. Anthropic API key for POST /chat and POST /lab/complete. Unset, /chat answers 502 with the
+   * outage reply and /lab/complete answers 503 so the lab apps show their offline state.
+   */
   ANTHROPIC_API_KEY?: string;
   /** Optional Anthropic model id for the lab apps; defaults to claude-haiku-5-5. */
   LAB_MODEL?: string;
