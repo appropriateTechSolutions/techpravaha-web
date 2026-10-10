@@ -27,9 +27,25 @@ function placeAt(top: number) {
   } as DOMRect);
 }
 
+// requestAnimationFrame and the clock are driven by hand, so the count-up never depends on real time
+// (it used to flake under parallel load).
+let frames: FrameRequestCallback[] = [];
+let now = 0;
+function advance(ms: number) {
+  now += ms;
+  const due = frames;
+  frames = [];
+  act(() => due.forEach((cb) => cb(now)));
+}
+
 beforeEach(() => {
   observed = [];
+  frames = [];
+  now = 1000;
   vi.stubGlobal('IntersectionObserver', IO);
+  vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => frames.push(cb));
+  vi.stubGlobal('cancelAnimationFrame', () => {});
+  vi.spyOn(performance, 'now').mockImplementation(() => now);
 });
 
 afterEach(() => {
@@ -49,13 +65,25 @@ describe('Counter', () => {
     expect(el).toHaveTextContent('2,50,000+');
   });
 
-  it('parks at 0 off screen and counts to the final value once seen', async () => {
+  it('parks at 0 off screen and counts to the final value once seen', () => {
     placeAt(5000);
-    const { container } = render(<Counter to={4} suffix=" weeks" duration={0.05} />);
+    const { container } = render(<Counter to={1000} suffix=" leads" duration={0.6} />);
     const el = container.querySelector('.counter')!;
-    expect(el).toHaveTextContent('0 weeks');
+    expect(el).toHaveTextContent(/^0 leads$/);
+    // Nothing runs until it is seen.
+    advance(1000);
+    expect(el).toHaveTextContent(/^0 leads$/);
 
     act(() => observed.forEach((cb) => cb([{ isIntersecting: true, target: el }])));
-    await vi.waitFor(() => expect(el).toHaveTextContent('4 weeks'));
+    advance(0);
+    expect(el).toHaveTextContent(/^0 leads$/);
+    advance(60);
+    const mid = Number(el.textContent!.replace(/\D/g, ''));
+    expect(mid).toBeGreaterThan(0);
+    expect(mid).toBeLessThan(1000);
+    advance(540);
+    expect(el).toHaveTextContent(/^1,000 leads$/);
+    // Done: no frame is scheduled after the last one.
+    expect(frames).toHaveLength(0);
   });
 });

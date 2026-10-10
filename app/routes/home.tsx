@@ -15,6 +15,7 @@ import { MetallicHero } from '../components/MetallicHero';
 import { LabCard } from '../components/LabCard';
 import { ServiceCard } from '../components/ServiceCard';
 import { ClosingCta } from '../components/ClosingCta';
+import { TEARDOWN_NOTE_ABOVE, TeardownNote } from '../components/TeardownNote';
 import { Steps } from '../components/Steps';
 import { Testimonials } from '../components/Testimonials';
 import { WorkCard } from '../components/WorkCard';
@@ -163,7 +164,9 @@ export default function Home() {
         intro="One call to agree the scope, the price and a start date."
         message="Hi Tech Pravaha, I want to talk about a project."
         page="/"
+        className={TEARDOWN_NOTE_ABOVE}
       />
+      <TeardownNote className="pb-16" />
     </>
   );
 }

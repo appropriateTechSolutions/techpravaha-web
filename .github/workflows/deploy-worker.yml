@@ -1,6 +1,7 @@
-# Redeploys the commerce Worker when the catalogue or the Worker changes on main. The Worker bundles
-# catalogue.json at deploy time, so without this a merged price edit changes what the site shows but
-# not what the Worker charges (checkout then refuses the order rather than charge a different amount).
+# Redeploys the commerce Worker when the catalogue, the chat facts' sources or the Worker change on main.
+# The Worker bundles catalogue.json and the chat facts (regenerated below) at deploy time, so without
+# this a merged price edit changes what the site shows but not what the Worker charges (checkout then
+# refuses the order rather than charge a different amount) or what the chat quotes.
 # Needs the repo secrets CLOUDFLARE_API_TOKEN (Workers edit permission) and CLOUDFLARE_ACCOUNT_ID.
 name: Deploy Worker
 
@@ -9,6 +10,8 @@ on:
     branches: [main]
     paths:
       - catalogue.json
+      - app/content/services.ts
+      - scripts/lib/prompt-data.ts
       - workers/**
   workflow_dispatch:
 
@@ -28,7 +31,18 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: workers/techpravaha-api/package-lock.json
+          cache-dependency-path: |
+            package-lock.json
+            workers/techpravaha-api/package-lock.json
+      # Regenerate the chat facts from the catalogue being deployed (a price edit made on github.com
+      # does not touch prompt-data.json), then apply the site build's catalogue rules
+      # (app/lib/catalogue.ts) so a bad catalogue never reaches the Worker.
+      - name: Regenerate chat facts and validate catalogue.json
+        working-directory: .
+        run: |
+          npm ci
+          npm run prompt:data
+          npx tsx scripts/validate-catalogue.ts
       - run: npm ci
       - run: npx wrangler deploy
         env:

@@ -60,4 +60,14 @@ describe('Home', () => {
       expect(hrefs).toContain(`/services/${s.id}`);
     }
   });
+
+  it('points not-ready visitors to the free teardown under the closing CTA', () => {
+    render(
+      <MemoryRouter>
+        <Home />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText(/Not ready to buy\?/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /free 10-point teardown/i })).toHaveAttribute('href', '/teardown');
+  });
 });

@@ -5,6 +5,17 @@ RAZORPAY_WEBHOOK_SECRET=dummy_webhook_secret
 RESEND_API_KEY=re_dummy
 SHEETS_WEBHOOK_URL=https://script.google.com/macros/s/DUMMY/exec
 SHEETS_WEBHOOK_TOKEN=dummy_sheets_token
+GEMINI_API_KEY=dummy_gemini_key
+# Optional lab proxy (POST /lab/complete); unset, it answers 503 and the lab apps show their offline state:
+# ANTHROPIC_API_KEY=sk-ant-dummy
+# Lab model (default claude-haiku-5-5). Claude 4.x ids (claude-haiku-4-5, claude-sonnet-4-6) get the per-app
+# temperature; any newer id gets thinking off and no sampling params, since those models reject a temperature.
+# LAB_MODEL=claude-haiku-5-5
+# Optional chat model (default gemini-3.5-flash-lite):
+# GEMINI_MODEL=gemini-3.5-flash-lite
+# Order/lead pings to Telegram (both needed; otherwise order pings email ALERT_EMAIL and lead pings are skipped):
+# TELEGRAM_BOT_TOKEN=123456:dummy_bot_token
+# TELEGRAM_CHAT_ID=123456789
 # Optional receipt-email vars (normally set in wrangler.toml [vars]):
 # BOOKING_URL=https://calendar.app.google/REPLACE
 # WHATSAPP_NUMBER=91XXXXXXXXXX

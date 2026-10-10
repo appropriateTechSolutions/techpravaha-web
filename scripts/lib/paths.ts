@@ -18,6 +18,7 @@ export const STATIC_PATHS = [
   '/journal',
   '/about',
   '/contact',
+  '/teardown',
   '/terms',
   '/privacy',
   '/refunds',

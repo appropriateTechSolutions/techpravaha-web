@@ -84,4 +84,30 @@ describe('SiteHeader mobile menu', () => {
     vi.unstubAllGlobals();
     document.body.style.overflow = '';
   });
+
+  it('closes on Escape, but not on an Escape that ends an IME composition or was already handled', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false, addEventListener: () => {}, removeEventListener: () => {} }));
+    try {
+      render(<MemoryRouter><SiteHeader isLight={false} onToggleTheme={() => {}} /></MemoryRouter>);
+      fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+      const expanded = () => screen.getByRole('button', { name: /menu/i, expanded: true });
+      expect(expanded()).toBeInTheDocument();
+
+      fireEvent.keyDown(window, { key: 'Escape', isComposing: true });
+      const handled = (e: Event) => e.preventDefault();
+      window.addEventListener('keydown', handled, { capture: true });
+      try {
+        fireEvent.keyDown(window, { key: 'Escape' });
+      } finally {
+        window.removeEventListener('keydown', handled, { capture: true });
+      }
+      expect(expanded()).toBeInTheDocument();
+
+      fireEvent.keyDown(window, { key: 'Escape' });
+      expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false');
+    } finally {
+      vi.unstubAllGlobals();
+      document.body.style.overflow = '';
+    }
+  });
 });

@@ -1,0 +1,613 @@
+{
+  "positioning": "Tech Pravaha is a design and build studio for things you launch: websites, apps, AI assistants, WhatsApp automation, content automation and UI/UX design. Delivered in weeks at a price you can see. Yogesh Laddha, the founder, designs and builds every project.",
+  "tagline": "Beautiful things, shipped.",
+  "currency": "INR",
+  "gstPct": 18,
+  "services": [
+    {
+      "id": "websites",
+      "name": "Websites & landing pages",
+      "short": "Fast, searchable sites with the copy and tracking already in place.",
+      "route": "/services/websites",
+      "h1": "A website that looks like you meant it.",
+      "subline": "Copy, design and build in one package, live on your own domain. Fixed scope, and a price you see before you pay.",
+      "faq": [
+        {
+          "q": "Is GST included in the price?",
+          "a": "No. Prices are shown before tax, and 18% GST is added on top. You get a GST invoice, so a registered business can claim input tax credit."
+        },
+        {
+          "q": "When does the timeline start?",
+          "a": "At the kickoff call, not at payment. Launch takes 2 weeks and Growth takes 4 weeks from that call. If something on your side takes longer, the launch date moves by the same number of days."
+        },
+        {
+          "q": "How does payment work?",
+          "a": "Launch is paid in full at checkout. Growth is 50% at checkout and 50% at launch. Bespoke work gets a fixed price and payment schedule in writing after a call."
+        }
+      ],
+      "afterPay": [
+        {
+          "title": "Receipt and intake form",
+          "body": "Your GST invoice and a short intake form arrive by email. Tell us your goal, your audience and what you already have."
+        },
+        {
+          "title": "Kickoff call",
+          "body": "Book your kickoff call. We confirm the scope, the launch date and what we need from you. Your timeline starts here."
+        },
+        {
+          "title": "Design in the open",
+          "body": "You get a preview link early. Comment on the real page, not a PDF, and watch the changes land."
+        },
+        {
+          "title": "Launch and handover",
+          "body": "We put the site live on your domain, submit it to Google and walk you through it. Every login and file is yours."
+        }
+      ],
+      "tiers": [
+        {
+          "id": "websites-launch",
+          "label": "Launch",
+          "tagline": "One page that converts",
+          "buyable": true,
+          "price": 35000,
+          "totalWithGst": 41300,
+          "depositPct": 100,
+          "dueAtCheckout": 41300,
+          "checkout": "/checkout/websites-launch",
+          "weeks": 2,
+          "payment": "Full payment at checkout",
+          "includes": [
+            "1 landing page, up to 6 sections",
+            "Copy and layout written to one clear goal",
+            "Mobile-first build, Lighthouse 90+ on all four scores",
+            "Contact form and WhatsApp button wired up",
+            "Analytics and search basics: meta tags, sitemap, indexing",
+            "Hosted on your domain, handover walkthrough included"
+          ]
+        },
+        {
+          "id": "websites-growth",
+          "label": "Growth",
+          "tagline": "The full site",
+          "buyable": true,
+          "price": 95000,
+          "totalWithGst": 112100,
+          "depositPct": 50,
+          "dueAtCheckout": 56050,
+          "checkout": "/checkout/websites-growth",
+          "weeks": 4,
+          "payment": "50% at checkout, 50% at launch",
+          "includes": [
+            "Up to 8 pages: home, services, about, contact and more",
+            "Custom design system: colours, type and components",
+            "Blog or case-study section you can edit yourself",
+            "On-page SEO for each page and structured data",
+            "Lead capture sent to your email or Google Sheet",
+            "30 days of fixes after launch"
+          ]
+        },
+        {
+          "id": "websites-bespoke",
+          "label": "Bespoke",
+          "tagline": "Something specific",
+          "buyable": false,
+          "price": null,
+          "from": 150000,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "Multi-language or multi-region sites",
+            "Custom integrations: CRM, payments, booking",
+            "Member areas, dashboards or gated content",
+            "Migration from an existing site with redirects kept",
+            "Fixed scope and price agreed before we start"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "apps",
+      "name": "Apps",
+      "short": "Mobile and web apps, from a clickable prototype to a shipped MVP.",
+      "route": "/services/apps",
+      "h1": "An app your customers actually open.",
+      "subline": "Start with a clickable prototype you can put in front of people. Build the first real version for Android, iOS or the web once you have seen it work.",
+      "faq": [
+        {
+          "q": "Is GST included in the price?",
+          "a": "No. Prices are shown before tax, and 18% GST is added on top. You get a GST invoice, so a registered business can claim input tax credit."
+        },
+        {
+          "q": "When does the timeline start?",
+          "a": "At the kickoff call, not at payment. Prototype takes 1 week from that call. An MVP gets its own dated plan in the quote. If something on your side takes longer, the launch date moves by the same number of days."
+        },
+        {
+          "q": "How does payment work?",
+          "a": "Prototype is paid in full at checkout. An MVP or bespoke build gets a fixed price and payment schedule in writing after a scoping call, before any work starts."
+        }
+      ],
+      "afterPay": [
+        {
+          "title": "Receipt and intake form",
+          "body": "Your GST invoice and a short intake form arrive by email. Tell us your goal, your audience and what you already have."
+        },
+        {
+          "title": "Kickoff call",
+          "body": "Book your kickoff call. We confirm the scope, the launch date and what we need from you. Your timeline starts here."
+        },
+        {
+          "title": "Design in the open",
+          "body": "You test it on your own phone as it takes shape: a clickable prototype first, then a new test build every week."
+        },
+        {
+          "title": "Launch and handover",
+          "body": "We help you through App Store and Play Store submission, then hand over the source code, documentation and a walkthrough."
+        }
+      ],
+      "tiers": [
+        {
+          "id": "apps-launch",
+          "label": "Prototype",
+          "tagline": "See it before you build it",
+          "buyable": true,
+          "price": 45000,
+          "totalWithGst": 53100,
+          "depositPct": 100,
+          "dueAtCheckout": 53100,
+          "checkout": "/checkout/apps-launch",
+          "weeks": 1,
+          "payment": "Full payment at checkout",
+          "includes": [
+            "Clickable prototype of the core flows, up to 8 screens",
+            "User flow map and screen-by-screen notes",
+            "Feature list split into must-have and later",
+            "Tech stack recommendation with rough build estimate",
+            "Walkthrough call to test it with your team"
+          ]
+        },
+        {
+          "id": "apps-growth",
+          "label": "MVP",
+          "tagline": "A working first version",
+          "buyable": false,
+          "price": null,
+          "from": 250000,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "Working app on Android and iOS, or a responsive web app",
+            "Sign-in, one core workflow and an admin view",
+            "Backend, database and hosting set up on your accounts",
+            "Test builds shared every week",
+            "Store submission support",
+            "Source code and handover documentation"
+          ]
+        },
+        {
+          "id": "apps-bespoke",
+          "label": "Bespoke",
+          "tagline": "Something specific",
+          "buyable": false,
+          "price": null,
+          "from": 600000,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "Multi-role apps with admin and reporting",
+            "Payments, notifications and third-party integrations",
+            "Offline mode and data sync where needed",
+            "Phased delivery with a fixed price per phase",
+            "Fixed scope and price agreed before we start"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai",
+      "name": "AI assistants & call centre",
+      "short": "Chat and voice assistants trained on your own documents and processes.",
+      "route": "/services/ai",
+      "h1": "An AI front door that answers at 2am.",
+      "subline": "A chat or voice assistant that answers from your own documents, on your website, WhatsApp or phone line. When it is unsure, it hands over to a person.",
+      "faq": [
+        {
+          "q": "Is GST included in the price?",
+          "a": "No. Prices are shown before tax, and 18% GST is added on top. You get a GST invoice, so a registered business can claim input tax credit."
+        },
+        {
+          "q": "When does the timeline start?",
+          "a": "At the kickoff call, not at payment. Assistant takes 2 weeks from that call. A call centre setup gets its own dated plan in the quote. If something on your side takes longer, the launch date moves by the same number of days."
+        },
+        {
+          "q": "How does payment work, and what does it cost to run?",
+          "a": "The Assistant is paid in full at checkout. A call centre has a setup fee quoted after a call. Usage is billed per minute at cost, on accounts in your name. Running costs are explained before go-live."
+        }
+      ],
+      "afterPay": [
+        {
+          "title": "Receipt and intake form",
+          "body": "Your GST invoice and a short intake form arrive by email. Tell us your goal, your audience and what you already have."
+        },
+        {
+          "title": "Kickoff call",
+          "body": "Book your kickoff call. We confirm the scope, the launch date and what we need from you. Your timeline starts here."
+        },
+        {
+          "title": "Design in the open",
+          "body": "You try the assistant on your own questions while we tune it. Before launch we run it against a set of real questions and show you every answer."
+        },
+        {
+          "title": "Launch and handover",
+          "body": "It goes live on your site, WhatsApp or number. You get the conversation log and a walkthrough of how it answers and when it hands over."
+        }
+      ],
+      "tiers": [
+        {
+          "id": "ai-launch",
+          "label": "Assistant",
+          "tagline": "An assistant that knows your business",
+          "buyable": true,
+          "price": 60000,
+          "totalWithGst": 70800,
+          "depositPct": 100,
+          "dueAtCheckout": 70800,
+          "checkout": "/checkout/ai-launch",
+          "weeks": 2,
+          "payment": "Full payment at checkout",
+          "includes": [
+            "Chat assistant trained on your documents and FAQs",
+            "Embedded on your website or connected to WhatsApp",
+            "Handover to a human when it is unsure",
+            "Conversation log you can review",
+            "Test set of 50 real questions checked before launch",
+            "Usage costs explained before go-live"
+          ]
+        },
+        {
+          "id": "ai-growth",
+          "label": "Call centre",
+          "tagline": "Voice agents that answer the phone",
+          "buyable": false,
+          "price": null,
+          "from": 120000,
+          "terms": "Setup fee plus usage, scoped on a call",
+          "includes": [
+            "Inbound and outbound voice agent on your phone number",
+            "Call scripts and escalation rules written with you",
+            "Calls logged and summarised into your CRM or Sheet",
+            "Call recordings and transcripts with search",
+            "Live dashboard for call volume and outcomes",
+            "Setup fee plus per-minute usage billed at cost"
+          ]
+        },
+        {
+          "id": "ai-bespoke",
+          "label": "Bespoke",
+          "tagline": "Something specific",
+          "buyable": false,
+          "price": null,
+          "from": 300000,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "Agents that take actions: bookings, orders, ticket updates",
+            "Integration with your internal systems and databases",
+            "Multi-language voice and chat",
+            "Evaluation set and monitoring for answer quality",
+            "Fixed scope and price agreed before we start"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "whatsapp",
+      "name": "WhatsApp marketing & automation",
+      "short": "Broadcasts, lead capture and follow-ups on the WhatsApp Business API.",
+      "route": "/services/whatsapp",
+      "h1": "WhatsApp that sells while you sleep.",
+      "subline": "Get verified on the WhatsApp Business API, then let replies, follow-ups and broadcasts run on rules you set. Your team steps in when a lead is ready.",
+      "faq": [
+        {
+          "q": "Is GST included in the price?",
+          "a": "No. Prices are shown before tax, and 18% GST is added on top. You get a GST invoice, so a registered business can claim input tax credit."
+        },
+        {
+          "q": "When does the timeline start?",
+          "a": "At the kickoff call, not at payment. Setup takes 1 week and Automation takes 3 weeks from that call. Template approval and business verification run on Meta's schedule, not ours. If something on your side takes longer, the launch date moves by the same number of days."
+        },
+        {
+          "q": "How does payment work?",
+          "a": "Setup is paid in full at checkout. Automation is 50% at checkout and 50% at launch. Meta's own per-message charges are billed by Meta or your provider and are not part of our price."
+        }
+      ],
+      "afterPay": [
+        {
+          "title": "Receipt and intake form",
+          "body": "Your GST invoice and a short intake form arrive by email. Tell us your goal, your audience and what you already have."
+        },
+        {
+          "title": "Kickoff call",
+          "body": "Book your kickoff call. We confirm the scope, the launch date and what we need from you. Your timeline starts here."
+        },
+        {
+          "title": "Design in the open",
+          "body": "You see every template and flow before it goes to Meta for approval or reaches a customer. Test it from your own phone first."
+        },
+        {
+          "title": "Launch and handover",
+          "body": "The flows go live on your number. Your team gets the shared inbox and a walkthrough of every flow and template."
+        }
+      ],
+      "tiers": [
+        {
+          "id": "whatsapp-launch",
+          "label": "Setup",
+          "tagline": "Get on the Business API",
+          "buyable": true,
+          "price": 25000,
+          "totalWithGst": 29500,
+          "depositPct": 100,
+          "dueAtCheckout": 29500,
+          "checkout": "/checkout/whatsapp-launch",
+          "weeks": 1,
+          "payment": "Full payment at checkout",
+          "includes": [
+            "WhatsApp Business API account set up and verified",
+            "Business profile, catalogue and green-tick guidance",
+            "Up to 5 approved message templates",
+            "Shared inbox for your team",
+            "Click-to-WhatsApp links for your site and ads"
+          ]
+        },
+        {
+          "id": "whatsapp-growth",
+          "label": "Automation",
+          "tagline": "Replies and follow-ups on autopilot",
+          "buyable": true,
+          "price": 65000,
+          "totalWithGst": 76700,
+          "depositPct": 50,
+          "dueAtCheckout": 38350,
+          "checkout": "/checkout/whatsapp-growth",
+          "weeks": 3,
+          "payment": "50% at checkout, 50% at launch",
+          "includes": [
+            "Everything in Setup",
+            "Automated lead capture and qualification flow",
+            "Follow-up sequences with delay and reply rules",
+            "Broadcast campaigns with opt-in lists",
+            "Leads and orders synced to your Sheet or CRM",
+            "Monthly report: sent, delivered, replied"
+          ]
+        },
+        {
+          "id": "whatsapp-bespoke",
+          "label": "Bespoke",
+          "tagline": "Something specific",
+          "buyable": false,
+          "price": null,
+          "from": 120000,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "In-chat ordering, payments and appointment booking",
+            "Integration with your ERP, POS or booking system",
+            "AI-assisted replies with human handover",
+            "Multi-agent inbox with routing rules",
+            "Fixed scope and price agreed before we start"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "content",
+      "name": "Content automation",
+      "short": "A pipeline that drafts, schedules and publishes your content for review.",
+      "route": "/services/content",
+      "h1": "Content that ships every week without you.",
+      "subline": "A pipeline that turns a topic sheet into drafts in your voice, queues them for your approval and publishes what you pass. Nothing goes out without your yes.",
+      "faq": [
+        {
+          "q": "Is GST included in the price?",
+          "a": "No. Prices are shown before tax, and 18% GST is added on top. You get a GST invoice, so a registered business can claim input tax credit."
+        },
+        {
+          "q": "When does the timeline start?",
+          "a": "At the kickoff call, not at payment. Starter takes 2 weeks and Studio takes 3 weeks from that call. If something on your side takes longer, the launch date moves by the same number of days."
+        },
+        {
+          "q": "How does payment work?",
+          "a": "Starter is paid in full at checkout. Studio is 50% at checkout and 50% at launch. Bespoke pipelines get a fixed price and payment schedule in writing after a call."
+        }
+      ],
+      "afterPay": [
+        {
+          "title": "Receipt and intake form",
+          "body": "Your GST invoice and a short intake form arrive by email. Tell us your goal, your audience and what you already have."
+        },
+        {
+          "title": "Kickoff call",
+          "body": "Book your kickoff call. We confirm the scope, the launch date and what we need from you. Your timeline starts here."
+        },
+        {
+          "title": "Design in the open",
+          "body": "We build your style guide from writing you already have, then show you the first drafts before anything runs on its own."
+        },
+        {
+          "title": "Launch and handover",
+          "body": "The pipeline runs on your accounts. You get a walkthrough and a written runbook, and you still approve every post."
+        }
+      ],
+      "tiers": [
+        {
+          "id": "content-launch",
+          "label": "Starter",
+          "tagline": "A steady stream of drafts",
+          "buyable": true,
+          "price": 40000,
+          "totalWithGst": 47200,
+          "depositPct": 100,
+          "dueAtCheckout": 47200,
+          "checkout": "/checkout/content-launch",
+          "weeks": 2,
+          "payment": "Full payment at checkout",
+          "includes": [
+            "Topic sheet in Google Sheets that drives the pipeline",
+            "Automated first drafts in your brand voice",
+            "Review step: nothing publishes without your approval",
+            "Publishing to one channel, such as your blog or LinkedIn",
+            "Style guide built from your existing writing",
+            "Walkthrough and a written runbook"
+          ]
+        },
+        {
+          "id": "content-growth",
+          "label": "Studio",
+          "tagline": "Many channels from one idea",
+          "buyable": true,
+          "price": 85000,
+          "totalWithGst": 100300,
+          "depositPct": 50,
+          "dueAtCheckout": 50150,
+          "checkout": "/checkout/content-growth",
+          "weeks": 3,
+          "payment": "50% at checkout, 50% at launch",
+          "includes": [
+            "Everything in Starter",
+            "One idea repurposed for blog, LinkedIn, X and email",
+            "Image and social card generation",
+            "Scheduling calendar with approval queue",
+            "Search and performance tracking per post",
+            "30 days of tuning after launch"
+          ]
+        },
+        {
+          "id": "content-bespoke",
+          "label": "Bespoke",
+          "tagline": "Something specific",
+          "buyable": false,
+          "price": null,
+          "from": 150000,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "Video and audio pipelines: scripts, captions, clips",
+            "Multi-brand or multi-language publishing",
+            "Pipelines fed by your own data or product catalogue",
+            "Custom approval flow for your team",
+            "Fixed scope and price agreed before we start"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "design",
+      "name": "UI/UX design",
+      "short": "Audits and redesigns for products and sites that people find hard to use.",
+      "route": "/services/design",
+      "h1": "Design that makes the product obvious.",
+      "subline": "Start with an audit of the screens that cost you users, ranked by impact. Then redesign them into a system your developers can build from.",
+      "faq": [
+        {
+          "q": "Is GST included in the price?",
+          "a": "No. Prices are shown before tax, and 18% GST is added on top. You get a GST invoice, so a registered business can claim input tax credit."
+        },
+        {
+          "q": "When does the timeline start?",
+          "a": "At the kickoff call, not at payment. Audit takes 5 days and Redesign takes 3 weeks from that call. If something on your side takes longer, the launch date moves by the same number of days."
+        },
+        {
+          "q": "How does payment work?",
+          "a": "The Audit is paid in full at checkout. The Redesign is 50% at checkout and 50% at launch. Bespoke work gets a fixed price and payment schedule in writing after a call."
+        }
+      ],
+      "afterPay": [
+        {
+          "title": "Receipt and intake form",
+          "body": "Your GST invoice and a short intake form arrive by email. Tell us your goal, your audience and what you already have."
+        },
+        {
+          "title": "Kickoff call",
+          "body": "Book your kickoff call. We confirm the scope, the launch date and what we need from you. Your timeline starts here."
+        },
+        {
+          "title": "Design in the open",
+          "body": "You get a shared Figma file from day one. Comment on screens as they take shape instead of waiting for a final reveal."
+        },
+        {
+          "title": "Launch and handover",
+          "body": "You get the findings or the finished screens, a recorded walkthrough and specs your developers can build from."
+        }
+      ],
+      "tiers": [
+        {
+          "id": "design-launch",
+          "label": "Audit",
+          "tagline": "Find what is costing you users",
+          "buyable": true,
+          "price": 15000,
+          "totalWithGst": 17700,
+          "depositPct": 100,
+          "dueAtCheckout": 17700,
+          "checkout": "/checkout/design-launch",
+          "days": 5,
+          "payment": "Full payment at checkout",
+          "includes": [
+            "Review of up to 10 key screens or pages",
+            "Usability and accessibility findings, ranked by impact",
+            "Annotated screenshots for every issue",
+            "Quick wins you can ship this week",
+            "Recorded walkthrough of the findings"
+          ]
+        },
+        {
+          "id": "design-growth",
+          "label": "Redesign",
+          "tagline": "A cleaner, clearer interface",
+          "buyable": true,
+          "price": 70000,
+          "totalWithGst": 82600,
+          "depositPct": 50,
+          "dueAtCheckout": 41300,
+          "checkout": "/checkout/design-growth",
+          "weeks": 3,
+          "payment": "50% at checkout, 50% at launch",
+          "includes": [
+            "Everything in Audit",
+            "Redesign of up to 10 screens in Figma",
+            "Design system: colours, type, components",
+            "Mobile and desktop layouts",
+            "Developer-ready handoff with specs",
+            "Two rounds of revisions on the redesigned screens"
+          ]
+        },
+        {
+          "id": "design-bespoke",
+          "label": "Bespoke",
+          "tagline": "Something specific",
+          "buyable": false,
+          "price": null,
+          "from": 150000,
+          "terms": "Scoped on a call, fixed price before we start",
+          "includes": [
+            "Full product redesign across all flows",
+            "User research and usability testing with your customers",
+            "Design system with documented, reusable components",
+            "Front-end implementation of the new design",
+            "Fixed scope and price agreed before we start"
+          ]
+        }
+      ]
+    }
+  ],
+  "addons": [
+    {
+      "name": "Care",
+      "from": 5000,
+      "per": "month",
+      "blurb": "Hosting, monitoring and small changes, billed monthly."
+    }
+  ],
+  "contact": {
+    "email": "hello@techpravaha.com",
+    "whatsapp": "WhatsApp is available from the WhatsApp button on every page of the site.",
+    "contactPath": "/contact",
+    "pricingPath": "/pricing",
+    "servicesPath": "/services",
+    "refundsPath": "/refunds"
+  }
+}

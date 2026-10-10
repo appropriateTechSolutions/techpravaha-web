@@ -37,6 +37,11 @@ const validPct = (v: unknown): v is number => typeof v === 'number' && Number.is
 export const chargedNowRupees = (totalRupees: number, depositPct: number): number =>
   Math.round((totalRupees * depositPct) / 100);
 
+/** True for any tier id in the catalogue, buyable or quote-only. */
+export function hasTier(tierId: string): boolean {
+  return catalogue.services.some((service) => (service.tiers as RawTier[]).some((t) => t.id === tierId));
+}
+
 export function priced(tierId: string): Priced | null {
   const gst = catalogue.gst;
   for (const service of catalogue.services) {

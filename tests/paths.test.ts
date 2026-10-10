@@ -24,6 +24,7 @@ describe('prerenderPaths', () => {
     for (const p of STATIC_PATHS) expect(paths).toContain(p);
     expect(paths).toContain('/');
     expect(paths).toContain('/pricing');
+    expect(paths).toContain('/teardown');
     expect(paths).toContain('/404');
   });
 
@@ -40,6 +41,7 @@ describe('prerenderPaths', () => {
     expect(NOINDEX_PATHS).toEqual(expect.arrayContaining(['/styleguide', '/404', '/thanks']));
     for (const p of paths.filter((x) => x.startsWith('/checkout/'))) expect(NOINDEX_PATHS).toContain(p);
     // Nothing else is hidden from the sitemap.
+    expect(NOINDEX_PATHS).not.toContain('/teardown');
     expect(NOINDEX_PATHS.filter((p) => !p.startsWith('/checkout/')).sort()).toEqual(['/404', '/styleguide', '/thanks']);
   });
 });

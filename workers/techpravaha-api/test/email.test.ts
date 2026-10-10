@@ -258,7 +258,7 @@ describe('Sheet append', () => {
     expect(row.slice(15)).toEqual([56050, 56050]);
   });
 
-  it('POSTs { token, row } with redirects followed and a timeout', async () => {
+  it('POSTs { token, type, row } with redirects followed and a timeout', async () => {
     const f = mockFetch(async () => okJson({ ok: true }));
     await appendOrderRow(baseEnv, order, f as unknown as typeof fetch);
     const [url, init] = f.mock.calls[0]! as [string, RequestInit];
@@ -266,7 +266,7 @@ describe('Sheet append', () => {
     expect(init.method).toBe('POST');
     expect(init.redirect ?? 'follow').toBe('follow');
     expect(init.signal).toBeInstanceOf(AbortSignal);
-    expect(JSON.parse(String(init.body))).toEqual({ token: 'sheet_tok', row: orderRow(order) });
+    expect(JSON.parse(String(init.body))).toEqual({ token: 'sheet_tok', type: 'order', row: orderRow(order) });
   });
 
   it('throws on a non-2xx, a { ok:false } reply (wrong token) or a non-JSON page', async () => {

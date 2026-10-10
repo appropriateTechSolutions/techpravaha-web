@@ -95,7 +95,10 @@ export function SiteHeader({ isLight, onToggleTheme }: SiteHeaderProps) {
     if (!open) return;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    // Not when something else already handled it, or when it only cancels an IME composition.
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !e.defaultPrevented && !e.isComposing) setOpen(false);
+    };
     const desktop = window.matchMedia('(min-width: 1024px)');
     const onDesktop = (e: MediaQueryListEvent) => e.matches && setOpen(false);
     window.addEventListener('keydown', onKey);

@@ -1,6 +1,7 @@
 import { orderAmounts, splitTotal } from './catalogue';
 import type { Env } from './env';
 import type { OrderRecord } from './orders';
+import type { LeadBody } from './validate';
 import { globalFetch, UPSTREAM_TIMEOUT_MS, UpstreamError } from './upstream';
 
 export type Cell = string | number;
@@ -44,15 +45,39 @@ export function orderRow(o: OrderRecord): Cell[] {
   return row.map(escapeCell);
 }
 
+export type SheetType = 'order' | 'lead';
+
 /**
- * POST { token, row } to the Apps Script web app. Apps Script answers the POST with a 302 to a
+ * One Sheet row for a lead, in this column order: timestamp (ISO), type (contact or lead_magnet),
+ * name, email, phone, message, page, tier, order, url. Blank when not given; formula-escaped.
+ */
+export function leadRow(l: LeadBody, now: Date = new Date()): Cell[] {
+  const row: Cell[] = [
+    now.toISOString(),
+    l.type,
+    l.name,
+    l.email,
+    l.phone ?? '',
+    l.message,
+    l.page,
+    l.tier ?? '',
+    l.order ?? '',
+    l.url ?? '',
+  ];
+  return row.map(escapeCell);
+}
+
+/**
+ * POST { token, type, row } to the Apps Script web app, which routes by `type`: "order" to the
+ * Orders tab, "lead" to the Leads tab. Apps Script answers the POST with a 302 to a
  * googleusercontent URL; fetch follows it (as a GET, which is what Apps Script expects) to the
  * JSON reply. Anything but a 2xx carrying { ok: true } is a failure: a wrong token, or a deployment
  * that serves a Google sign-in page, must surface as an alert rather than pass silently.
  */
-export async function appendOrderRow(
+export async function postToSheet(
   env: Pick<Env, 'SHEETS_WEBHOOK_URL' | 'SHEETS_WEBHOOK_TOKEN'>,
-  o: OrderRecord,
+  type: SheetType,
+  row: Cell[],
   fetchImpl: typeof fetch = globalFetch,
 ): Promise<void> {
   if (!env.SHEETS_WEBHOOK_URL || !env.SHEETS_WEBHOOK_TOKEN) throw new UpstreamError('sheet webhook not configured');
@@ -60,7 +85,7 @@ export async function appendOrderRow(
   const res = await fetchImpl(env.SHEETS_WEBHOOK_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token: env.SHEETS_WEBHOOK_TOKEN, row: orderRow(o) }),
+    body: JSON.stringify({ token: env.SHEETS_WEBHOOK_TOKEN, type, row }),
     redirect: 'follow',
     signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
   });
@@ -77,3 +102,15 @@ export async function appendOrderRow(
     throw new UpstreamError('sheet refused the row (check TP_ORDERS_TOKEN matches SHEETS_WEBHOOK_TOKEN)');
   }
 }
+
+export const appendOrderRow = (
+  env: Pick<Env, 'SHEETS_WEBHOOK_URL' | 'SHEETS_WEBHOOK_TOKEN'>,
+  o: OrderRecord,
+  fetchImpl: typeof fetch = globalFetch,
+): Promise<void> => postToSheet(env, 'order', orderRow(o), fetchImpl);
+
+export const appendLeadRow = (
+  env: Pick<Env, 'SHEETS_WEBHOOK_URL' | 'SHEETS_WEBHOOK_TOKEN'>,
+  l: LeadBody,
+  fetchImpl: typeof fetch = globalFetch,
+): Promise<void> => postToSheet(env, 'lead', leadRow(l), fetchImpl);

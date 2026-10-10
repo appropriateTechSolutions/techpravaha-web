@@ -1,25 +1,29 @@
 import { describe, expect, it } from 'vitest';
 import { orderAmounts, priced } from '../src/catalogue';
+import { expected } from './helpers/amounts';
+
+const LAUNCH = expected('websites-launch');
+const GROWTH = expected('websites-growth');
 
 describe('priced', () => {
   it('computes paise from catalogue price plus GST', () => {
     const p = priced('websites-launch');
     expect(p).not.toBeNull();
-    expect(p!.amountPaise).toBe(4130000);
+    expect(p!.amountPaise).toBe(LAUNCH.totalPaise);
     expect(p!.gst).toBe(0.18);
     expect(p!.service.id).toBe('websites');
-    expect(p!.tier).toMatchObject({ id: 'websites-launch', price: 35000, weeks: 2 });
-    expect(p!.totalPaise).toBe(4130000);
+    expect(p!.tier).toMatchObject({ id: 'websites-launch', price: LAUNCH.price, weeks: 2 });
+    expect(p!.totalPaise).toBe(LAUNCH.totalPaise);
     expect(p!.depositPct).toBe(100);
     expect(p!.balancePaise).toBe(0);
   });
 
   it('charges a 50% deposit, GST included, for a Growth tier (spec section 4)', () => {
     const p = priced('websites-growth')!;
-    expect(p.amountPaise).toBe(5605000);
-    expect(p.totalPaise).toBe(11210000);
+    expect(p.amountPaise).toBe(GROWTH.amountPaise);
+    expect(p.totalPaise).toBe(GROWTH.totalPaise);
     expect(p.depositPct).toBe(50);
-    expect(p.balancePaise).toBe(5605000);
+    expect(p.balancePaise).toBe(GROWTH.balancePaise);
     for (const id of ['whatsapp-growth', 'content-growth', 'design-growth']) {
       const g = priced(id)!;
       expect(g.depositPct).toBe(50);

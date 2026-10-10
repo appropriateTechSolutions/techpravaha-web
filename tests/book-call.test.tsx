@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 async function renderButton(bookingUrl: string, page: string, compact = false) {
   vi.resetModules();
@@ -14,6 +14,12 @@ async function renderButton(bookingUrl: string, page: string, compact = false) {
 }
 
 let gtag: ReturnType<typeof vi.fn>;
+
+// The first import of the component graph is the slow part (seconds under parallel load). Do it once
+// here, with a generous timeout, so no test pays for it; the per-test re-imports are then cache hits.
+beforeAll(async () => {
+  await import('../app/components/BookCallButton');
+}, 30_000);
 
 beforeEach(() => {
   gtag = vi.fn();

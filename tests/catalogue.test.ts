@@ -44,7 +44,8 @@ describe('catalogue data', () => {
     }
   });
 
-  // Structural only, so a price edit in catalogue.json never needs a test change.
+  // Structural only. Amounts elsewhere in the suites (this file, tests/checkout.test.tsx and the Worker's
+  // test/{catalogue,orders}.test.ts) are derived from catalogue.json, so a price edit needs no test change.
   // The launch prices live in spec section 4 (docs/superpowers/specs/2026-10-10-techpravaha-web-design.md);
   // catalogue.json is the source of truth after launch.
   it('gives every buyable tier an integer price above zero', () => {
@@ -153,8 +154,9 @@ describe('helpers', () => {
     const launch = getTier('websites-launch')!.tier as typeof tiers[number] & { price: number };
     expect(depositFor(growth)).toBe(0.5);
     expect(depositFor(launch)).toBe(1);
-    expect(chargedNow(growth)).toBe(56050);
-    expect(chargedNow(launch)).toBe(41300);
+    // Derived from catalogue.json, so a price edit needs no test change.
+    expect(chargedNow(growth)).toBe(Math.round(withGst(growth.price) / 2));
+    expect(chargedNow(launch)).toBe(withGst(launch.price));
     expect(chargedNow({ price: 1001, depositPct: 50 })).toBe(Math.round(withGst(1001) / 2));
   });
 

@@ -11,3 +11,4 @@ playwright-report
 
 workers/techpravaha-api/.dev.vars
 .wrangler/
+.claude/launch.json

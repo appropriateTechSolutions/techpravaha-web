@@ -7,6 +7,17 @@ import { ApiError, createOrder, type CreateOrderResponse, type Customer } from '
 import { chargedNow, formatINR, type Service, type Tier } from '../lib/catalogue';
 import { RAZORPAY_THEME_COLOR, loadCheckout, paymentsEnabled } from '../lib/razorpay';
 import { pagePath } from '../lib/site';
+import {
+  COMPANY_MAX,
+  CONTROL_RE,
+  EMAIL_MAX,
+  EMAIL_RE,
+  GSTIN_RE,
+  HIDDEN_CHAR_HINT,
+  NAME_MAX,
+  NAME_MIN,
+  ORDER_PHONE_RE,
+} from '../lib/validation';
 import { tierMessage } from '../lib/whatsapp';
 import { FormField } from './ui/FormField';
 import { WhatsAppCta } from './WhatsAppCta';
@@ -19,22 +30,15 @@ type Status = 'idle' | 'creating' | 'open' | 'failed';
 
 const FIELDS: Field[] = ['name', 'email', 'phone', 'company', 'gstin'];
 
-// Mirrors workers/techpravaha-api/src/validate.ts (EMAIL_RE, PHONE_RE, GSTIN_RE, CONTROL_RE and the
-// length limits), so anything this form accepts the Worker accepts too and a 400 never surprises the buyer.
-// Keep the two in step.
-const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_RE = /^(?:\+91|91|0)?[6-9]\d{9}$/;
-const GSTIN_RE = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
-// Control, zero-width, bidi and BOM characters: invisible when pasted, rejected by the Worker.
-const CONTROL_RE =
-  /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b-\u200f\u2028-\u202e\u2060\u2066-\u2069\ufeff]/;
-const HIDDEN = 'It has a hidden character, probably from a paste. Retype it.';
+// The rules mirror the Worker's validateOrderBody (app/lib/validation.ts; tests/validation-parity.test.ts
+// keeps them in step), so anything this form accepts the Worker accepts too and a 400 never surprises the buyer.
+const HIDDEN = HIDDEN_CHAR_HINT;
 
 const MESSAGES: Record<Field, string> = {
   name: 'Add your name.',
   email: 'That email does not look right.',
   phone: 'Use a 10-digit Indian mobile number.',
-  company: 'Keep the company name under 120 characters.',
+  company: `Keep the company name under ${COMPANY_MAX} characters.`,
   gstin: 'That GSTIN does not look right. It has 15 characters, like 27ABCDE1234F1Z5.',
 };
 
@@ -42,17 +46,17 @@ export function validateCheckout(v: Values): Errors {
   const errors: Errors = {};
   const name = v.name.trim();
   if (CONTROL_RE.test(name)) errors.name = `That name does not look right. ${HIDDEN}`;
-  else if (name.length < 2) errors.name = MESSAGES.name;
-  else if (name.length > 80) errors.name = 'Keep the name under 80 characters.';
+  else if (name.length < NAME_MIN) errors.name = MESSAGES.name;
+  else if (name.length > NAME_MAX) errors.name = `Keep the name under ${NAME_MAX} characters.`;
   const email = v.email.trim();
   if (!email) errors.email = 'Add your email. The receipt goes there.';
   else if (CONTROL_RE.test(email)) errors.email = `${MESSAGES.email} ${HIDDEN}`;
-  else if (email.length > 254 || !EMAIL_RE.test(email)) errors.email = MESSAGES.email;
+  else if (email.length > EMAIL_MAX || !EMAIL_RE.test(email)) errors.email = MESSAGES.email;
   if (!v.phone.trim()) errors.phone = 'Add your mobile number.';
-  else if (!PHONE_RE.test(v.phone.replace(/[\s-]/g, ''))) errors.phone = MESSAGES.phone;
+  else if (!ORDER_PHONE_RE.test(v.phone.replace(/[\s-]/g, ''))) errors.phone = MESSAGES.phone;
   const company = v.company.trim();
   if (CONTROL_RE.test(company)) errors.company = `That company name does not look right. ${HIDDEN}`;
-  else if (company.length > 120) errors.company = MESSAGES.company;
+  else if (company.length > COMPANY_MAX) errors.company = MESSAGES.company;
   const gstin = v.gstin.trim().toUpperCase();
   if (gstin && !GSTIN_RE.test(gstin)) errors.gstin = MESSAGES.gstin;
   return errors;
@@ -84,7 +88,7 @@ export function CheckoutForm({ service, tier }: CheckoutFormProps) {
   const [values, setValues] = useState<Values>({ name: '', email: '', phone: '', company: '', gstin: '' });
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>('idle');
-  // Set when the Worker's amount differs from this page's: the alert then also asks the buyer to message us.
+  // Set when the Worker's amount differs from this page's: the alert then says the price changed and points to WhatsApp.
   const [mismatch, setMismatch] = useState(false);
   const alertRef = useRef<HTMLDivElement>(null);
   const payRef = useRef<HTMLButtonElement>(null);
@@ -291,8 +295,11 @@ export function CheckoutForm({ service, tier }: CheckoutFormProps) {
       {status === 'failed' && (
         <div ref={alertRef} role="alert" tabIndex={-1} className="card p-6 outline-none">
           <p className="text-ink">Checkout did not open. Nothing was charged.</p>
-          <p className="mt-2 text-ink-2">Try again, or message us on WhatsApp and we will help you finish.</p>
-          {mismatch && <p className="mt-2 text-ink-2">Please message us; nothing was charged.</p>}
+          <p className="mt-2 text-ink-2">
+            {mismatch
+              ? 'This price was just updated on our side. Message us on WhatsApp and we will send you a payment link.'
+              : 'Try again, or message us on WhatsApp and we will help you finish.'}
+          </p>
           <div className="mt-5">
             <WhatsAppCta message={`Hi Tech Pravaha, I tried to buy ${what} and checkout failed.`} page={page} />
           </div>

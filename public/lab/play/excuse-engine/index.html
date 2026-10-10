@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<!--
+  Source: ~/Downloads/newproducts/excuse-engine.html, copied into the Tech Pravaha lab on 2026-10-10.
+  Only change: model calls go through the Tech Pravaha Worker (/lab/complete); no other edits.
+  The Worker host is read from the tp-api meta tag below; edit it if the API host changes.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="tp-api" content="https://api.techpravaha.com">
+<title>Excuse Engine — plausible deniability as a service</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#14161B;--card:#1D2027;--line:#31353F;--txt:#EDEEF2;--dim:#9AA0AC;--neon:#B8F135;--risk:#FF6B6B;--mid:#FFC145}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:'DM Sans',system-ui,sans-serif;min-height:100vh;padding:30px 16px 80px}
+  .wrap{max-width:600px;margin:0 auto}
+  .badge{display:block;width:fit-content;margin:0 auto 10px;font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--neon);border:1px solid var(--neon);border-radius:999px;padding:6px 14px}
+  h1{font-family:'DM Serif Display',serif;font-size:clamp(2rem,7vw,3rem);text-align:center;line-height:1.1}
+  .tag{text-align:center;color:var(--dim);margin:8px 0 26px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:14px}
+  label{display:block;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+  select,input{width:100%;background:#15171D;border:1.5px solid var(--line);border-radius:10px;color:var(--txt);font-family:'DM Sans',sans-serif;font-size:.98rem;padding:12px}
+  select:focus,input:focus{outline:2px solid var(--neon)}
+  .dial{margin-top:16px}
+  input[type=range]{accent-color:var(--neon);padding:0;height:30px}
+  .ends{display:flex;justify-content:space-between;font-size:.72rem;color:var(--dim);margin-top:2px}
+  .dialLabel{text-align:center;font-weight:800;color:var(--neon);margin-top:6px;font-size:.95rem;min-height:1.3em}
+  .go{display:block;width:100%;margin-top:18px;font-family:'DM Sans',sans-serif;font-weight:800;font-size:1.05rem;background:var(--neon);color:#131A05;border:none;border-radius:12px;padding:16px;cursor:pointer}
+  .go:hover{filter:brightness(1.1)}
+  .go:disabled{opacity:.5;cursor:not-allowed}
+  .go:focus-visible{outline:3px solid #fff;outline-offset:2px}
+  .loading{display:none;text-align:center;color:var(--dim);font-style:italic;margin:18px 0;animation:pulse 1.3s infinite}
+  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+  .results{display:none}
+  .excuse{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:12px;animation:up .35s ease both}
+  .excuse:nth-child(2){animation-delay:.08s}.excuse:nth-child(3){animation-delay:.16s}
+  @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @media(prefers-reduced-motion:reduce){.excuse{animation:none}}
+  .excuse .txt{font-size:1.02rem;line-height:1.55;margin-bottom:12px}
+  .meta{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem}
+  .meta .m{display:flex;align-items:center;gap:6px;color:var(--dim)}
+  .meterbar{width:70px;height:7px;border-radius:4px;background:#2A2E38;overflow:hidden}
+  .meterbar i{display:block;height:100%;border-radius:4px}
+  .risknote{font-size:.82rem;color:var(--dim);font-style:italic;margin-top:10px;border-left:2px solid var(--mid);padding-left:10px;line-height:1.5}
+  .copyx{margin-top:12px;background:none;border:1.5px solid var(--line);color:var(--dim);border-radius:8px;padding:7px 13px;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+  .copyx:hover{border-color:var(--neon);color:var(--neon)}
+  .err{display:none;border:1.5px dashed var(--risk);border-radius:10px;padding:12px;color:var(--risk);font-size:.9rem;margin-top:14px}
+  footer{text-align:center;color:var(--dim);font-size:.76rem;margin-top:40px;line-height:1.6;font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="badge">Plausible deniability as a service</span>
+  <h1>Excuse Engine</h1>
+  <p class="tag">Three ways out. Risk-rated. Use responsibly-ish.</p>
+
+  <div class="card">
+    <label for="situation">The situation</label>
+    <select id="situation">
+      <option>Late to a meeting</option>
+      <option>Skipping a party / family function</option>
+      <option>Missed a deadline</option>
+      <option>Forgot to reply for 5 days</option>
+      <option>Cancelling plans last minute</option>
+      <option>Didn't do the homework/reading</option>
+      <option>Left the group project till the end</option>
+      <option>Missed someone's call 6 times</option>
+      <option value="custom">Custom (describe below)…</option>
+    </select>
+    <input type="text" id="custom" placeholder="Describe your crime" style="display:none;margin-top:10px" maxlength="120">
+
+    <div class="dial">
+      <label for="believe">Believability dial</label>
+      <input type="range" id="believe" min="1" max="5" value="3">
+      <div class="ends"><span>airtight</span><span>so absurd it works</span></div>
+      <div class="dialLabel" id="dialLabel">Balanced — plausible with personality</div>
+    </div>
+
+    <button class="go" id="go">Generate my ways out</button>
+  </div>
+
+  <div class="loading" id="loading">Fabricating alibis…</div>
+  <div class="err" id="err"></div>
+  <div class="results" id="results"></div>
+
+  <footer>Excuse Engine is a comedy tool. It will not lie to your doctor, the court, or your mother.<br>Actually especially not your mother. She knows.</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const DIAL = [
+  "Airtight — boring but bulletproof",
+  "Safe — mild, believable, forgettable",
+  "Balanced — plausible with personality",
+  "Risky — memorable, raises one eyebrow",
+  "Absurd — so ridiculous it loops back to charming"
+];
+const LOADS = ["Fabricating alibis…","Consulting the department of circumstances…","Checking traffic reports for narrative support…","Interviewing an imaginary plumber…"];
+
+$("believe").addEventListener("input", ()=>{ $("dialLabel").textContent = DIAL[$("believe").value-1]; });
+$("situation").addEventListener("change", ()=>{
+  $("custom").style.display = $("situation").value==="custom" ? "block" : "none";
+});
+
+$("go").addEventListener("click", async ()=>{
+  const sit = $("situation").value==="custom" ? $("custom").value.trim() : $("situation").value;
+  if(!sit){ return; }
+  const lvl = +$("believe").value;
+  $("go").disabled = true; $("err").style.display="none"; $("results").style.display="none";
+  $("loading").textContent = LOADS[Math.floor(Math.random()*LOADS.length)];
+  $("loading").style.display="block";
+  try{
+    const API_URL = (document.querySelector('meta[name="tp-api"]')||{}).content || "";
+    const res = await fetch(API_URL + "/lab/complete",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ app:"excuse-engine", input:sit, options:{ level:lvl } })
+    });
+    const data = await res.json();
+    const text = data.text || "";
+    const parsed = JSON.parse(text.replace(/```json|```/g,"").trim());
+    render(parsed.excuses);
+  }catch(e){
+    $("err").textContent = "The alibi factory jammed. Try again — or lower the absurdity dial.";
+    $("err").style.display="block";
+  }finally{
+    $("loading").style.display="none"; $("go").disabled=false;
+  }
+});
+
+function bar(v, invert){
+  const hue = invert ? (v>66?"var(--risk)":v>33?"var(--mid)":"var(--neon)") : (v>66?"var(--neon)":v>33?"var(--mid)":"var(--risk)");
+  return `<span class="meterbar"><i style="width:${v}%;background:${hue}"></i></span>`;
+}
+function render(list){
+  const r = $("results"); r.innerHTML = "";
+  (list||[]).slice(0,3).forEach(x=>{
+    const d = document.createElement("div"); d.className="excuse";
+    d.innerHTML = `
+      <div class="txt"></div>
+      <div class="meta">
+        <span class="m">Believability ${bar(x.believability)} ${x.believability}%</span>
+        <span class="m">Backfire risk ${bar(x.risk,true)} ${x.risk}%</span>
+      </div>
+      <div class="risknote"></div>
+      <button class="copyx">Copy</button>`;
+    d.querySelector(".txt").textContent = "“" + x.excuse + "”";
+    d.querySelector(".risknote").textContent = x.note || "";
+    d.querySelector(".copyx").addEventListener("click", async (ev)=>{
+      try{ await navigator.clipboard.writeText(x.excuse); ev.target.textContent="Copied"; setTimeout(()=>ev.target.textContent="Copy",1200);}catch(e){}
+    });
+    r.appendChild(d);
+  });
+  r.style.display="block";
+  r.scrollIntoView({behavior:"smooth"});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!--
+  Source: ~/Downloads/newproducts/landlord-translator.html, copied into the Tech Pravaha lab on 2026-10-10.
+  Only change: model calls go through the Tech Pravaha Worker (/lab/complete); no other edits.
+  The Worker host is read from the tp-api meta tag below; edit it if the API host changes.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="tp-api" content="https://api.techpravaha.com">
+<title>Landlord Translator — what the listing actually means</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Inter:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#FBF7F0;--ink:#22252A;--dim:#6A6F78;--line:#E3DDD2;--brick:#C6532B;--sky:#2E6E8E;--warn:#B9861F;--ok:#3D7A52}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;min-height:100vh;padding:30px 16px 80px}
+  .wrap{max-width:640px;margin:0 auto}
+  h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(1.8rem,6.5vw,2.6rem);text-align:center;letter-spacing:-.02em}
+  h1 span{color:var(--brick)}
+  .tag{text-align:center;color:var(--dim);margin:8px 0 24px;font-size:.95rem}
+  .card{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(34,37,42,.04)}
+  label{display:block;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--sky);margin-bottom:8px}
+  textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;background:#FDFCFA;font-family:'Inter',sans-serif;font-size:.95rem;line-height:1.6;padding:13px;min-height:140px;resize:vertical;color:var(--ink)}
+  textarea:focus{outline:2px solid var(--brick)}
+  .go{display:block;width:100%;margin-top:14px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.05rem;background:var(--brick);color:#fff;border:none;border-radius:12px;padding:15px;cursor:pointer}
+  .go:hover{background:#A84421}
+  .go:disabled{opacity:.5;cursor:not-allowed}
+  .go:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+  .sample{background:none;border:none;color:var(--sky);cursor:pointer;font-size:.82rem;text-decoration:underline;margin-top:10px;font-family:'Inter',sans-serif}
+  .loading{display:none;text-align:center;color:var(--dim);font-style:italic;margin:18px 0;animation:pulse 1.3s infinite}
+  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+  .results{display:none}
+  .trans{border-left:4px solid var(--brick);background:#fff;border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:10px;border-top:1.5px solid var(--line);border-right:1.5px solid var(--line);border-bottom:1.5px solid var(--line)}
+  .trans .said{font-weight:600;font-size:.95rem}
+  .trans .said::before{content:"They said: ";color:var(--dim);font-weight:400}
+  .trans .means{margin-top:6px;font-size:.95rem;color:var(--brick);font-style:italic}
+  .trans .means::before{content:"Translation: ";color:var(--dim);font-style:normal}
+  .sectionH{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.05rem;margin:22px 0 10px}
+  .flag{display:flex;gap:10px;align-items:flex-start;background:#FDF6E7;border:1.5px solid var(--warn);border-radius:12px;padding:12px 14px;margin-bottom:8px;font-size:.92rem;line-height:1.5}
+  .ask{display:flex;gap:10px;align-items:flex-start;background:#EFF6F1;border:1.5px solid var(--ok);border-radius:12px;padding:12px 14px;margin-bottom:8px;font-size:.92rem;line-height:1.5}
+  .verdictBox{background:var(--ink);color:#fff;border-radius:14px;padding:18px;margin-top:18px;font-size:1rem;line-height:1.6}
+  .verdictBox b{color:#FFC96B;font-family:'Bricolage Grotesque',sans-serif}
+  .copyAll{margin-top:12px;background:none;border:1.5px solid var(--line);border-radius:9px;padding:9px 15px;font-size:.8rem;cursor:pointer;color:var(--dim);font-family:'Inter',sans-serif}
+  .copyAll:hover{border-color:var(--ok);color:var(--ok)}
+  .err{display:none;border:1.5px dashed var(--brick);border-radius:10px;padding:12px;color:var(--brick);font-size:.9rem;margin-top:14px}
+  .note{font-size:.8rem;color:var(--dim);margin-top:8px;min-height:1.1em}
+  footer{text-align:center;color:var(--dim);font-size:.78rem;margin-top:40px;font-style:italic;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Landlord <span>Translator</span></h1>
+  <p class="tag">Paste the listing. Get what it actually means — plus the questions you should ask before visiting.</p>
+
+  <div class="card">
+    <label for="listing">The listing</label>
+    <textarea id="listing" maxlength="2500" placeholder="Paste the rental listing text here — the more 'cozy' and 'upcoming' it sounds, the better we can help."></textarea>
+    <button class="go" id="go">Translate this listing</button>
+    <button class="sample" id="sample">…or try a suspiciously typical sample</button>
+  </div>
+
+  <div class="loading" id="loading">Reading between the lines…</div>
+  <div class="err" id="err"></div>
+
+  <div class="results" id="results">
+    <div class="sectionH">🔍 The translation</div>
+    <div id="transList"></div>
+    <div class="sectionH">🚩 What they're not telling you</div>
+    <div id="flagList"></div>
+    <div class="sectionH">❓ Ask before you visit</div>
+    <div id="askList"></div>
+    <div class="verdictBox" id="verdict"></div>
+    <button class="copyAll" id="copyAsk">Copy the questions list</button>
+    <div class="note" id="note"></div>
+  </div>
+
+  <footer>Half comedy, half consumer protection. The landlord is probably lovely.<br>The listing, however, is under oath here.</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const SAMPLE = `Cozy 1BHK in upcoming area, just 5 mins from station! Newly renovated, compact modular kitchen, cross ventilation, peaceful surroundings. Vegetarians preferred. Rent 18k, deposit negotiable. Bachelors allowed (with conditions). Water no problem. Contact owner directly, no brokers (small brokerage applicable).`;
+
+$("sample").addEventListener("click", ()=>{ $("listing").value = SAMPLE; });
+
+$("go").addEventListener("click", async ()=>{
+  const text = $("listing").value.trim();
+  if(!text) return;
+  $("go").disabled = true; $("err").style.display="none"; $("results").style.display="none";
+  $("loading").style.display="block";
+  try{
+    const API_URL = (document.querySelector('meta[name="tp-api"]')||{}).content || "";
+    const res = await fetch(API_URL + "/lab/complete",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ app:"landlord-translator", input:text })
+    });
+    const data = await res.json();
+    const raw = data.text || "";
+    const p = JSON.parse(raw.replace(/```json|```/g,"").trim());
+    render(p);
+  }catch(e){
+    $("err").textContent = "Couldn't decode this one — try again, or trim the listing a little.";
+    $("err").style.display="block";
+  }finally{
+    $("loading").style.display="none"; $("go").disabled=false;
+  }
+});
+
+function render(p){
+  const tl = $("transList"); tl.innerHTML="";
+  (p.translations||[]).forEach(t=>{
+    const d = document.createElement("div"); d.className="trans";
+    d.innerHTML = `<div class="said"></div><div class="means"></div>`;
+    d.querySelector(".said").textContent = "“" + t.said + "”";
+    d.querySelector(".means").textContent = t.means;
+    tl.appendChild(d);
+  });
+  const fl = $("flagList"); fl.innerHTML="";
+  (p.flags||[]).forEach(f=>{
+    const d = document.createElement("div"); d.className="flag";
+    d.innerHTML = `<span>🚩</span><span></span>`;
+    d.querySelector("span:last-child").textContent = f;
+    fl.appendChild(d);
+  });
+  const al = $("askList"); al.innerHTML="";
+  (p.questions||[]).forEach((q,i)=>{
+    const d = document.createElement("div"); d.className="ask";
+    d.innerHTML = `<span>${i+1}.</span><span></span>`;
+    d.querySelector("span:last-child").textContent = q;
+    al.appendChild(d);
+  });
+  $("verdict").innerHTML = "<b>VERDICT:</b> ";
+  $("verdict").append(document.createTextNode(p.verdict||""));
+  window._questions = (p.questions||[]).map((q,i)=>(i+1)+". "+q).join("\n");
+  $("results").style.display="block";
+  $("results").scrollIntoView({behavior:"smooth"});
+}
+
+$("copyAsk").addEventListener("click", async ()=>{
+  try{ await navigator.clipboard.writeText("Questions before visiting:\n"+window._questions); $("note").textContent="Copied — paste it to the owner/broker chat."; }
+  catch(e){ $("note").textContent="Copy manually from the list."; }
+});
+</script>
+</body>
+</html>

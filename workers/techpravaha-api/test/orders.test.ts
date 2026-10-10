@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import worker, { type Env } from '../src/index';
 import { getOrder, getPaymentOrderId, markPaid, putOrder, type OrderRecord } from '../src/orders';
 import { normalisePhone, validateOrderBody } from '../src/validate';
+import { expected } from './helpers/amounts';
 import { fakeKV, type FakeKV } from './helpers/fake-kv';
 
 const ctx = {} as ExecutionContext;
@@ -175,12 +176,13 @@ describe('POST /orders', () => {
   });
 
   it('happy path: amount comes from the catalogue, order stored, keyId returned', async () => {
+    const launch = expected('websites-launch');
     const res = await post({ tierId: 'websites-launch', customer, page: '/services/websites' });
     expect(res.status).toBe(200);
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://techpravaha.com');
     expect(await res.json()).toEqual({
       orderId: 'order_x',
-      amount: 4130000,
+      amount: launch.amountPaise,
       currency: 'INR',
       keyId: 'rzp_test_key',
       tier: { label: 'Launch' },
@@ -192,7 +194,7 @@ describe('POST /orders', () => {
     expect(url).toBe('https://api.razorpay.com/v1/orders');
     expect(new Headers(init.headers).get('Authorization')).toBe(`Basic ${btoa('rzp_test_key:shh_secret')}`);
     const sent = JSON.parse(String(init.body));
-    expect(sent.amount).toBe(4130000);
+    expect(sent.amount).toBe(launch.amountPaise);
     expect(sent.currency).toBe('INR');
     expect(sent.receipt).toMatch(/^tp_websites-launch_[0-9a-z]+$/);
     expect(sent.receipt.length).toBeLessThanOrEqual(40);
@@ -209,12 +211,12 @@ describe('POST /orders', () => {
       tierId: 'websites-launch',
       serviceName: 'Websites & landing pages',
       tierLabel: 'Launch',
-      amountPaise: 4130000,
+      amountPaise: launch.amountPaise,
       customer: { name: 'Asha Rao', email: 'asha@example.com', phone: '+919876543210' },
       status: 'created',
       page: '/services/websites',
       gst: 0.18,
-      totalPaise: 4130000,
+      totalPaise: launch.totalPaise,
       depositPct: 100,
     });
     expect(new Date(stored!.createdAt).toISOString()).toBe(stored!.createdAt);
@@ -222,12 +224,13 @@ describe('POST /orders', () => {
   });
 
   it('a Growth tier creates a Razorpay order for the 50% deposit and stores the full total', async () => {
+    const growth = expected('websites-growth');
     const res = await post({ tierId: 'websites-growth', customer });
     expect(res.status).toBe(200);
-    expect(((await res.json()) as { amount: number }).amount).toBe(5605000);
+    expect(((await res.json()) as { amount: number }).amount).toBe(growth.amountPaise);
     const [, init] = fetchMock.mock.calls[0]! as [string, RequestInit];
-    expect(JSON.parse(String(init.body)).amount).toBe(5605000);
-    expect(await getOrder(kv, 'order_x')).toMatchObject({ amountPaise: 5605000, totalPaise: 11210000, depositPct: 50 });
+    expect(JSON.parse(String(init.body)).amount).toBe(growth.amountPaise);
+    expect(await getOrder(kv, 'order_x')).toMatchObject({ amountPaise: growth.amountPaise, totalPaise: growth.totalPaise, depositPct: 50 });
   });
 
   it('every receipt fits in 40 chars for every buyable tier', async () => {

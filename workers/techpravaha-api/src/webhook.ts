@@ -1,7 +1,10 @@
+import { orderAmounts } from './catalogue';
 import { sendAlert, sendReceipt } from './email';
 import type { Env } from './env';
+import { inr } from './format';
 import { json, readBodyCapped } from './http';
 import { getPaymentOrderId, markPaid, type OrderRecord } from './orders';
+import { ping } from './ping';
 import { verifyWebhookSignature } from './razorpay';
 import { appendOrderRow } from './sheets';
 import { safeErrorText } from './upstream';
@@ -24,6 +27,7 @@ export async function alertSafely(env: Env, subject: string, body: string): Prom
 /**
  * Post-payment side effects. Each step runs regardless of the other; any failure becomes an
  * alert carrying the order id, payment id and an alert-safe error description, never customer data.
+ * Last, an internal ping to Yogesh (Telegram or email); ping never throws and is not alerted.
  */
 export async function afterPaid(env: Env, o: OrderRecord): Promise<void> {
   const steps: [string, () => Promise<void>][] = [
@@ -44,6 +48,11 @@ export async function afterPaid(env: Env, o: OrderRecord): Promise<void> {
       );
     }
   }
+  await ping(
+    env,
+    'order',
+    `Order ${o.id} paid: ${o.serviceName} · ${o.tierLabel}, ${inr(orderAmounts(o).charged)} (${o.customer.name})`,
+  );
 }
 
 /**
@@ -182,15 +191,16 @@ export async function handleRazorpayWebhook(req: Request, env: Env, ctx: Executi
       );
       return json({ ok: true }, 200, req, env);
     }
-    // Index not written (or unreadable): answer 500 so Razorpay retries, and the retry runs the side
-    // effects itself. This alert has its own subject so nobody sends a duplicate receipt by hand.
+    // Index not written (or unreadable): answer 500 so Razorpay retries. The retry either runs the side
+    // effects itself or raises "check receipt and Sheet row". This alert has its own subject so nobody
+    // sends a duplicate receipt by hand.
     ctx.waitUntil(
       alertSafely(
         env,
         `Order ${orderId}: store error, Razorpay will retry`,
         `Payment ${paymentId} for order ${orderId} was captured, but the order store failed (${why}) before the payment was recorded. ` +
-          'Razorpay will retry the webhook, and a successful retry adds the Sheet row and sends the receipt. ' +
-          'Wait about an hour; act only if no Sheet row or receipt appears for this order.',
+          'Razorpay will retry the webhook. A retry either runs the side effects (Sheet row and receipt) or sends a ' +
+          '"check receipt and Sheet row" alert; act on that alert, or check by hand if nothing appears within about an hour.',
       ),
     );
     return json({ error: 'storage error' }, 500, req, env);

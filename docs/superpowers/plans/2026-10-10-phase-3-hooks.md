@@ -14,10 +14,10 @@
 
 - Phase 1 and 2 constraints apply (tokens only, no em-dashes, `m.*`, catalogue is the source, secrets only in the Worker).
 - The chatbot never quotes a price that is not in `catalogue.json`, never promises a timeline not in the catalogue, and always offers WhatsApp/contact as the human path; it says "I am an assistant on the Tech Pravaha site" when asked what it is. Spec voice applies to its system prompt.
-- Every proxied model call has a hard cap: chat 20 turns per conversation, 2,000 input chars per message, 60 requests per IP per hour; lab completions 30 per IP per hour, 600 output tokens. Over quota → 429 with a friendly message.
+- Every proxied model call has a hard cap: chat 20 turns per conversation, 2,000 input chars per message, 12 requests per IP per minute (Workers Rate Limiting binding); lab completions 30 per IP per minute (Rate Limiting binding), 600 output tokens (1,200 for the landlord translator). Over quota → 429 with a friendly message.
 - No prompt content, lead or chat text is logged in full; logs carry ids, lengths and status.
 - The chatbot and lead magnet mount after idle and never block LCP; the floating button has a 44px target and an `aria-label`.
-- Lab apps: only the fetch target changes (relative `/lab/complete` via `VITE_API_URL`); no other edits to their code, documented per file in a header comment.
+- Lab apps: only the fetch target changes (`/lab/complete` on the host from a `tp-api` meta tag); no other edits to their code, documented per file in a header comment.
 - Commit per task on `feat/phase-1-foundation` (controller squashes). Never push.
 
 ## Review Focus
@@ -69,5 +69,34 @@ export async function ping(env, kind: 'order'|'lead', text: string, fetchImpl?):
 ### Task 6: Polish parked from phase 1 + verification
 
 - `AnalyticsNotice`: `scroll-padding-bottom` while visible; hide the GA/Clarity names when ids are placeholders ("We use analytics…").
-- README phase 3 section; `.env.example`; morning notes (Gemini key, Anthropic key, Telegram bot, teardown process).
+- README phase 3 section; `.env.example`; morning notes (Gemini key, Anthropic key, Telegram bot, teardown process), consolidated below.
 - `npm run typecheck && npm test && npm run build && npm run test:e2e`; Worker suite; LHCI once (chat chunk must stay out of the home critical path).
+- Also absorbs the residuals parked by the phase 2 final review (alert and mismatch wording, price-derived tests, catalogue validation before the Worker deploy, a site/Worker price parity test) and by the phase 3 task reviews (plain-text chat prompt, deterministic timing tests, Escape guards, checkout validation parity, TeardownNote spacing, try/finally around lead submits).
+
+## Morning notes for Yogesh (phase 3)
+
+Everything here needs your accounts or a decision. The site and the Worker work without any of it: chat answers with the outage reply, the lab apps that use a model show their offline state, order pings arrive as emails and lead pings are skipped (the Leads tab still records every lead).
+
+**Go-live prerequisites:** Gemini key on a billed project (note 1), Anthropic key with a spend cap (note 2), Telegram bot configured (note 3).
+
+**Keys and secrets** (Worker, `npx wrangler secret put <NAME>` on Node 22; README "Phase 3 · Hooks" has the details)
+
+1. Gemini: use a billed Gemini project (on an unbilled AI Studio project, Google's terms let it use chat content to improve its products). Create an API key there, then `npx wrangler secret put GEMINI_API_KEY`. Set a spend cap (or a budget alert) on that Google Cloud project. Leave `GEMINI_MODEL` unset (default `gemini-3.5-flash-lite`). Confirm the model answers on your key with one request; expect a JSON body with `candidates` (a 403 or 404 means the key cannot reach that model):
+   ```sh
+   curl -s -H "x-goog-api-key: $KEY" -H "Content-Type: application/json" -d '{"contents":[{"parts":[{"text":"hi"}]}]}' https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent
+   ```
+   If you change `GEMINI_MODEL`: a `gemini-2.5*` id gets `thinkingBudget: 0`, any other id gets no thinking config (3.x models default to minimal thinking); the reply cap is 600 output tokens.
+2. Anthropic: create a key in a workspace with a monthly spend cap, then `npx wrangler secret put ANTHROPIC_API_KEY`. Until it is set, the three lab apps that use a model show their offline state. Leave `LAB_MODEL` unset (default `claude-haiku-5-5`): only that model or Claude 4.x models work, Opus and Sonnet 5.x reject the disabled-thinking parameter.
+3. Telegram (required before go-live): `@BotFather`, `/newbot`, then `npx wrangler secret put TELEGRAM_BOT_TOKEN`; message the bot, read `message.chat.id` from `https://api.telegram.org/bot<token>/getUpdates`, and set `TELEGRAM_CHAT_ID` in `wrangler.toml` `[vars]`. Until both are set, order pings arrive as emails to `ALERT_EMAIL` and lead pings are skipped (anyone can post a lead, so lead pings never spend the Resend quota that receipts need). The Leads tab is the record.
+
+**Deploy order**
+
+4. Publish the new Apps Script version first (it routes `type: "lead"` rows to the Leads tab, created on the first lead), then deploy the Worker. An old script would put leads in the Orders tab.
+5. Rate limits need no setup: `/chat` (12 per IP per minute), `/leads` (6) and `/lab/complete` (30) are Workers Rate Limiting bindings in `wrangler.toml`, counted per Cloudflare location and approximate (see `docs/ops/razorpay-setup.md`). No KV namespace to create for them.
+6. Confirm the Cloudflare Workers plan: Free has a 1,000 KV writes a day cap across the account, and every order writes 2 to 3 keys.
+
+**Decisions**
+
+7. Teardown delivery is manual in v1: every `lead_magnet` row in the Leads tab needs a reply within two working days (the site promises it). Decide the reply template (the ten points are in `app/content/teardown.ts`) and who covers it when you are away.
+8. Price edits need no extra step: edit `catalogue.json` (on github.com is fine) and merge. `deploy-worker.yml` regenerates the chat facts (`npm run prompt:data`) and validates the catalogue before every Worker deploy, so the chat quotes the new price once the Worker is redeployed. Adding or removing a tier or a service still needs `npm run prompt:data` in the same PR (the structure test checks every buyable tier is in the facts).
+9. GST on advances: see the phase 2 morning note "GST on advances" (a question for the CA).

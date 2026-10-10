@@ -164,6 +164,10 @@ describe('WORK', () => {
 
 const BLOCKED_API_HOSTS = ['api.anthropic.com', 'api.openai.com', 'generativelanguage.googleapis.com'];
 const FETCH_ALLOWED_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
+/** Lab apps that use a model, through the Worker's /lab/complete proxy only. */
+const PROXIED_LAB_APPS = ['landlord-translator', 'excuse-engine', 'split-the-awkward'];
+/** The only non-literal fetch targets a lab app may use: the proxy path, alone or after the tp-api meta host. */
+const PROXY_FETCH_RE = /^(?:API_URL\s*\+\s*)?["'`]\/lab\/complete["'`]$/;
 
 /** Every .html and .js file under `dir`, recursively (plot-twist is a folder app). */
 function labScripts(dir: string): string[] {
@@ -189,7 +193,7 @@ describe('LAB', () => {
     }
   });
 
-  it('holds back apps that call a third-party API from the browser', () => {
+  it('never calls a third-party API from the browser; model calls go through /lab/complete', () => {
     const files = labScripts(join(PUBLIC, 'lab', 'play'));
     expect(files.some((f) => f.endsWith('.html'))).toBe(true);
     for (const file of files) {
@@ -198,7 +202,28 @@ describe('LAB', () => {
       for (const m of text.matchAll(/fetch\(\s*[`'"]https?:\/\/([^/`'"\s]+)/g)) {
         expect(FETCH_ALLOWED_HOSTS, `${file} fetches ${m[1]}`).toContain(m[1]);
       }
+      // Any fetch target that is not an absolute literal must be the proxy path (relative, or after the tp-api host).
+      for (const m of text.matchAll(/fetch\(\s*([^,)]+?)\s*[,)]/g)) {
+        if (/^[`'"]https?:\/\//.test(m[1]!)) continue;
+        expect(m[1], `${file} fetches ${m[1]}`).toMatch(PROXY_FETCH_RE);
+      }
+      // API_URL may only come from the tp-api meta tag.
+      for (const m of text.matchAll(/API_URL\s*=\s*([^;\n]+)/g)) {
+        expect(m[1], `${file} sets API_URL`).toMatch(/^\(document\.querySelector\('meta\[name="tp-api"\]'\)\|\|\{\}\)\.content \|\| ""$/);
+      }
     }
+  });
+
+  it('routes the three model apps through the Worker proxy, with the API host in a tp-api meta tag', () => {
+    for (const slug of PROXIED_LAB_APPS) {
+      const text = readFileSync(join(PUBLIC, 'lab', 'play', slug, 'index.html'), 'utf8');
+      expect(text, slug).toContain('/lab/complete');
+      expect(text, slug).not.toContain('api.anthropic.com');
+      expect(text, slug).toContain('<meta name="tp-api" content="https://api.techpravaha.com">');
+      expect(text, slug).toContain('Only change: model calls go through the Tech Pravaha Worker (/lab/complete); no other edits.');
+      expect(text, slug).toContain(`app:"${slug}"`);
+    }
+    expect(LAB.filter((l) => l.kind === 'play').map((l) => l.slug)).toEqual(expect.arrayContaining(PROXIED_LAB_APPS));
   });
 
   it('lists exactly the apps on disk', () => {

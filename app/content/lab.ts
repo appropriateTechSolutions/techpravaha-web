@@ -22,9 +22,10 @@ const play = (slug: string, name: string, blurb: string, tags: string[]): LabIte
  * Small things built for fun or to test an idea. Playable items are small static
  * apps (most are one HTML file, Plot Twist is a folder) copied verbatim into
  * `public/lab/play/<slug>/`; extensions and web apps stay unlinked (`#`) until
- * they have a public listing. Apps that call an AI API from the browser
- * (Landlord Translator, Excuse Engine, Split the Awkward) are held back until a
- * server-side proxy exists; tests/content.test.ts scans for them.
+ * they have a public listing. The three apps that use a language model
+ * (Landlord Translator, Excuse Engine, Split the Awkward) call the Worker's
+ * `/lab/complete` proxy instead of an AI API (host from their `tp-api` meta tag);
+ * tests/content.test.ts scans every lab file for third-party API hosts.
  */
 export const LAB: LabItem[] = [
   play(
@@ -50,6 +51,24 @@ export const LAB: LabItem[] = [
     'Plot Twist',
     'A one-minute daily mystery: read the case file, reveal only the clues you need, name the culprit.',
     ['Daily game', 'Offline'],
+  ),
+  play(
+    'landlord-translator',
+    'Landlord Translator',
+    'Paste a rental listing and get what it actually means, what it leaves out, and the questions to ask before you visit.',
+    ['AI', 'Renters'],
+  ),
+  play(
+    'excuse-engine',
+    'Excuse Engine',
+    'Pick a situation, set the believability dial, and get three harmless excuses with a backfire risk for each.',
+    ['AI', 'Comedy'],
+  ),
+  play(
+    'split-the-awkward',
+    'Split the Awkward',
+    'Splits a group bill, works out who pays whom, then writes the reminder message in the tone you pick.',
+    ['AI', 'Works offline'],
   ),
   {
     slug: 'tab-tamer',

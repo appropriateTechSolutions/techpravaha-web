@@ -136,3 +136,18 @@ for (const width of [1440, 375]) {
     expect(errors).toEqual([]);
   });
 }
+
+test('teardown page lists ten checks and validates the site URL after hydration', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/teardown/');
+  await page.waitForLoadState('networkidle');
+  await expect(page.getByRole('list', { name: 'The ten checks' }).locator(':scope > li')).toHaveCount(10);
+  const form = page.getByRole('form', { name: 'Free teardown request' });
+  await form.getByLabel('Site URL').fill('not a url');
+  await form.getByLabel('Name').fill('Asha');
+  await form.getByLabel('Email').fill('asha@example.com');
+  await form.getByRole('button', { name: 'Get my teardown' }).click();
+  await expect(form.getByText(/does not look like a web address/)).toBeVisible();
+  expect(errors).toEqual([]);
+});

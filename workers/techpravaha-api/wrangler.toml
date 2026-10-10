@@ -14,6 +14,25 @@ binding = "ORDERS"
 id = "REPLACE"
 preview_id = "REPLACE"
 
+# Per-IP limit for POST /chat: 12 requests per 60 s. Workers Rate Limiting counts per Cloudflare
+# location and is approximate; it needs no setup beyond this block (namespace_id is ours to pick).
+[[ratelimits]]
+name = "CHAT_RATE"
+namespace_id = "1001"
+simple = { limit = 12, period = 60 }
+
+# Per-IP limit for POST /leads: 6 requests per 60 s.
+[[ratelimits]]
+name = "LEADS_RATE"
+namespace_id = "1002"
+simple = { limit = 6, period = 60 }
+
+# Per-IP limit for POST /lab/complete (the three lab apps that use a model): 30 requests per 60 s.
+[[ratelimits]]
+name = "LAB_RATE"
+namespace_id = "1003"
+simple = { limit = 30, period = 60 }
+
 [vars]
 ALLOWED_ORIGINS = "https://techpravaha.com,https://www.techpravaha.com,http://localhost:3000"
 FROM_EMAIL = "Tech Pravaha <hello@techpravaha.com>"
@@ -21,3 +40,12 @@ ALERT_EMAIL = "yogesh@appropriatetechsolutions.com"
 # Optional, used in the receipt email. Leave unset until decided.
 # BOOKING_URL = "https://calendar.app.google/REPLACE"   # absolute https link to the kickoff booking page
 # WHATSAPP_NUMBER = "91XXXXXXXXXX"                       # digits with country code; placeholder is ignored
+# Chat model for POST /chat; defaults to gemini-3.5-flash-lite when unset.
+# GEMINI_MODEL = "gemini-3.5-flash-lite"
+# Lab model for POST /lab/complete; defaults to claude-haiku-5-5 when unset.
+# LAB_MODEL = "claude-haiku-5-5"
+# Order and lead pings go to Telegram when both are set. Without them, order pings go to ALERT_EMAIL
+# and lead pings are skipped (the Leads tab is the record).
+# TELEGRAM_CHAT_ID = "REPLACE"                           # your user id, or a group id like -100...
+# Secrets, never here: `npx wrangler secret put GEMINI_API_KEY`, `npx wrangler secret put TELEGRAM_BOT_TOKEN` and
+# `npx wrangler secret put ANTHROPIC_API_KEY` (lab apps; unset, /lab/complete answers 503 and the apps go offline).

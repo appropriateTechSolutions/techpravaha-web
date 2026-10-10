@@ -132,3 +132,18 @@ describe('pricing', () => {
     expect(screen.getByText(catalogue.addons[0].name, { selector: 'h3' })).toBeInTheDocument();
   });
 });
+
+describe('teardown pointer', () => {
+  it('appears after the packages on websites and design, and nowhere else', () => {
+    for (const slug of ['websites', 'design']) {
+      const { unmount } = renderAt(`/services/${slug}`);
+      const link = screen.getByRole('link', { name: /free 10-point teardown/i });
+      expect(link).toHaveAttribute('href', '/teardown');
+      const packages = document.getElementById('packages')!;
+      expect(packages.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      unmount();
+    }
+    renderAt('/services/apps');
+    expect(screen.queryByRole('link', { name: /free 10-point teardown/i })).toBeNull();
+  });
+});

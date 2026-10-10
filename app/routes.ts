@@ -12,6 +12,7 @@ export default [
   route('journal/:slug', 'routes/journal.$slug.tsx'),
   route('about', 'routes/about.tsx'),
   route('contact', 'routes/contact.tsx'),
+  route('teardown', 'routes/teardown.tsx'),
   route('terms', 'routes/terms.tsx'),
   route('privacy', 'routes/privacy.tsx'),
   route('refunds', 'routes/refunds.tsx'),

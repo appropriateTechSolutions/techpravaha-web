@@ -6,7 +6,9 @@ export type EventName =
   | 'whatsapp_click'
   | 'book_click'
   | 'lead_submit'
-  | 'lab_play';
+  | 'lab_play'
+  | 'chat_open'
+  | 'chat_send';
 
 declare global {
   interface Window {
@@ -28,6 +30,17 @@ export function track(name: EventName, params?: Record<string, string | number>)
 // An id is usable when set and not a `.env.example` placeholder (a run of X's).
 const usable = (id: unknown): id is string =>
   typeof id === 'string' && id.trim() !== '' && !/x{4,}/i.test(id);
+
+/**
+ * Display names of the analytics tools this build loads, for the notice. Empty while both ids are
+ * unset or `.env.example` placeholders, so the notice never names a tool that is not running.
+ */
+export function analyticsTools(): string[] {
+  const tools: string[] = [];
+  if (usable(import.meta.env.VITE_GA_ID)) tools.push('Google Analytics');
+  if (usable(import.meta.env.VITE_CLARITY_ID)) tools.push('Microsoft Clarity');
+  return tools;
+}
 
 let loaded = false;
 

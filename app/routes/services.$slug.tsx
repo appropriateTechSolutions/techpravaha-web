@@ -12,9 +12,13 @@ import { Reveal } from '../components/ui/Reveal';
 import { Section } from '../components/ui/Section';
 import { Breadcrumb } from '../components/Breadcrumb';
 import { ClosingCta } from '../components/ClosingCta';
+import { TEARDOWN_NOTE_ABOVE, TeardownNote } from '../components/TeardownNote';
 import { Steps } from '../components/Steps';
 import { TierCard } from '../components/TierCard';
 import { WorkCard } from '../components/WorkCard';
+
+// Services whose visitors often compare against a site they already have.
+const TEARDOWN_SERVICES = new Set(['websites', 'design']);
 
 const GST = `${Math.round(catalogue.gst * 100)}% GST`;
 
@@ -72,7 +76,7 @@ export default function ServicePage() {
         eyebrow="Packages"
         title="Pick a package."
         intro="Three ways in. Each one has a fixed scope and the price on the card."
-        className="scroll-mt-16"
+        className={`scroll-mt-16 ${TEARDOWN_SERVICES.has(service.id) ? TEARDOWN_NOTE_ABOVE : ''}`}
       >
         <div className="grid gap-6 lg:grid-cols-3 [&_article]:scroll-mt-24">
           {service.tiers.map((tier) => (
@@ -83,6 +87,8 @@ export default function ServicePage() {
           Prices in INR, {GST} extra. Pay by UPI, card or netbanking.
         </p>
       </Section>
+
+      {TEARDOWN_SERVICES.has(service.id) && <TeardownNote />}
 
       <Section eyebrow="After you pay" title="What happens after you pay.">
         <Steps steps={content.afterPay} />

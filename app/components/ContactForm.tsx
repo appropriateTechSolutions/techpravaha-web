@@ -6,6 +6,18 @@ import { track } from '../lib/analytics';
 import { getTier, type Service, type Tier } from '../lib/catalogue';
 import { useHydrated } from '../lib/motion';
 import { useOrderParam } from '../lib/orderParam';
+import {
+  CONTROL_RE,
+  EMAIL_MAX,
+  EMAIL_RE,
+  HIDDEN_CHAR_HINT,
+  MESSAGE_COUNTER_FROM,
+  MESSAGE_MAX,
+  NAME_MAX,
+  NAME_MIN,
+  TEXT_CONTROL_RE,
+  phoneOk,
+} from '../lib/validation';
 import { CONTACT_EMAIL, pagePath } from '../lib/site';
 import { WHATSAPP_NUMBER, waLink } from '../lib/whatsapp';
 import { submitLead } from '../services/leads';
@@ -33,18 +45,21 @@ type Values = Record<Field, string>;
 type Errors = Partial<Record<Field, string>>;
 type Status = 'idle' | 'sending' | 'sent' | 'failed';
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export function validate(v: Values): Errors {
   const errors: Errors = {};
-  if (!v.name.trim()) errors.name = 'Add your name.';
-  if (!v.email.trim()) errors.email = 'Add your email.';
-  else if (!EMAIL_RE.test(v.email.trim())) errors.email = 'That email does not look right.';
-  const digits = v.phone.replace(/\D/g, '');
-  if (v.phone.trim() && (digits.length < 10 || digits.length > 15)) {
-    errors.phone = 'That phone number does not look right.';
-  }
-  if (!v.message.trim()) errors.message = 'Add a short message.';
+  const name = v.name.trim();
+  if (CONTROL_RE.test(name)) errors.name = `That name does not look right. ${HIDDEN_CHAR_HINT}`;
+  else if (name.length < NAME_MIN) errors.name = 'Add your name.';
+  else if (name.length > NAME_MAX) errors.name = `Keep the name under ${NAME_MAX} characters.`;
+  const email = v.email.trim();
+  if (!email) errors.email = 'Add your email.';
+  else if (CONTROL_RE.test(email)) errors.email = `That email does not look right. ${HIDDEN_CHAR_HINT}`;
+  else if (email.length > EMAIL_MAX || !EMAIL_RE.test(email)) errors.email = 'That email does not look right.';
+  if (v.phone.trim() && !phoneOk(v.phone)) errors.phone = 'That phone number does not look right.';
+  const message = v.message.trim();
+  if (!message) errors.message = 'Add a short message.';
+  else if (message.length > MESSAGE_MAX) errors.message = `Keep the message under ${MESSAGE_MAX.toLocaleString('en-US')} characters.`;
+  else if (TEXT_CONTROL_RE.test(message)) errors.message = `That message does not look right. ${HIDDEN_CHAR_HINT}`;
   return errors;
 }
 
@@ -94,27 +109,34 @@ export function ContactForm() {
 
     setStatus('sending');
     const tier = picked?.tier.id;
-    const { ok } = await submitLead({
-      name: values.name.trim(),
-      email: values.email.trim(),
-      ...(values.phone.trim() ? { phone: values.phone.trim() } : {}),
-      message: values.message.trim(),
-      ...(tier ? { tier } : {}),
-      page: pathname,
-      type: 'contact',
-    });
-    if (ok) {
-      track('lead_submit', tier ? { page: pathname, tier } : { page: pathname });
-      setStatus('sent');
-    } else {
-      setStatus('failed');
+    let ok = false;
+    try {
+      ({ ok } = await submitLead({
+        name: values.name.trim(),
+        email: values.email.trim(),
+        ...(values.phone.trim() ? { phone: values.phone.trim() } : {}),
+        message: values.message.trim(),
+        ...(tier ? { tier } : {}),
+        ...(orderId ? { order: orderId } : {}),
+        page: pathname,
+        type: 'contact',
+      }));
+      if (ok) track('lead_submit', tier ? { page: pathname, tier } : { page: pathname });
+    } catch {
+      // submitLead resolves { ok: false } rather than throw; this only keeps the form from sticking on "Sending".
+    } finally {
+      setStatus(ok ? 'sent' : 'failed');
     }
   }
 
   const sending = status === 'sending';
   const fallbackMessage = `Hi Tech Pravaha, the form on your website didn't send. ${values.message.trim()}`.trim();
 
-  const field = (name: Field, label: string, extra: { type?: string; autoComplete?: string; optional?: boolean }) => (
+  const field = (
+    name: Field,
+    label: string,
+    extra: { type?: string; autoComplete?: string; optional?: boolean; maxLength?: number },
+  ) => (
     <FormField
       id={`${uid}-${name}`}
       name={name}
@@ -127,6 +149,7 @@ export function ContactForm() {
   );
 
   const messageId = `${uid}-message`;
+  const showCounter = values.message.length >= MESSAGE_COUNTER_FROM;
   const sent = status === 'sent';
   return (
     <>
@@ -147,8 +170,8 @@ export function ContactForm() {
       {!sent && (
         <form noValidate onSubmit={onSubmit} aria-label="Contact form" className="grid gap-6">
           <div className="grid gap-6 sm:grid-cols-2">
-            {field('name', 'Name', { autoComplete: 'name' })}
-            {field('email', 'Email', { type: 'email', autoComplete: 'email' })}
+            {field('name', 'Name', { autoComplete: 'name', maxLength: NAME_MAX })}
+            {field('email', 'Email', { type: 'email', autoComplete: 'email', maxLength: EMAIL_MAX })}
           </div>
           {field('phone', 'Phone', { type: 'tel', autoComplete: 'tel', optional: true })}
           <div>
@@ -162,11 +185,19 @@ export function ContactForm() {
               value={values.message}
               onChange={set('message')}
               aria-invalid={errors.message ? true : undefined}
-              aria-describedby={errors.message ? `${messageId}-error` : undefined}
+              aria-describedby={[errors.message ? `${messageId}-error` : '', showCounter ? `${messageId}-count` : '']
+                .filter(Boolean)
+                .join(' ') || undefined}
+              maxLength={MESSAGE_MAX}
               placeholder="What do you want to launch, and by when?"
               className={`${INPUT_CLASS} resize-y`}
             />
             {errors.message && <FieldError id={`${messageId}-error`}>{errors.message}</FieldError>}
+            {showCounter && (
+              <p id={`${messageId}-count`} className="mt-2 text-sm text-muted">
+                {values.message.length.toLocaleString('en-US')} / {MESSAGE_MAX.toLocaleString('en-US')}
+              </p>
+            )}
           </div>
           <input type="hidden" name="tier" value={picked?.tier.id ?? ''} />
 

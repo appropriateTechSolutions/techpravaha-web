@@ -26,6 +26,8 @@ interface FormFieldProps {
   autoComplete?: string;
   inputMode?: 'text' | 'tel' | 'email';
   optional?: boolean;
+  /** Hard cap on typed or pasted length. */
+  maxLength?: number;
   /** Help text under the field, read after the error. */
   hint?: ReactNode;
 }
@@ -45,6 +47,7 @@ export function FormField({
   autoComplete,
   inputMode,
   optional = false,
+  maxLength,
   hint,
 }: FormFieldProps) {
   const errorId = `${id}-error`;
@@ -62,6 +65,7 @@ export function FormField({
         type={type}
         inputMode={inputMode}
         autoComplete={autoComplete}
+        maxLength={maxLength}
         value={value}
         onChange={onChange}
         aria-invalid={error ? true : undefined}

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<!--
+  Source: ~/Downloads/newproducts/split-the-awkward.html, copied into the Tech Pravaha lab on 2026-10-10.
+  Only change: model calls go through the Tech Pravaha Worker (/lab/complete); no other edits.
+  The Worker host is read from the tp-api meta tag below; edit it if the API host changes.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="tp-api" content="https://api.techpravaha.com">
+<title>Split the Awkward — the math is easy, the asking isn't</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#F4F6F8;--card:#FFFFFF;--ink:#1D2530;--dim:#66707D;--line:#DDE3EA;--teal:#0E7C7B;--coral:#EF6351;--gold:#E8B14E}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:'Sora',system-ui,sans-serif;min-height:100vh;padding:28px 14px 80px}
+  .wrap{max-width:640px;margin:0 auto}
+  h1{font-weight:800;font-size:clamp(1.7rem,6.5vw,2.4rem);text-align:center}
+  h1 em{font-style:normal;color:var(--teal)}
+  .tag{text-align:center;color:var(--dim);margin:6px 0 24px;font-size:.95rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(29,37,48,.05)}
+  h2{font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+  input,select,textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;background:#FBFCFD;font-family:'Sora',sans-serif;font-size:.95rem;padding:11px 12px;color:var(--ink)}
+  input:focus,select:focus{outline:2px solid var(--teal)}
+  .row{display:flex;gap:10px;margin-bottom:10px}
+  .row > *{flex:1}
+  .btn{font-family:'Sora',sans-serif;font-weight:600;font-size:.88rem;padding:12px 18px;border-radius:10px;cursor:pointer;border:1.5px solid var(--teal);background:var(--teal);color:#fff}
+  .btn.ghost{background:none;color:var(--teal)}
+  .btn.sm{padding:8px 12px;font-size:.78rem}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .chiplist{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .pchip{display:flex;align-items:center;gap:6px;background:#EAF4F4;border:1px solid var(--teal);color:var(--teal);border-radius:999px;padding:6px 12px;font-size:.85rem;font-weight:600}
+  .pchip button{background:none;border:none;color:var(--teal);cursor:pointer;font-size:1rem;line-height:1}
+  .expense{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line);font-size:.92rem}
+  .expense .who{color:var(--dim);font-size:.8rem}
+  .expense .amt{font-family:'IBM Plex Mono',monospace;font-weight:700}
+  .balances .b{display:flex;justify-content:space-between;padding:8px 0;font-size:.95rem}
+  .pos{color:var(--teal);font-weight:700}.neg{color:var(--coral);font-weight:700}
+  .settle{background:#FDF6E8;border:1px solid var(--gold);border-radius:10px;padding:12px 14px;margin-top:10px;font-size:.93rem;line-height:1.6}
+  .settle b{font-family:'IBM Plex Mono',monospace}
+  .tones{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .tone{padding:9px 14px;border-radius:999px;border:1.5px solid var(--line);background:none;cursor:pointer;font-size:.82rem;font-weight:600;color:var(--dim)}
+  .tone.on{border-color:var(--coral);color:var(--coral);background:#FDEEEB}
+  .msgOut{display:none;background:#F0FAF9;border:1.5px solid var(--teal);border-radius:12px;padding:16px;font-size:.95rem;line-height:1.65;white-space:pre-wrap;margin-top:10px}
+  .loading{display:none;color:var(--dim);font-style:italic;font-size:.88rem;margin-top:10px}
+  .note{font-size:.8rem;color:var(--dim);margin-top:8px;min-height:1.1em}
+  .empty{color:var(--dim);font-style:italic;font-size:.9rem}
+  footer{text-align:center;color:var(--dim);font-size:.78rem;margin-top:36px;font-style:italic}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Split the <em>Awkward</em></h1>
+  <p class="tag">The math takes 4 seconds. This handles the other part — the asking.</p>
+
+  <div class="card">
+    <h2>1 · Who's in</h2>
+    <div class="row">
+      <input type="text" id="pname" placeholder="Name (e.g. Rahul)" maxlength="20">
+      <button class="btn ghost" id="addP">Add person</button>
+    </div>
+    <div class="chiplist" id="people"></div>
+  </div>
+
+  <div class="card">
+    <h2>2 · What was spent</h2>
+    <div class="row">
+      <input type="text" id="edesc" placeholder="Dinner, cab, tickets…" maxlength="40">
+      <input type="number" id="eamt" placeholder="₹ amount" min="1">
+    </div>
+    <div class="row">
+      <select id="epayer"></select>
+      <button class="btn ghost" id="addE">Add expense</button>
+    </div>
+    <div id="expenses"><p class="empty">No expenses yet. Add the damage.</p></div>
+  </div>
+
+  <div class="card">
+    <h2>3 · Who owes whom</h2>
+    <div class="balances" id="balances"><p class="empty">Balances appear here.</p></div>
+    <div id="settlements"></div>
+  </div>
+
+  <div class="card">
+    <h2>4 · The ask (the hard part)</h2>
+    <div class="row">
+      <select id="askTarget"></select>
+      <input type="text" id="upi" placeholder="Your UPI ID (optional)" maxlength="60">
+    </div>
+    <div class="tones">
+      <button class="tone on" data-t="gentle">🕊 Gentle nudge</button>
+      <button class="tone" data-t="petty">💅 Politely petty</button>
+      <button class="tone" data-t="formal">📋 Invoice energy</button>
+      <button class="tone" data-t="bestie">🫶 Bestie mode</button>
+    </div>
+    <button class="btn" id="craft">Craft the message</button>
+    <div class="loading" id="msgLoading">Consulting the diplomacy department…</div>
+    <div class="msgOut" id="msgOut"></div>
+    <button class="btn ghost sm" id="copyMsg" style="display:none;margin-top:10px">Copy message</button>
+    <div class="note" id="msgNote"></div>
+  </div>
+
+  <footer>Friendship survives shared expenses. It rarely survives unspoken ones.</footer>
+</div>
+
+<script>
+let people = [], expenses = [], tone = "gentle";
+const $ = id => document.getElementById(id);
+
+function paintPeople(){
+  const pl = $("people"); pl.innerHTML = "";
+  people.forEach((p,i)=>{
+    const c = document.createElement("span"); c.className="pchip";
+    c.innerHTML = `${p} <button aria-label="Remove ${p}">×</button>`;
+    c.querySelector("button").addEventListener("click", ()=>{
+      people.splice(i,1);
+      expenses = expenses.filter(e=>e.payer!==p);
+      paintAll();
+    });
+    pl.appendChild(c);
+  });
+  const sel = $("epayer"); sel.innerHTML = "";
+  people.forEach(p=>{ const o=document.createElement("option"); o.textContent=p+" paid"; o.value=p; sel.appendChild(o); });
+  if(!people.length){ const o=document.createElement("option"); o.textContent="Add people first"; sel.appendChild(o); }
+}
+$("addP").addEventListener("click", ()=>{
+  const n = $("pname").value.trim();
+  if(!n || people.includes(n) || people.length>=12) return;
+  people.push(n); $("pname").value=""; paintAll();
+});
+$("pname").addEventListener("keydown", e=>{ if(e.key==="Enter") $("addP").click(); });
+
+$("addE").addEventListener("click", ()=>{
+  const d = $("edesc").value.trim(), a = +$("eamt").value, p = $("epayer").value;
+  if(!d || !a || a<=0 || !people.includes(p)) return;
+  expenses.push({desc:d, amt:a, payer:p});
+  $("edesc").value=""; $("eamt").value=""; paintAll();
+});
+
+function computeBalances(){
+  const bal = {}; people.forEach(p=>bal[p]=0);
+  const total = expenses.reduce((s,e)=>s+e.amt,0);
+  const share = people.length ? total/people.length : 0;
+  expenses.forEach(e=>{ bal[e.payer]+=e.amt; });
+  people.forEach(p=>{ bal[p]-=share; });
+  return {bal, total, share};
+}
+function computeSettlements(bal){
+  const debt = people.filter(p=>bal[p]<-1).map(p=>({p, v:-bal[p]})).sort((a,b)=>b.v-a.v);
+  const cred = people.filter(p=>bal[p]>1).map(p=>({p, v:bal[p]})).sort((a,b)=>b.v-a.v);
+  const moves = [];
+  let i=0,j=0;
+  while(i<debt.length && j<cred.length){
+    const pay = Math.min(debt[i].v, cred[j].v);
+    moves.push({from:debt[i].p, to:cred[j].p, amt:Math.round(pay)});
+    debt[i].v-=pay; cred[j].v-=pay;
+    if(debt[i].v<1) i++; if(cred[j].v<1) j++;
+  }
+  return moves;
+}
+function paintMoney(){
+  const {bal,total,share} = computeBalances();
+  const ex = $("expenses");
+  ex.innerHTML = expenses.length ? "" : '<p class="empty">No expenses yet. Add the damage.</p>';
+  expenses.forEach((e,i)=>{
+    const d = document.createElement("div"); d.className="expense";
+    d.innerHTML = `<span>${e.desc}<div class="who">${e.payer} paid</div></span>
+      <span class="amt">₹${e.amt.toLocaleString("en-IN")} <button class="btn ghost sm" aria-label="delete">✕</button></span>`;
+    d.querySelector("button").addEventListener("click",()=>{expenses.splice(i,1);paintAll();});
+    ex.appendChild(d);
+  });
+  const bd = $("balances");
+  if(!people.length || !expenses.length){ bd.innerHTML='<p class="empty">Balances appear here.</p>'; $("settlements").innerHTML=""; return; }
+  bd.innerHTML = `<div class="b"><span>Total damage</span><b>₹${Math.round(total).toLocaleString("en-IN")}</b></div>
+    <div class="b"><span>Fair share each</span><b>₹${Math.round(share).toLocaleString("en-IN")}</b></div>`;
+  people.forEach(p=>{
+    const v = Math.round(bal[p]);
+    const d = document.createElement("div"); d.className="b";
+    d.innerHTML = `<span>${p}</span><span class="${v>=0?'pos':'neg'}">${v>=0?'gets back':'owes'} ₹${Math.abs(v).toLocaleString("en-IN")}</span>`;
+    bd.appendChild(d);
+  });
+  const moves = computeSettlements(bal);
+  $("settlements").innerHTML = moves.length
+    ? `<div class="settle">${moves.map(m=>`<b>${m.from}</b> → pays <b>₹${m.amt.toLocaleString("en-IN")}</b> → <b>${m.to}</b>`).join("<br>")}</div>`
+    : "";
+  const at = $("askTarget"); at.innerHTML="";
+  moves.forEach(m=>{
+    const o = document.createElement("option");
+    o.value = JSON.stringify(m);
+    o.textContent = `Remind ${m.from} (owes ₹${m.amt.toLocaleString("en-IN")} to ${m.to})`;
+    at.appendChild(o);
+  });
+  if(!moves.length){ const o=document.createElement("option"); o.textContent="All settled ✓"; at.appendChild(o); }
+}
+function paintAll(){ paintPeople(); paintMoney(); }
+
+document.querySelectorAll(".tone").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    tone = b.dataset.t;
+    document.querySelectorAll(".tone").forEach(x=>x.classList.toggle("on", x===b));
+  });
+});
+
+const TONE_SPECS = {
+  gentle:"warm, low-pressure, easygoing — a friend who genuinely doesn't want it to be weird",
+  petty:"excessively polite with an unmistakable edge — 'per my last message' energy, faux-cheerful, screenshot-worthy, but zero insults or profanity",
+  formal:"deadpan corporate invoice parody — reference numbers, 'as per our dinner dated', payment terms NET-3-days, absurdly official",
+  bestie:"chaotic warm best-friend energy, emojis welcome, teasing but loving"
+};
+const FALLBACKS = {
+  gentle:(m,ctx,upi)=>`Hey ${m.from}! Whenever you get a chance — ₹${m.amt} for ${ctx}. Zero rush, just clearing up the tab 🙂${upi?`\nUPI: ${upi}`:""}`,
+  petty:(m,ctx,upi)=>`Hi ${m.from}! Hope you're doing amazing 💛 Just circling back (third time's the charm!) on the ₹${m.amt} for ${ctx}. I know how busy things get — luckily UPI takes nine seconds!${upi?`\n${upi} — whenever the stars align ✨`:""}`,
+  formal:(m,ctx,upi)=>`INVOICE #FRND-001\nBill to: ${m.from}\nFor: ${ctx}\nAmount due: ₹${m.amt}\nTerms: NET 3 days\nLate fee: one (1) chai, compounding daily.${upi?`\nRemit to: ${upi}`:""}`,
+  bestie:(m,ctx,upi)=>`${m.from.toUpperCase()}. my beloved. my brother-in-biryani. the ₹${m.amt} from ${ctx} 🥺👉👈 send it and I'll pretend the thing you said on Saturday never happened${upi?`\n${upi} 💸`:""}`
+};
+
+$("craft").addEventListener("click", async ()=>{
+  const at = $("askTarget");
+  if(!at.value || at.value.startsWith("All")) return;
+  const m = JSON.parse(at.value);
+  const ctx = expenses.map(e=>e.desc).slice(0,3).join(", ") || "the group expenses";
+  const upi = $("upi").value.trim();
+  $("msgLoading").style.display="block"; $("msgOut").style.display="none";
+  $("craft").disabled = true; $("msgNote").textContent="";
+  let msg = "";
+  try{
+    const API_URL = (document.querySelector('meta[name="tp-api"]')||{}).content || "";
+    const res = await fetch(API_URL + "/lab/complete",{
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ app:"split-the-awkward", input:ctx, options:{ from:m.from, to:m.to, amount:m.amt, tone, upi } })
+    });
+    const data = await res.json();
+    msg = (data.text || "").trim();
+    if(!msg) throw new Error("empty");
+  }catch(e){
+    msg = FALLBACKS[tone](m, ctx, upi);
+    $("msgNote").textContent = "Offline template used (API unreachable) — still sendable.";
+  }
+  window._msg = msg;
+  $("msgOut").textContent = msg;
+  $("msgOut").style.display="block";
+  $("copyMsg").style.display="inline-block";
+  $("msgLoading").style.display="none";
+  $("craft").disabled = false;
+});
+
+$("copyMsg").addEventListener("click", async ()=>{
+  try{ await navigator.clipboard.writeText(window._msg); $("msgNote").textContent="Copied — paste it in WhatsApp and hit send before you overthink it."; }
+  catch(e){ $("msgNote").textContent="Copy manually from the box above."; }
+});
+
+paintAll();
+</script>
+</body>
+</html>

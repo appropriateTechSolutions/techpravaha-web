@@ -16,6 +16,7 @@ const STUDIO = [
   { to: '/lab', label: 'Lab' },
   { to: '/journal', label: 'Journal' },
   { to: '/about', label: 'About' },
+  { to: '/teardown', label: 'Free teardown' },
   { to: '/contact', label: 'Contact' },
 ];
 

@@ -16,6 +16,7 @@ import geistLatinUrl from '../node_modules/@fontsource-variable/geist/files/geis
 import { JsonLd } from './components/ui/JsonLd';
 import { organizationSchema } from './lib/schema';
 import { AnalyticsNotice } from './components/AnalyticsNotice';
+import { ChatLauncher } from './components/ChatLauncher';
 import { SiteFooter } from './components/SiteFooter';
 import { SiteHeader } from './components/SiteHeader';
 import { useTheme } from './components/ThemeToggle';
@@ -60,6 +61,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <SiteFooter />
           {/* Loads GA4 + Clarity on idle after the notice renders; never inside Reveal. */}
           <AnalyticsNotice />
+          {/* After hydration + idle; the panel is a lazy chunk loaded on first use. */}
+          <ChatLauncher />
         </LazyMotion>
         <ScrollRestoration />
         <Scripts />

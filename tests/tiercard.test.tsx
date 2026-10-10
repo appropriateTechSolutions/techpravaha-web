@@ -1,6 +1,6 @@
 import { act, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { formatINR, getTier } from '../app/lib/catalogue';
 
 // jsdom has no IntersectionObserver; this stub lets a test decide when a card is seen.
@@ -34,6 +34,12 @@ async function renderTier(tierId: string, number: string, cta?: 'whatsapp' | 'ch
     </MemoryRouter>,
   );
 }
+
+// The first import of the component graph is the slow part (seconds under parallel load). Do it once
+// here, with a generous timeout, so no test pays for it; the per-test re-imports are then cache hits.
+beforeAll(async () => {
+  await import('../app/components/TierCard');
+}, 30_000);
 
 beforeEach(() => {
   observers = [];

@@ -69,7 +69,7 @@ Test and live mode have separate keys **and separate webhooks**. Repeat steps 2 
    curl https://api.techpravaha.com/health          # {"ok":true,"version":"..."}
    npx wrangler tail                                # live logs while testing
    ```
-6. **Redeploys.** The Worker bundles `catalogue.json` at deploy time. `.github/workflows/deploy-worker.yml` redeploys it on every push to `main` that touches `catalogue.json` or `workers/**`. It needs two GitHub repo secrets (Settings > Secrets and variables > Actions): `CLOUDFLARE_API_TOKEN` (a token from the "Edit Cloudflare Workers" template, scoped to this account) and `CLOUDFLARE_ACCOUNT_ID`. Until then, run `npm run worker:deploy` on Node 22 after every price change: checkout refuses an order whose amount differs from the page, so a stale Worker blocks the sale rather than charging the wrong amount.
+6. **Redeploys.** The Worker bundles `catalogue.json` and the chat facts at deploy time; `npm run worker:deploy` regenerates the chat facts (`npm run prompt:data`) before it deploys. `.github/workflows/deploy-worker.yml` redeploys it on every push to `main` that touches `catalogue.json` or `workers/**`. It needs two GitHub repo secrets (Settings > Secrets and variables > Actions): `CLOUDFLARE_API_TOKEN` (a token from the "Edit Cloudflare Workers" template, scoped to this account) and `CLOUDFLARE_ACCOUNT_ID`. Until then, run `npm run worker:deploy` on Node 22 after every price change: checkout refuses an order whose amount differs from the page, so a stale Worker blocks the sale rather than charging the wrong amount.
 
 ### Rate limit `/orders` (WAF)
 
@@ -80,6 +80,14 @@ Every `POST /orders` creates a Razorpay order, so cap it. **Security > WAF > Rat
 - Action: Block (or Managed Challenge) for 1 minute
 
 If the plan only offers a 10 second period, use 2 requests per 10 seconds. Do **not** rate-limit `/webhooks/razorpay`: Razorpay retries from a small set of IPs and a block there delays order confirmation.
+
+### Rate limit `/chat` (Workers Rate Limiting binding)
+
+`POST /chat` (the site chatbot, a Gemini call per message) is limited inside the Worker by the `CHAT_RATE` binding in `wrangler.toml` (`[[ratelimits]]`, 12 requests per 60 seconds per IP, keyed on `CF-Connecting-IP`). Over the limit the Worker answers 429 with a friendly reply; if the binding itself errors, the message is allowed through. Nothing to create in the dashboard: `namespace_id` is a number we pick, and the binding deploys with the Worker.
+
+- **Per location and approximate.** Counters live in each Cloudflare location and are not synchronised, so a visitor whose requests reach two locations can get more than 12 a minute, and the count can lag slightly. Fine for abuse control; it is not a hard cap on Gemini spend.
+- **No KV writes.** It does not touch the KV write allowance (the orders flow is the only KV writer).
+- **Spend backstop.** Because the limit is approximate, set a budget or spend cap on the Google Cloud project that owns `GEMINI_API_KEY`.
 
 ## 3. Resend
 
@@ -105,6 +113,8 @@ Check it by hand (should append a row and print `{"ok":true}`; delete the row af
 curl -sL -H 'Content-Type: application/json' \
   -d '{"token":"<TP_ORDERS_TOKEN>","row":["test","order_test"]}' '<exec URL>'
 ```
+
+The same script and URL also take leads: the Worker's `POST /leads` sends `type: "lead"`, which lands in a "Leads" tab (created on the first lead, with its header row: Timestamp, Type, Name, Email, Phone, Message, Page, Tier, Order, URL). Orders go to the tab named "Orders", or the first tab if none has that name. Deploy the updated script (New version) before the Worker that sends leads: an older script ignores `type` and would put lead rows in the first tab. The site no longer has a leads Apps Script URL; leads reach the Sheet only through the Worker. Check a lead by hand with `"type":"lead","row":["test","contact","Test","t@example.com"]` in the body above.
 
 A wrong token prints `{"ok":false}` and appends nothing. An HTML page instead of JSON means the deployment access is not "Anyone"; the Worker treats that as a failure and alerts.
 
@@ -144,8 +154,11 @@ All alerts come from the Worker via Resend to `ALERT_EMAIL`. None contain custom
 | `Order <id>: amount mismatch` | Captured amount differs from the catalogue amount stored with the order | Check the dashboard; refund or collect the difference |
 | `Order <id>: second payment captured` | The customer paid the same order twice | Refund the second payment |
 | `Order <id>: paid, side effects not run` | The payment was recorded (payment index written) but processing stopped (KV error) before the Sheet row and receipt. A retry would be deduplicated, so nothing will redo them | Add the row and send the receipt by hand |
-| `Order <id>: store error, Razorpay will retry` | KV failed before the payment was recorded; the webhook answered 500, so Razorpay retries and a successful retry adds the row and sends the receipt itself | Wait about an hour; act only if no Sheet row or receipt appears for the order |
+| `Order <id>: store error, Razorpay will retry` | KV failed before the payment was recorded; the webhook answered 500, so Razorpay retries. A retry either runs the side effects (Sheet row and receipt) or sends a "check receipt and Sheet row" alert | Act on that alert, or if nothing appears within about an hour, check the Sheet and the sent mail and send whatever is missing |
 | `Order <id>: check receipt and Sheet row` | A redelivery found the order paid but the payment not indexed (an earlier delivery stopped halfway, or two raced) | Check the Sheet and the sent mail; send whatever is missing |
+| `Lead sheet append failed` | A contact or teardown lead was accepted (the visitor saw "sent") but the Leads tab append failed. The lead is not stored anywhere else: only the Telegram lead ping (name, email, page, and the site URL for a teardown) is left, and only if Telegram is configured. The message and phone are lost | Find the Telegram ping and ask the visitor again for what they sent |
+
+Lead pings need Telegram (`TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`). Without it, lead pings are skipped, never emailed: `/leads` is open to anyone, and an email per lead would let anyone drain the Resend quota that receipts and these alerts depend on. The Leads tab is the record of every lead. Order pings fall back to `ALERT_EMAIL` when Telegram is unset.
 
 If Resend itself is down the alert cannot be sent; it is logged instead (`npx wrangler tail`, or Workers Logs in the dashboard, which keeps logs only once Workers Logs is turned on). A KV outage before the payment is recorded makes the webhook answer 500 so Razorpay retries later.
 

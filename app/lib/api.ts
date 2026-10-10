@@ -65,10 +65,20 @@ export const ORDER_ID_RE = /^order_[A-Za-z0-9]{6,40}$/;
  * fetch + JSON body under one timeout: the timer is cleared only after the body has
  * been read, so a server that sends headers and then stalls still times out.
  * `body` is null when the response has no JSON. Throws ApiError(0) on no response.
+ * An `init.signal` from the caller aborts the request too (same ApiError(0)).
  */
-async function request(path: string, init: RequestInit, timeoutMs: number): Promise<{ res: Response; body: unknown }> {
+export async function request(
+  path: string,
+  init: RequestInit,
+  timeoutMs: number,
+): Promise<{ res: Response; body: unknown }> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  const outer = init.signal;
+  if (outer) {
+    if (outer.aborted) ctrl.abort();
+    else outer.addEventListener('abort', () => ctrl.abort(), { once: true });
+  }
   try {
     const res = await fetch(`${apiUrl()}${path}`, { ...init, signal: ctrl.signal });
     let body: unknown = null;

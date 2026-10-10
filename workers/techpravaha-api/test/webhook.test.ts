@@ -69,7 +69,10 @@ describe('POST /webhooks/razorpay', () => {
 
   const sheetCalls = () => sent.filter((s) => s.url === SHEET_URL);
   const receipts = () => sent.filter((s) => s.url === 'https://api.resend.com/emails' && s.body.to === CUSTOMER_EMAIL);
-  const alerts = () => sent.filter((s) => s.url === 'https://api.resend.com/emails' && s.body.to === ALERT_TO);
+  // Failure alerts only; the "New order" ping (afterPaid's last step, email when Telegram is unset) is pings().
+  const toAlertEmail = () => sent.filter((s) => s.url === 'https://api.resend.com/emails' && s.body.to === ALERT_TO);
+  const alerts = () => toAlertEmail().filter((s) => s.body.subject !== 'New order');
+  const pings = () => toAlertEmail().filter((s) => s.body.subject === 'New order');
 
   async function deliver(raw: string, signature: string | null = sign(raw)): Promise<Response> {
     const headers: Record<string, string> = { 'Content-Type': 'application/json', 'X-Razorpay-Event-Id': 'evt_123' };
@@ -165,6 +168,9 @@ describe('POST /webhooks/razorpay', () => {
     expect(receipts()).toHaveLength(1);
     expect(receipts()[0]!.body.subject).toBe(`Your Tech Pravaha order ${ORDER_ID}`);
     expect(alerts()).toHaveLength(0);
+    expect(pings().map((p) => p.body.text)).toEqual([
+      `Order ${ORDER_ID} paid: Websites & landing pages · Launch, ₹41,300 (Asha Rao)`,
+    ]);
   });
 
   it('replay of the same payload: 200 duplicate, no second Sheet or Resend call, no KV writes', async () => {
@@ -364,9 +370,9 @@ describe('POST /webhooks/razorpay', () => {
     };
     const res = await deliver(event('payment.captured'));
     expect(res.status).toBe(500);
-    // Nothing is indexed, so the retry will run the side effects: the alert says so and asks for no manual work yet.
+    // Nothing is indexed, so a retry recovers: the alert says what the retry will do and when to act.
     expect(alerts().map((a) => a.body.subject)).toEqual([`Order ${ORDER_ID}: store error, Razorpay will retry`]);
-    expect(String(alerts()[0]!.body.text)).toContain('act only if no Sheet row or receipt appears');
+    expect(String(alerts()[0]!.body.text)).toContain('act on that alert, or check by hand if nothing appears within about an hour');
     expect(sheetCalls()).toHaveLength(0);
     expect(receipts()).toHaveLength(0);
 

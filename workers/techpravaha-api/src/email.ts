@@ -1,5 +1,6 @@
 import { orderAmounts, splitTotal } from './catalogue';
 import type { Env } from './env';
+import { inr } from './format';
 import type { OrderRecord } from './orders';
 import { globalFetch, UPSTREAM_TIMEOUT_MS, UpstreamError } from './upstream';
 
@@ -18,7 +19,6 @@ export function escapeHtml(s: string): string {
     .replace(/'/g, '&#39;');
 }
 
-const inr = (rupees: number) => `₹${new Intl.NumberFormat('en-IN').format(rupees)}`;
 
 /** BOOKING_URL is used only when it is an absolute https link; anything else falls back to the sentence. */
 function bookingUrl(env: Pick<Env, 'BOOKING_URL'>): string | null {

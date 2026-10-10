@@ -135,13 +135,54 @@ describe('contact form', () => {
     await screen.findByText('Thanks. We reply within one working day.');
     // Trailing slash from Cloudflare Pages is normalised away.
     expect(submitLeadMock).toHaveBeenCalledWith(
-      expect.objectContaining({ tier: 'websites-launch', page: '/contact' }),
+      expect.objectContaining({
+        type: 'contact',
+        order: 'order_TEST1234567890',
+        tier: 'websites-launch',
+        page: '/contact',
+      }),
     );
   });
 
   it('ignores a malformed ?order=', () => {
     renderAt('/contact?order=%3Cb%3Ehi');
     expect((screen.getByLabelText(/^message/i) as HTMLTextAreaElement).value).toBe('');
+  });
+
+  it.each([
+    ['a one-character name', { name: 'A', email: 'a@example.com', message: 'Hi' }, 'Add your name.'],
+    ['a name over 80 characters', { name: 'x'.repeat(81), email: 'a@example.com', message: 'Hi' }, 'Keep the name under 80 characters.'],
+    ["an apostrophe email the Worker refuses", { name: 'Asha', email: "o'brien@example.com", message: 'Hi' }, 'That email does not look right.'],
+    ['a hidden character in the message', { name: 'Asha', email: 'a@example.com', message: 'Hi\u202ethere' }, 'That message does not look right. It has a hidden character, probably from a paste. Retype it.'],
+    ['letters in the phone', { name: 'Asha', email: 'a@example.com', message: 'Hi', phone: '98765 x3210' }, 'That phone number does not look right.'],
+  ])('refuses %s before sending', (_label, values, error) => {
+    renderAt('/contact');
+    for (const [k, v] of Object.entries(values)) fill(new RegExp(`^${k}`, 'i'), v);
+    submit();
+    expect(screen.getByText(error)).toBeInTheDocument();
+    expect(submitLeadMock).not.toHaveBeenCalled();
+  });
+
+  it('caps the inputs at the Worker limits and counts the message from 1,800 characters', () => {
+    renderAt('/contact');
+    expect(screen.getByLabelText(/^name/i)).toHaveAttribute('maxlength', '80');
+    expect(screen.getByLabelText(/^email/i)).toHaveAttribute('maxlength', '254');
+    expect(screen.getByLabelText(/^message/i)).toHaveAttribute('maxlength', '2000');
+    expect(screen.queryByText(/\/ 2,000/)).toBeNull();
+    fill(/^message/i, 'x'.repeat(1800));
+    expect(screen.getByText('1,800 / 2,000')).toBeInTheDocument();
+  });
+
+  it('accepts a foreign phone number and a message with line breaks', async () => {
+    submitLeadMock.mockResolvedValue({ ok: true });
+    renderAt('/contact');
+    fill(/^name/i, 'Asha');
+    fill(/^email/i, 'asha@example.com');
+    fill(/^phone/i, '+44 20 7946 0958');
+    fill(/^message/i, 'Line one\nLine two');
+    submit();
+    await screen.findByText('Thanks. We reply within one working day.');
+    expect(submitLeadMock).toHaveBeenCalledWith(expect.objectContaining({ phone: '+44 20 7946 0958' }));
   });
 
   it('shows the thank-you state when the lead is sent', async () => {
@@ -164,6 +205,8 @@ describe('contact form', () => {
         type: 'contact',
       }),
     );
+    // No ?order= means no order field at all.
+    expect(submitLeadMock.mock.calls[0]![0]).not.toHaveProperty('order');
   });
 
   it('offers WhatsApp when the lead fails to send', async () => {
@@ -178,46 +221,16 @@ describe('contact form', () => {
     const fallback = screen.getByRole('link', { name: /WhatsApp us instead/ });
     expect(fallback.getAttribute('href')).toMatch(/^https:\/\/wa\.me\/919800000000\?text=/);
   });
-});
 
-describe('submitLead', () => {
-  const lead = {
-    name: 'Asha',
-    email: 'asha@example.com',
-    message: 'Hello',
-    page: '/contact',
-    type: 'contact' as const,
-  };
+  it('falls back, never stuck on sending, even if submitLead throws', async () => {
+    submitLeadMock.mockRejectedValue(new Error('boom'));
+    renderAt('/contact');
+    fill(/^name/i, 'Asha');
+    fill(/^email/i, 'asha@example.com');
+    fill(/^message/i, 'A site for my bakery.');
+    submit();
 
-  it('resolves ok:false without a network call while the script URL is unset or a placeholder', async () => {
-    const { submitLead: real } = await vi.importActual<typeof import('../app/services/leads')>(
-      '../app/services/leads',
-    );
-    const fetchMock = vi.fn();
-    vi.stubGlobal('fetch', fetchMock);
-
-    vi.stubEnv('VITE_LEADS_SCRIPT_URL', '');
-    expect(await real(lead)).toEqual({ ok: false });
-    vi.stubEnv('VITE_LEADS_SCRIPT_URL', 'https://script.google.com/macros/s/REPLACE/exec');
-    expect(await real(lead)).toEqual({ ok: false });
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it('POSTs the lead as JSON in no-cors mode when the URL is set', async () => {
-    const { submitLead: real } = await vi.importActual<typeof import('../app/services/leads')>(
-      '../app/services/leads',
-    );
-    const fetchMock = vi.fn().mockResolvedValue(new Response(null));
-    vi.stubGlobal('fetch', fetchMock);
-    vi.stubEnv('VITE_LEADS_SCRIPT_URL', 'https://script.google.com/macros/s/abc123/exec');
-
-    expect(await real(lead)).toEqual({ ok: true });
-    const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('https://script.google.com/macros/s/abc123/exec');
-    expect(init).toMatchObject({ method: 'POST', mode: 'no-cors' });
-    expect(JSON.parse(init.body)).toEqual(lead);
-
-    fetchMock.mockRejectedValueOnce(new TypeError('offline'));
-    expect(await real(lead)).toEqual({ ok: false });
+    expect(await screen.findByText(/Message didn't send\./)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /WhatsApp us instead/ })).toBeInTheDocument();
   });
 });

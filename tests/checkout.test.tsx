@@ -13,7 +13,7 @@ vi.mock('../app/lib/razorpay', async (importOriginal) => {
 import { track } from '../app/lib/analytics';
 import { loadCheckout, type RazorpayOptions } from '../app/lib/razorpay';
 import CheckoutPage from '../app/routes/checkout.$tierId';
-import { chargedNow, formatINR, getTier, withGst } from '../app/lib/catalogue';
+import { chargedNow, formatINR, getTier, withGst, type Tier } from '../app/lib/catalogue';
 
 const trackMock = vi.mocked(track);
 const loadMock = vi.mocked(loadCheckout);
@@ -36,9 +36,16 @@ class FakeRazorpay {
   }
 }
 
+// Every amount below is derived from catalogue.json, so a price edit needs no test change.
+const LAUNCH = getTier('websites-launch')!.tier as Tier & { price: number };
+const GROWTH = getTier('websites-growth')!.tier as Tier & { price: number };
+const LAUNCH_TOTAL = withGst(LAUNCH.price);
+const LAUNCH_PAISE = chargedNow(LAUNCH) * 100;
+const GROWTH_PAISE = chargedNow(GROWTH) * 100;
+
 const ORDER = {
   orderId: 'order_TEST1234567890',
-  amount: 4130000,
+  amount: LAUNCH_PAISE,
   currency: 'INR',
   keyId: 'rzp_test_abc123',
   tier: { label: 'Launch' },
@@ -118,10 +125,10 @@ describe('checkout page', () => {
   it('shows the Launch total with GST for websites-launch', () => {
     renderAt('/checkout/websites-launch');
     const summary = screen.getByRole('complementary', { name: /order summary/i });
-    expect(within(summary).getByText('₹35,000')).toBeInTheDocument();
-    expect(within(summary).getByText('₹6,300')).toBeInTheDocument();
-    expect(within(summary).getAllByText('₹41,300').length).toBeGreaterThan(0);
-    expect(payButton()).toHaveTextContent('Pay ₹41,300');
+    expect(within(summary).getByText(formatINR(LAUNCH.price))).toBeInTheDocument();
+    expect(within(summary).getByText(formatINR(LAUNCH_TOTAL - LAUNCH.price))).toBeInTheDocument();
+    expect(within(summary).getAllByText(formatINR(LAUNCH_TOTAL)).length).toBeGreaterThan(0);
+    expect(payButton()).toHaveTextContent(`Pay ${formatINR(LAUNCH_TOTAL)}`);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Websites & landing pages · Launch');
   });
 
@@ -129,7 +136,7 @@ describe('checkout page', () => {
     const { tier } = getTier('websites-growth')!;
     const total = withGst(tier.price!);
     const deposit = chargedNow(tier as typeof tier & { price: number });
-    expect(deposit).toBe(56050);
+    expect(deposit).toBe(Math.round(total / 2));
     renderAt('/checkout/websites-growth');
     const summary = screen.getByRole('complementary', { name: /order summary/i });
     expect(within(summary).getByText(formatINR(total))).toBeInTheDocument();
@@ -142,21 +149,25 @@ describe('checkout page', () => {
 
   it('shows a Launch tier as charged in full, with no deposit or balance line', () => {
     renderAt('/checkout/websites-launch');
-    expect(screen.getByText(/Charged now/)).toHaveTextContent(/^Charged now: ₹41,300$/);
+    expect(screen.getByText(/Charged now/).textContent).toBe(`Charged now: ${formatINR(LAUNCH_TOTAL)}`);
     expect(screen.queryByText(/deposit/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Balance at launch/)).not.toBeInTheDocument();
   });
 
   it('refuses to open Razorpay when the Worker amount differs from the page (stale Worker)', async () => {
     // e.g. the catalogue price was lowered and merged, but the Worker was not redeployed.
-    fetchMock.mockImplementation(() => Promise.resolve(json({ ...ORDER, amount: 4130000 + 100 })));
+    fetchMock.mockImplementation(() => Promise.resolve(json({ ...ORDER, amount: LAUNCH_PAISE + 100 })));
     renderAt('/checkout/websites-launch');
     fillValid();
     fireEvent.click(payButton());
 
     const alert = await screen.findByRole('alert');
     expect(alert).toHaveTextContent('Checkout did not open. Nothing was charged.');
-    expect(alert).toHaveTextContent('Please message us; nothing was charged.');
+    expect(alert).toHaveTextContent(
+      'This price was just updated on our side. Message us on WhatsApp and we will send you a payment link.',
+    );
+    expect(alert.textContent!.match(/nothing was charged/gi)).toHaveLength(1);
+    expect(alert).not.toHaveTextContent('Try again');
     expect(within(alert).getByRole('link', { name: /WhatsApp/ })).toBeInTheDocument();
     expect(trackMock).toHaveBeenCalledWith('checkout_mismatch', { tier: 'websites-launch' });
     expect(loadMock).not.toHaveBeenCalled();
@@ -174,20 +185,20 @@ describe('checkout page', () => {
     renderAt('/checkout/websites-launch');
     fillValid();
     fireEvent.click(payButton());
-    expect(await screen.findByRole('alert')).toHaveTextContent('Please message us; nothing was charged.');
+    expect(await screen.findByRole('alert')).toHaveTextContent('This price was just updated on our side.');
     expect(trackMock).toHaveBeenCalledWith('checkout_mismatch', { tier: 'websites-launch' });
     expect(opened).toHaveLength(0);
   });
 
   it('opens Razorpay for a Growth tier when the Worker charges the 50% deposit', async () => {
     fetchMock.mockImplementation(() =>
-      Promise.resolve(json({ ...ORDER, amount: 5605000, tier: { label: 'Growth' } })),
+      Promise.resolve(json({ ...ORDER, amount: GROWTH_PAISE, tier: { label: 'Growth' } })),
     );
     renderAt('/checkout/websites-growth');
     fillValid();
     fireEvent.click(payButton());
     await vi.waitFor(() => expect(opened).toHaveLength(1));
-    expect(opened[0].amount).toBe(5605000);
+    expect(opened[0].amount).toBe(GROWTH_PAISE);
     expect(trackMock).not.toHaveBeenCalledWith('checkout_mismatch', expect.anything());
   });
 
@@ -196,7 +207,9 @@ describe('checkout page', () => {
     renderAt('/checkout/websites-launch');
     fillValid();
     fireEvent.click(payButton());
-    expect(await screen.findByRole('alert')).not.toHaveTextContent('Please message us');
+    const alert = await screen.findByRole('alert');
+    expect(alert).not.toHaveTextContent('This price was just updated');
+    expect(alert).toHaveTextContent('Try again, or message us on WhatsApp');
   });
 
   it('throws a 404 for a quote-only tier', () => {
@@ -266,7 +279,7 @@ describe('checkout page', () => {
     const options = opened[0];
     expect(options).toMatchObject({
       key: 'rzp_test_abc123',
-      amount: 4130000,
+      amount: LAUNCH_PAISE,
       currency: 'INR',
       order_id: 'order_TEST1234567890',
       name: 'Tech Pravaha',
@@ -291,7 +304,7 @@ describe('checkout page', () => {
     expect(payButton()).toHaveAttribute('aria-disabled', 'true');
     act(() => opened[0].modal?.ondismiss?.());
     expect(payButton()).not.toHaveAttribute('aria-disabled');
-    expect(payButton()).toHaveTextContent('Pay ₹41,300');
+    expect(payButton()).toHaveTextContent(`Pay ${formatINR(LAUNCH_TOTAL)}`);
     expect(document.activeElement).toBe(payButton());
   });
 
@@ -426,7 +439,7 @@ describe('checkout page', () => {
     expect(screen.getByText('Online payment is not switched on yet.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /WhatsApp/ })).toBeInTheDocument();
     // The total stays on the page.
-    expect(screen.getAllByText('₹41,300').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(formatINR(LAUNCH_TOTAL)).length).toBeGreaterThan(0);
   });
 
   it('treats an unset key id as switched off', () => {

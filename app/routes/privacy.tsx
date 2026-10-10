@@ -7,7 +7,7 @@ export function meta(): Route.MetaDescriptors {
   return pageMeta({
     title: 'Privacy policy',
     description:
-      'What Tech Pravaha collects through the contact form, WhatsApp, payments and analytics (Google Analytics 4 and Microsoft Clarity), where it is kept, and how to have it deleted.',
+      'What Tech Pravaha collects through its forms, the chat assistant, the lab apps, WhatsApp, payments and analytics (Google Analytics 4 and Microsoft Clarity), where it is kept, and how to have it deleted.',
     path: '/privacy',
   });
 }
@@ -23,21 +23,54 @@ const CLAUSES: Clause[] = [
     ),
   },
   {
-    title: 'What the contact form collects',
+    title: 'What our forms collect',
     body: (
       <>
-        <p>When you send the contact form, we receive:</p>
+        <p>When you send the contact form or the free teardown form, we receive:</p>
         <ul>
           <li>your name and email address;</li>
           <li>your phone number, if you add it;</li>
           <li>your message;</li>
-          <li>the page you sent it from, and the package you asked about, if any.</li>
+          <li>your site address, if you ask for a teardown;</li>
+          <li>the page you sent it from, and the package or order you asked about, if any.</li>
         </ul>
         <p>
           This goes into a private Google Sheet that only Tech Pravaha can open. We use it to reply to you,
           quote for your project and follow up on it.
         </p>
+        <p>
+          Each message also triggers a Telegram message to the founder that carries your name and email,
+          the page you sent it from and, for a teardown, your site address. Telegram, Cloudflare (which runs
+          the service that receives the form) and Google (the Sheet) process it for us.
+        </p>
       </>
+    ),
+  },
+  {
+    title: 'Chat assistant',
+    body: (
+      <>
+        <p>
+          The chat assistant on the site is an AI. When you send it a message, your message and the earlier
+          messages in that conversation go through our Cloudflare Worker to Google's Gemini API, which
+          generates the reply. We do not store the conversation.
+        </p>
+        <p>
+          The transcript stays in your browser's local storage until you clear it, with "Clear chat" in the
+          chat or by clearing your browser's site data. Do not share passwords, card numbers or other
+          sensitive details in the chat.
+        </p>
+      </>
+    ),
+  },
+  {
+    title: 'Lab apps',
+    body: (
+      <p>
+        Text you enter in the three AI lab apps (Landlord Translator, Excuse Engine and Split the Awkward)
+        goes through our Cloudflare Worker to Anthropic's API to generate a result, and is not stored by us.
+        The lab apps load their fonts from Google Fonts, so Google receives that request.
+      </p>
     ),
   },
   {
@@ -64,6 +97,10 @@ const CLAUSES: Clause[] = [
           <li>Razorpay processes the payment.</li>
           <li>Resend sends your receipt email.</li>
           <li>
+            Each paid order triggers a Telegram message to the founder with your name, the package and the
+            amount (or an email, if Telegram is not set up).
+          </li>
+          <li>
             Cloudflare stores the order record in Workers KV. We keep it until you ask us to delete it.
           </li>
           <li>A copy of each paid order goes into a private Google Sheet that only Tech Pravaha can open.</li>
@@ -84,13 +121,14 @@ const CLAUSES: Clause[] = [
           </li>
           <li>
             Microsoft Clarity makes session recordings: how you scroll, move and click on each page. It
-            does not record what you type into forms.
+            does not record what you type into forms, and the chat conversation is masked in recordings.
           </li>
         </ul>
         <p>
           Both tools set cookies in your browser. You can block or delete cookies in your browser settings
-          and the site still works. We also store your light or dark theme choice in your browser; it never
-          leaves your device.
+          and the site still works. We also store your light or dark theme choice in your browser; that
+          choice never leaves your device. The chat transcript is stored in your browser too, and is sent with
+          each new chat message (see Chat assistant).
         </p>
         <p>
           On your first visit a one-line notice at the bottom of the page names these two tools, and they load
@@ -105,7 +143,7 @@ const CLAUSES: Clause[] = [
       <p>
         Cloudflare hosts the site and keeps request logs, such as your IP address, browser type and the page
         you asked for, to serve and protect it. hello@techpravaha.com is a Google Workspace mailbox, so the
-        emails you send us, and the copy of each form enquiry we receive by email, are held by Google.
+        emails you send us are held by Google.
       </p>
     ),
   },
@@ -113,9 +151,10 @@ const CLAUSES: Clause[] = [
     title: 'What we do not do',
     body: (
       <p>
-        We do not sell your data, rent it or share it for advertising. It goes only to the services named
-        on this page, which we use to run the site and our work, or to a government authority when Indian
-        law requires it.
+        We do not sell your data, rent it or share it for advertising. We send it only to the services named
+        on this page (Cloudflare, Google, Microsoft, Anthropic, Razorpay, Resend, Telegram and Meta for
+        WhatsApp), which we use to run the site and our work, or to a government authority when Indian law
+        requires it.
       </p>
     ),
   },
