@@ -15,6 +15,8 @@ export default [
   route('terms', 'routes/terms.tsx'),
   route('privacy', 'routes/privacy.tsx'),
   route('refunds', 'routes/refunds.tsx'),
+  route('checkout/:tierId', 'routes/checkout.$tierId.tsx'),
+  route('thanks', 'routes/thanks.tsx'),
   route('styleguide', 'routes/styleguide.tsx'),
   route('*', 'routes/catchall.tsx'),
 ] satisfies RouteConfig;

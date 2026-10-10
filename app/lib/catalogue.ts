@@ -14,6 +14,8 @@ export interface Tier {
   includes: string[];
   terms?: string;
   payment?: string;
+  /** Share of the GST-inclusive total charged at checkout, an integer from 1 to 100. Absent means 100. */
+  depositPct?: number;
 }
 
 export interface Service {
@@ -88,6 +90,12 @@ export function validateCatalogue(c: unknown): Catalogue {
       if (t.from !== undefined && !isMoney(t.from)) fail(`tier ${tid} from must be a positive integer`);
       if (t.buyable && t.price === null) fail(`tier ${tid} buyable without price`);
       if (t.price === null && t.from === undefined) fail(`tier ${tid} needs a price or a from`);
+      if (
+        t.depositPct !== undefined &&
+        !(typeof t.depositPct === 'number' && Number.isInteger(t.depositPct) && t.depositPct >= 1 && t.depositPct <= 100)
+      ) {
+        fail(`tier ${tid} depositPct must be an integer from 1 to 100`);
+      }
       if (!Array.isArray(t.includes) || t.includes.length === 0 || !t.includes.every(isStr)) {
         fail(`tier ${tid} includes must be a non-empty array of strings`);
       }
@@ -129,6 +137,19 @@ export function formatINR(n: number): string {
 
 export function withGst(n: number, gst: number = catalogue.gst): number {
   return Math.round(n * (1 + gst));
+}
+
+/** Share of the total charged at checkout, as a fraction: 1 for full payment, 0.5 for a 50% deposit. */
+export function depositFor(tier: Pick<Tier, 'depositPct'>): number {
+  return (tier.depositPct ?? 100) / 100;
+}
+
+/**
+ * Rupees charged at checkout, GST included, in whole rupees. The Worker computes the same number
+ * (workers/techpravaha-api/src/catalogue.ts); CheckoutForm refuses an order whose amount differs.
+ */
+export function chargedNow(tier: Pick<Tier, 'depositPct'> & { price: number }): number {
+  return Math.round((withGst(tier.price) * (tier.depositPct ?? 100)) / 100);
 }
 
 export function tierFromPrice(t: Tier): number | null {

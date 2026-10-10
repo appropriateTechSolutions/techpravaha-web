@@ -76,7 +76,7 @@ export default function ServicePage() {
       >
         <div className="grid gap-6 lg:grid-cols-3 [&_article]:scroll-mt-24">
           {service.tiers.map((tier) => (
-            <TierCard key={tier.id} service={service} tier={tier} cta="whatsapp" />
+            <TierCard key={tier.id} service={service} tier={tier} />
           ))}
         </div>
         <p className="label-mono mt-8 leading-relaxed">

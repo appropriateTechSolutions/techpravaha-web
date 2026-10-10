@@ -118,6 +118,32 @@ describe('contact form', () => {
     );
   });
 
+  it('prefills the order line from ?order= and keeps the tier alongside', async () => {
+    submitLeadMock.mockResolvedValue({ ok: true });
+    renderAt('/contact/?order=order_TEST1234567890&tier=websites-launch');
+    const message = screen.getByLabelText(/^message/i) as HTMLTextAreaElement;
+    expect(message.value).toBe('Order order_TEST1234567890: here are my details and references.');
+    // The page's WhatsApp button speaks for a paid order, not a quote request.
+    const wa = screen.getAllByRole('link', { name: /whatsapp/i })[0];
+    expect(wa.getAttribute('href')).toContain(
+      encodeURIComponent('Hi Tech Pravaha, order order_TEST1234567890: here are my details and references.'),
+    );
+
+    fill(/^name/i, 'Asha');
+    fill(/^email/i, 'asha@example.com');
+    submit();
+    await screen.findByText('Thanks. We reply within one working day.');
+    // Trailing slash from Cloudflare Pages is normalised away.
+    expect(submitLeadMock).toHaveBeenCalledWith(
+      expect.objectContaining({ tier: 'websites-launch', page: '/contact' }),
+    );
+  });
+
+  it('ignores a malformed ?order=', () => {
+    renderAt('/contact?order=%3Cb%3Ehi');
+    expect((screen.getByLabelText(/^message/i) as HTMLTextAreaElement).value).toBe('');
+  });
+
   it('shows the thank-you state when the lead is sent', async () => {
     submitLeadMock.mockResolvedValue({ ok: true });
     renderAt('/contact?tier=websites-launch');

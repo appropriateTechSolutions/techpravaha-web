@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - All of phase 1's Global Constraints apply (tokens only, no em-dashes, `m.*`, catalogue is the price source, scripts use fs).
-- The amount charged is computed in the Worker from `catalogue.json` (`withGst(tier.price)` in paise); the client sends only `tierId` + customer fields.
+- The amount charged is computed in the Worker from `catalogue.json` (`withGst(tier.price)` × `depositPct`/100, in paise; Growth tiers carry `depositPct: 50` per spec §4); the client sends only `tierId` + customer fields.
 - Secrets live only in Worker secrets (`wrangler secret put`): `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`, `RESEND_API_KEY`, `SHEETS_WEBHOOK_URL`, `SHEETS_WEBHOOK_TOKEN`. `.env.example` and `workers/techpravaha-api/.dev.vars.example` carry dummies. The site needs only `VITE_API_URL` (default `https://api.techpravaha.com`) and `VITE_RAZORPAY_KEY_ID` (public key id).
 - Webhook handling is idempotent on `payment.entity.id`; signature failures return 400 and log nothing sensitive; Sheet/email failures never cause a non-2xx to Razorpay after the signature is verified (log + alert email instead), so Razorpay does not retry forever.
 - The `/thanks` page never claims "confirmed" before `GET /orders/:id/status` returns `paid`; after 30 s of polling it says the receipt is on its way.
@@ -139,8 +139,26 @@ export function loadCheckout(): Promise<RazorpayCtor>;  // injects https://check
 
 ## Morning notes for Yogesh (phase 2)
 
-- Razorpay: create account/KYC, copy test keys → `wrangler secret put RAZORPAY_KEY_ID/SECRET/WEBHOOK_SECRET`; set `VITE_RAZORPAY_KEY_ID` in Pages env.
+- Razorpay: create account/KYC, copy test keys → `wrangler secret put RAZORPAY_KEY_ID/SECRET/WEBHOOK_SECRET`; set the test `VITE_RAZORPAY_KEY_ID` in the Pages **Preview** env only (the live key goes into Production after KYC; see the go-live order).
 - Resend: domain techpravaha.com verified; `RESEND_API_KEY`.
 - Apps Script: deploy `scripts/google-apps-script-orders.js` against a new "TP Orders" sheet; set `SHEETS_WEBHOOK_URL` + `SHEETS_WEBHOOK_TOKEN`.
 - Cloudflare: create KV namespace `techpravaha-orders`, paste ids into `wrangler.toml`; `wrangler deploy`; route `api.techpravaha.com`.
 - Decide `BOOKING_URL` (Google Calendar appointment schedule) for the receipt email and the site.
+- Worker toolchain: wrangler 4.149 needs Node >= 22 (root site runs on Node 20); use `node@22` for `npm run worker:dev`/deploy. Pin TypeScript ^6 in the Worker if you want it to match the root.
+- Growth tiers: the 50% deposit is now implemented. The four buyable Growth tiers carry `"depositPct": 50` in `catalogue.json`; checkout charges half the GST-inclusive total and shows "Charged now: ₹X (50% deposit)" and "Balance at launch: ₹Y"; the receipt and the Orders Sheet carry the deposit and the balance due at launch. The balance is invoiced by hand at launch. If you prefer full payment, set `depositPct` to 100 (or remove it) and change the "50% at checkout, 50% at launch" copy (catalogue `payment` lines, Terms, Refunds, the pricing FAQ, the service FAQs) in the same commit.
+- Worker auto-deploy: `.github/workflows/deploy-worker.yml` redeploys the Worker when `catalogue.json` or `workers/**` changes on `main`. Add the GitHub repo secrets `CLOUDFLARE_API_TOKEN` ("Edit Cloudflare Workers" template) and `CLOUDFLARE_ACCOUNT_ID`, and do the first deploy by hand once the KV ids are in `wrangler.toml` (the workflow fails until then). Until the secrets exist, run `npm run worker:deploy` on Node 22 after every price edit; checkout refuses an order whose amount differs from the page.
+- Orders Sheet: two columns at the end, "Deposit" and "Balance due at launch" (17 in total; see the Apps Script header).
+- Online payment stays off until `VITE_RAZORPAY_KEY_ID` is set (not the `rzp_test_XXXX` placeholder) in the Pages env: `/checkout/*` shows the price, a disabled form and "Online payment is not switched on yet." with WhatsApp. Set `VITE_API_URL` too if the Worker is not on `https://api.techpravaha.com`.
+
+### Go-live order (revised after the phase 2 final review)
+
+1. Razorpay, test mode: test keys, the test webhook (`payment.captured`, its own secret), auto-capture on, and the account's registered website includes `techpravaha.com`. If the account is shared with ATS, expect a "Payment for unknown order" alert for every ATS payment (webhooks are account-wide).
+2. Resend: verify `techpravaha.com`, create the sending key (`RESEND_API_KEY`).
+3. Apps Script: deploy the orders script against "TP Orders" (17 headers), copy the `/exec` URL and the token.
+4. Cloudflare: create the KV namespaces and paste the ids into `wrangler.toml`; `wrangler secret put` the six secrets with the **test** keys; turn on Workers Logs; `npm run worker:deploy` on Node 22; route `api.techpravaha.com/*`; the WAF rate limit on `POST /orders`; confirm the Workers plan (Free allows 1,000 KV writes a day).
+5. Growth decision: the 50% deposit is implemented; keep it, or set `depositPct` to 100 and change the copy (see the Growth note above).
+6. Walkthrough on a Pages preview: `VITE_RAZORPAY_KEY_ID=rzp_test_...` in the Pages **Preview** environment only, the preview origin added to `ALLOWED_ORIGINS`. Pay by card, by UPI, and once after closing the Razorpay window; then remove the preview origin and delete the test rows.
+7. After KYC: live keys and the live webhook secret on the Worker (redeploy), then the ₹1 Payment Link check.
+8. Production Pages environment with `VITE_RAZORPAY_KEY_ID=rzp_live_...`, then redeploy the site.
+9. Optional: buy the cheapest tier for real and refund it. Then announce.
+- GST on advances: the Orders Sheet shows full-order Price/GST/Total; the GST collected on a 50% deposit (e.g. ₹8,550 of ₹56,050 on Websites Growth) is not a separate column. Ask the CA whether receipt vouchers need it; add a column if so.

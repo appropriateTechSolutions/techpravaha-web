@@ -11,8 +11,8 @@ import { Pill } from './ui/Pill';
 interface TierCardProps {
   service: Service;
   tier: Tier;
-  /** Phase 1 sells over WhatsApp; phase 2 switches buyable tiers to checkout. */
-  cta: 'whatsapp' | 'checkout';
+  /** Buyable tiers go to on-site checkout by default; 'whatsapp' keeps the phase 1 prefilled message. */
+  cta?: 'whatsapp' | 'checkout';
 }
 
 const GST_NOTE = `+${Math.round(catalogue.gst * 100)}% GST`;
@@ -23,7 +23,7 @@ function duration(tier: Tier): string | null {
   return null;
 }
 
-function TierCta({ service, tier, cta }: TierCardProps) {
+function TierCta({ service, tier, cta = 'checkout' }: TierCardProps) {
   const page = pagePath(useLocation().pathname);
   const quote = `/contact?tier=${tier.id}`;
 
@@ -39,7 +39,11 @@ function TierCta({ service, tier, cta }: TierCardProps) {
 
   if (cta === 'checkout') {
     return (
-      <Button to={`/checkout/${tier.id}`} className="w-full">
+      <Button
+        to={`/checkout/${tier.id}/`}
+        onClick={() => track('begin_checkout', { tier: tier.id, from: 'tier_card' })}
+        className="w-full"
+      >
         {label}
         <ArrowUpRight size={16} weight="bold" aria-hidden="true" />
       </Button>

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   catalogue,
+  chargedNow,
+  depositFor,
   formatINR,
   getService,
   getTier,
@@ -108,6 +110,19 @@ describe('validateCatalogue', () => {
     expect(() => validateCatalogue(c)).toThrow(/catalogue: tier .* includes/);
   });
 
+  it('throws on a depositPct that is not an integer from 1 to 100', () => {
+    for (const bad of [0, 150, '50', 50.5, -10, null]) {
+      const c = clone();
+      c.services[0].tiers[1].depositPct = bad;
+      expect(() => validateCatalogue(c), String(bad)).toThrow(/catalogue: tier .* depositPct/);
+    }
+    for (const ok of [1, 50, 100]) {
+      const c = clone();
+      c.services[0].tiers[1].depositPct = ok;
+      expect(() => validateCatalogue(c)).not.toThrow();
+    }
+  });
+
   it('throws on non-object input and bad gst', () => {
     expect(() => validateCatalogue(null)).toThrow(/^catalogue:/);
     const c = clone();
@@ -125,6 +140,22 @@ describe('helpers', () => {
   it('withGst adds 18%', () => {
     expect(withGst(35000)).toBe(41300);
     expect(withGst(35000, 0.05)).toBe(36750);
+  });
+
+  it('the four buyable Growth tiers take a 50% deposit; every other tier is paid in full', () => {
+    const deposit = tiers.filter((t) => t.depositPct !== undefined).map((t) => t.id);
+    expect(deposit.sort()).toEqual(['content-growth', 'design-growth', 'websites-growth', 'whatsapp-growth']);
+    for (const id of deposit) expect(getTier(id)!.tier.depositPct).toBe(50);
+  });
+
+  it('depositFor and chargedNow: whole rupees, GST included', () => {
+    const growth = getTier('websites-growth')!.tier as typeof tiers[number] & { price: number };
+    const launch = getTier('websites-launch')!.tier as typeof tiers[number] & { price: number };
+    expect(depositFor(growth)).toBe(0.5);
+    expect(depositFor(launch)).toBe(1);
+    expect(chargedNow(growth)).toBe(56050);
+    expect(chargedNow(launch)).toBe(41300);
+    expect(chargedNow({ price: 1001, depositPct: 50 })).toBe(Math.round(withGst(1001) / 2));
   });
 
   it('getService and getTier look up by id', () => {

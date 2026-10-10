@@ -38,6 +38,7 @@
           "weeks": 4,
           "badge": "Recommended",
           "payment": "50% at checkout, 50% at launch",
+          "depositPct": 50,
           "includes": [
             "Up to 8 pages: home, services, about, contact and more",
             "Custom design system: colours, type and components",
@@ -231,6 +232,7 @@
           "weeks": 3,
           "badge": "Recommended",
           "payment": "50% at checkout, 50% at launch",
+          "depositPct": 50,
           "includes": [
             "Everything in Setup",
             "Automated lead capture and qualification flow",
@@ -296,6 +298,7 @@
           "weeks": 3,
           "badge": "Recommended",
           "payment": "50% at checkout, 50% at launch",
+          "depositPct": 50,
           "includes": [
             "Everything in Starter",
             "One idea repurposed for blog, LinkedIn, X and email",
@@ -360,6 +363,7 @@
           "weeks": 3,
           "badge": "Recommended",
           "payment": "50% at checkout, 50% at launch",
+          "depositPct": 50,
           "includes": [
             "Everything in Audit",
             "Redesign of up to 10 screens in Figma",

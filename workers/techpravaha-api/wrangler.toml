@@ -1,0 +1,23 @@
+name = "techpravaha-api"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+# Enable once api.techpravaha.com is on Cloudflare. Keep this above every [table]: TOML would
+# otherwise read it as a key of the table before it (e.g. a var inside [vars]).
+# routes = [{ pattern = "api.techpravaha.com/*", zone_name = "techpravaha.com" }]
+
+# Replace both ids with real namespaces before deploy:
+#   npx wrangler kv namespace create techpravaha-orders
+#   npx wrangler kv namespace create techpravaha-orders --preview
+[[kv_namespaces]]
+binding = "ORDERS"
+id = "REPLACE"
+preview_id = "REPLACE"
+
+[vars]
+ALLOWED_ORIGINS = "https://techpravaha.com,https://www.techpravaha.com,http://localhost:3000"
+FROM_EMAIL = "Tech Pravaha <hello@techpravaha.com>"
+ALERT_EMAIL = "yogesh@appropriatetechsolutions.com"
+# Optional, used in the receipt email. Leave unset until decided.
+# BOOKING_URL = "https://calendar.app.google/REPLACE"   # absolute https link to the kickoff booking page
+# WHATSAPP_NUMBER = "91XXXXXXXXXX"                       # digits with country code; placeholder is ignored

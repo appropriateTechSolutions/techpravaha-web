@@ -22,7 +22,7 @@ const seen = (isIntersecting: boolean) =>
 
 // TierCard reads VITE_WHATSAPP_NUMBER at module load (via lib/whatsapp), so each
 // case stubs the env and imports fresh modules.
-async function renderTier(tierId: string, number: string) {
+async function renderTier(tierId: string, number: string, cta?: 'whatsapp' | 'checkout') {
   vi.resetModules();
   vi.stubEnv('VITE_WHATSAPP_NUMBER', number);
   const { TierCard } = await import('../app/components/TierCard');
@@ -30,7 +30,7 @@ async function renderTier(tierId: string, number: string) {
   const { service, tier } = getTier(tierId)!;
   return render(
     <MemoryRouter>
-      <TierCard service={service} tier={tier} cta="whatsapp" />
+      <TierCard service={service} tier={tier} {...(cta ? { cta } : {})} />
     </MemoryRouter>,
   );
 }
@@ -46,10 +46,35 @@ afterEach(() => {
 });
 
 describe('TierCard', () => {
-  it('buyable tier: price, GST note and a wa.me link when the number is set', async () => {
+  it('buyable tier by default: links to /checkout/<id>/ and fires begin_checkout on click', async () => {
     const gtag = vi.fn();
     vi.stubGlobal('gtag', gtag);
     await renderTier('websites-launch', '919999999999');
+
+    expect(screen.getByText(formatINR(getTier('websites-launch')!.tier.price!))).toBeInTheDocument();
+    expect(screen.getByText('+18% GST')).toBeInTheDocument();
+
+    const cta = screen.getByRole('link', { name: 'Buy Launch' });
+    expect(cta).toHaveAttribute('href', '/checkout/websites-launch/');
+    expect(cta).not.toHaveAttribute('target');
+
+    const viewTier = () => gtag.mock.calls.filter(([, name]) => name === 'view_tier');
+    expect(viewTier()).toEqual([]);
+    seen(true);
+    expect(viewTier()).toEqual([['event', 'view_tier', { tier: 'websites-launch' }]]);
+    seen(true);
+    expect(viewTier()).toHaveLength(1);
+
+    cta.addEventListener('click', (e) => e.preventDefault()); // keep the router from navigating
+    cta.click();
+    expect(gtag).toHaveBeenCalledWith('event', 'begin_checkout', { tier: 'websites-launch', from: 'tier_card' });
+    expect(gtag.mock.calls.some(([, name]) => name === 'whatsapp_click')).toBe(false);
+  });
+
+  it('buyable tier with cta="whatsapp": price, GST note and a wa.me link when the number is set', async () => {
+    const gtag = vi.fn();
+    vi.stubGlobal('gtag', gtag);
+    await renderTier('websites-launch', '919999999999', 'whatsapp');
 
     expect(screen.getByText(formatINR(getTier('websites-launch')!.tier.price!))).toBeInTheDocument();
     expect(screen.getByText('+18% GST')).toBeInTheDocument();
@@ -73,10 +98,10 @@ describe('TierCard', () => {
     expect(gtag).toHaveBeenCalledWith('event', 'whatsapp_click', { tier: 'websites-launch' });
   });
 
-  it('buyable tier: links to /contact with the tier when the number is not set', async () => {
+  it('buyable tier with cta="whatsapp": links to /contact with the tier when the number is not set', async () => {
     const gtag = vi.fn();
     vi.stubGlobal('gtag', gtag);
-    await renderTier('websites-launch', '91XXXXXXXXXX');
+    await renderTier('websites-launch', '91XXXXXXXXXX', 'whatsapp');
 
     const cta = screen.getByRole('link', { name: /buy/i });
     expect(cta).toHaveAttribute('href', '/contact?tier=websites-launch');

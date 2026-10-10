@@ -1,0 +1,36 @@
+# Redeploys the commerce Worker when the catalogue or the Worker changes on main. The Worker bundles
+# catalogue.json at deploy time, so without this a merged price edit changes what the site shows but
+# not what the Worker charges (checkout then refuses the order rather than charge a different amount).
+# Needs the repo secrets CLOUDFLARE_API_TOKEN (Workers edit permission) and CLOUDFLARE_ACCOUNT_ID.
+name: Deploy Worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - catalogue.json
+      - workers/**
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-worker
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: workers/techpravaha-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: workers/techpravaha-api/package-lock.json
+      - run: npm ci
+      - run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

@@ -100,7 +100,7 @@ export default function Pricing() {
           </header>
           <div className="grid gap-6 lg:grid-cols-3">
             {s.tiers.map((t) => (
-              <TierCard key={t.id} service={s} tier={t} cta="whatsapp" />
+              <TierCard key={t.id} service={s} tier={t} />
             ))}
           </div>
         </section>

@@ -24,6 +24,31 @@ test('websites page shows the Launch price from the catalogue', async ({ page })
   await expect(page.getByText(inr.format(launch)).first()).toBeVisible();
 });
 
+test('checkout page shows the GST-inclusive total and the customer form', async ({ page }) => {
+  const catalogue = JSON.parse(readFileSync('catalogue.json', 'utf8'));
+  const launch: number = catalogue.services.find((s: { id: string }) => s.id === 'websites').tiers[0].price;
+  const inr = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/checkout/websites-launch/');
+  await page.waitForLoadState('networkidle');
+  const summary = page.getByRole('complementary', { name: 'Order summary' });
+  await expect(summary.getByText(inr.format(Math.round(launch * (1 + catalogue.gst))), { exact: true })).toBeVisible();
+  const form = page.getByRole('form', { name: 'Checkout' });
+  await expect(form).toBeVisible();
+  await expect(form.getByLabel('Email')).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+  // Checkout.js is injected only when the buyer presses Pay.
+  await expect(page.locator('script[src*="checkout.razorpay.com"]')).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test('sitemap leaves out checkout and thanks', async ({ request }) => {
+  const xml = await (await request.get('/sitemap.xml')).text();
+  expect(xml).not.toContain('/checkout/');
+  expect(xml).not.toContain('/thanks');
+});
+
 test('header WhatsApp control points at wa.me or /contact', async ({ page }) => {
   await page.goto('/');
   const control = page.locator('header').getByRole('link', { name: /WhatsApp/ });

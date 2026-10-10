@@ -1,13 +1,15 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { flushSync } from 'react-dom';
 import { useLocation, useSearchParams } from 'react-router';
-import { ArrowRight, CheckCircle, WarningCircle } from '@phosphor-icons/react';
+import { ArrowRight, CheckCircle } from '@phosphor-icons/react';
 import { track } from '../lib/analytics';
 import { getTier, type Service, type Tier } from '../lib/catalogue';
 import { useHydrated } from '../lib/motion';
-import { CONTACT_EMAIL } from '../lib/site';
+import { useOrderParam } from '../lib/orderParam';
+import { CONTACT_EMAIL, pagePath } from '../lib/site';
 import { WHATSAPP_NUMBER, waLink } from '../lib/whatsapp';
 import { submitLead } from '../services/leads';
+import { FieldError, FormField, INPUT_CLASS } from './ui/FormField';
 
 /**
  * The package named by `?tier=<tierId>`, or undefined. Prerendered HTML has no
@@ -46,21 +48,10 @@ export function validate(v: Values): Errors {
   return errors;
 }
 
-function FieldError({ id, children }: { id: string; children: string }) {
-  return (
-    <p id={id} className="mt-2 flex items-center gap-1.5 text-sm text-ink">
-      <WarningCircle size={16} weight="bold" aria-hidden="true" className="shrink-0" />
-      {children}
-    </p>
-  );
-}
-
-const INPUT =
-  'w-full rounded-xl border border-line-strong bg-surface px-4 py-3 text-ink placeholder:text-muted-2 transition-colors focus:border-ink aria-[invalid=true]:border-ink';
-
 export function ContactForm() {
   const picked = useQuotedTier();
-  const { pathname } = useLocation();
+  const orderId = useOrderParam();
+  const pathname = pagePath(useLocation().pathname);
   const uid = useId();
   const [values, setValues] = useState<Values>({ name: '', email: '', phone: '', message: '' });
   const [errors, setErrors] = useState<Errors>({});
@@ -72,8 +63,13 @@ export function ContactForm() {
     if (status === 'sent') statusRef.current?.focus();
   }, [status]);
 
-  // Prefill the message once the tier is known, without overwriting anything typed.
-  const prefill = picked ? `I'd like a quote for ${tierName(picked)}.` : '';
+  // Prefill the message once the order or tier is known, without overwriting anything typed.
+  // A paid order (from the /thanks intake link) wins; its tier still rides along in `tier`.
+  const prefill = orderId
+    ? `Order ${orderId}: here are my details and references.`
+    : picked
+      ? `I'd like a quote for ${tierName(picked)}.`
+      : '';
   useEffect(() => {
     if (prefill) setValues((v) => (v.message.trim() === '' ? { ...v, message: prefill } : v));
   }, [prefill]);
@@ -118,30 +114,17 @@ export function ContactForm() {
   const sending = status === 'sending';
   const fallbackMessage = `Hi Tech Pravaha, the form on your website didn't send. ${values.message.trim()}`.trim();
 
-  const field = (name: Field, label: string, extra: { type?: string; autoComplete?: string; optional?: boolean }) => {
-    const id = `${uid}-${name}`;
-    const err = errors[name];
-    return (
-      <div>
-        <label htmlFor={id} className="mb-2 block text-sm font-medium text-ink">
-          {label}
-          {extra.optional && <span className="font-normal text-muted"> (optional)</span>}
-        </label>
-        <input
-          id={id}
-          name={name}
-          type={extra.type ?? 'text'}
-          autoComplete={extra.autoComplete}
-          value={values[name]}
-          onChange={set(name)}
-          aria-invalid={err ? true : undefined}
-          aria-describedby={err ? `${id}-error` : undefined}
-          className={INPUT}
-        />
-        {err && <FieldError id={`${id}-error`}>{err}</FieldError>}
-      </div>
-    );
-  };
+  const field = (name: Field, label: string, extra: { type?: string; autoComplete?: string; optional?: boolean }) => (
+    <FormField
+      id={`${uid}-${name}`}
+      name={name}
+      label={label}
+      value={values[name]}
+      onChange={set(name)}
+      error={errors[name]}
+      {...extra}
+    />
+  );
 
   const messageId = `${uid}-message`;
   const sent = status === 'sent';
@@ -181,7 +164,7 @@ export function ContactForm() {
               aria-invalid={errors.message ? true : undefined}
               aria-describedby={errors.message ? `${messageId}-error` : undefined}
               placeholder="What do you want to launch, and by when?"
-              className={`${INPUT} resize-y`}
+              className={`${INPUT_CLASS} resize-y`}
             />
             {errors.message && <FieldError id={`${messageId}-error`}>{errors.message}</FieldError>}
           </div>

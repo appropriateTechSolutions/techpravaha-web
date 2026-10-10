@@ -1,0 +1,12 @@
+# Copy to .dev.vars for `wrangler dev`. Dummy values only; real secrets via `wrangler secret put`.
+RAZORPAY_KEY_ID=rzp_test_dummy
+RAZORPAY_KEY_SECRET=dummy_key_secret
+RAZORPAY_WEBHOOK_SECRET=dummy_webhook_secret
+RESEND_API_KEY=re_dummy
+SHEETS_WEBHOOK_URL=https://script.google.com/macros/s/DUMMY/exec
+SHEETS_WEBHOOK_TOKEN=dummy_sheets_token
+# Optional receipt-email vars (normally set in wrangler.toml [vars]):
+# BOOKING_URL=https://calendar.app.google/REPLACE
+# WHATSAPP_NUMBER=91XXXXXXXXXX
+# For the browser e2e (E2E_RAZORPAY=1) the site is served from :4173, so allow that origin:
+# ALLOWED_ORIGINS=http://localhost:4173,http://localhost:3000

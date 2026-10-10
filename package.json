@@ -13,7 +13,10 @@
     "typecheck": "react-router typegen && tsc",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "og": "tsx scripts/og.ts"
+    "og": "tsx scripts/og.ts",
+    "worker:dev": "npm --prefix workers/techpravaha-api run dev",
+    "worker:test": "npm --prefix workers/techpravaha-api run test",
+    "worker:deploy": "npm --prefix workers/techpravaha-api run deploy"
   },
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",

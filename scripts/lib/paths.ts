@@ -25,15 +25,31 @@ export const STATIC_PATHS = [
   '/404',
 ];
 
-/** Prerendered, but kept out of the sitemap and marked noindex. */
-export const NOINDEX_PATHS = ['/styleguide', '/404'];
+interface RawCatalogue {
+  services: { route: string; tiers: { id: string; buyable: boolean }[] }[];
+}
+
+function readCatalogue(): RawCatalogue {
+  return JSON.parse(readFileSync(join(ROOT, 'catalogue.json'), 'utf8')) as RawCatalogue;
+}
 
 function serviceRoutes(): string[] {
-  const raw = JSON.parse(readFileSync(join(ROOT, 'catalogue.json'), 'utf8')) as {
-    services: { route: string }[];
-  };
-  return raw.services.map((s) => s.route);
+  return readCatalogue().services.map((s) => s.route);
 }
+
+/** One checkout page per tier that can be bought online; quote-only tiers have none. */
+function checkoutRoutes(): string[] {
+  return readCatalogue()
+    .services.flatMap((s) => s.tiers)
+    .filter((t) => t.buyable)
+    .map((t) => `/checkout/${t.id}`);
+}
+
+/** Post-purchase page; reads `?order=` in the browser. */
+const THANKS_PATH = '/thanks';
+
+/** Prerendered, but kept out of the sitemap and marked noindex. */
+export const NOINDEX_PATHS = ['/styleguide', '/404', THANKS_PATH, ...checkoutRoutes()];
 
 /** Slugs from `slug: '...'` entries in app/content/work.ts (text scan; no TS loader in Node). */
 function workRoutes(): string[] {
@@ -52,5 +68,14 @@ function journalRoutes(): string[] {
 }
 
 export function prerenderPaths(): string[] {
-  return [...new Set([...STATIC_PATHS, ...serviceRoutes(), ...workRoutes(), ...journalRoutes()])];
+  return [
+    ...new Set([
+      ...STATIC_PATHS,
+      ...serviceRoutes(),
+      ...workRoutes(),
+      ...journalRoutes(),
+      ...checkoutRoutes(),
+      THANKS_PATH,
+    ]),
+  ];
 }

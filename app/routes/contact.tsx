@@ -1,5 +1,6 @@
 import { EnvelopeSimple } from '@phosphor-icons/react';
 import type { Route } from './+types/contact';
+import { useOrderParam } from '../lib/orderParam';
 import { CONTACT_EMAIL, HAS_BOOKING, pageMeta } from '../lib/site';
 import { tierMessage } from '../lib/whatsapp';
 import { BookCallButton } from '../components/BookCallButton';
@@ -23,7 +24,13 @@ const DEFAULT_MESSAGE = 'Hi Tech Pravaha, I want to talk about a project.';
 
 export default function Contact() {
   const picked = useQuotedTier();
-  const waMessage = picked ? tierMessage(picked.service.name, picked.tier.label, null) : DEFAULT_MESSAGE;
+  const orderId = useOrderParam();
+  // A paid order (the /thanks intake link) is not a quote request.
+  const waMessage = orderId
+    ? `Hi Tech Pravaha, order ${orderId}: here are my details and references.`
+    : picked
+      ? tierMessage(picked.service.name, picked.tier.label, null)
+      : DEFAULT_MESSAGE;
 
   return (
     <section className="mx-auto max-w-[1280px] px-6 pt-32 pb-24 md:pt-40 md:pb-28">

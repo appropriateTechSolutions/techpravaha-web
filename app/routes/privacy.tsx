@@ -53,11 +53,22 @@ const CLAUSES: Clause[] = [
   {
     title: 'Payments',
     body: (
-      <p>
-        When you buy a package, payment is handled by Razorpay. We do not see or store your card, UPI or
-        bank details. We receive your name, email, phone number, your GSTIN if you give it, and whether the
-        payment went through. We use these to issue your invoice, send your receipt and start the work.
-      </p>
+      <>
+        <p>
+          When you buy a package, payment is handled by Razorpay. We do not see or store your card, UPI or
+          bank details. We receive your name, email, phone number, your company and GSTIN if you give them,
+          and whether the payment went through. We use these to issue your invoice, send your receipt and
+          start the work.
+        </p>
+        <ul>
+          <li>Razorpay processes the payment.</li>
+          <li>Resend sends your receipt email.</li>
+          <li>
+            Cloudflare stores the order record in Workers KV. We keep it until you ask us to delete it.
+          </li>
+          <li>A copy of each paid order goes into a private Google Sheet that only Tech Pravaha can open.</li>
+        </ul>
+      </>
     ),
   },
   {
@@ -122,8 +133,8 @@ const CLAUSES: Clause[] = [
     body: (
       <p>
         Email <EmailLink /> to ask what data we hold about you, to correct it, or to have it deleted. We
-        delete it from our Sheet and inbox and confirm by email. Records we must keep by law, such as tax
-        invoices, are kept until that period ends.
+        delete it from our Sheets, our inbox and our order records in Cloudflare Workers KV, and confirm by
+        email. Records we must keep by law, such as tax invoices, are kept until that period ends.
       </p>
     ),
   },

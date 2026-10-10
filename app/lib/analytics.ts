@@ -1,6 +1,7 @@
 export type EventName =
   | 'view_tier'
   | 'begin_checkout'
+  | 'checkout_mismatch'
   | 'purchase'
   | 'whatsapp_click'
   | 'book_click'
